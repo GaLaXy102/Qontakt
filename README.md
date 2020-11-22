@@ -1,45 +1,104 @@
-**Edit a file, create a new file, and clone from Bitbucket in under 2 minutes**
+# Qontakt
 
-When you're done, you can delete the content in this README and update the file with details for others getting started with your repository.
+Qontakt ist eine Anwendung zur Nachverfolgung von Infektionsketten im Sinne des Infektionsschutzgesetzes. Öffentliche Orte wie Läden und Restaurants können Lokal-Profile erstellen. In diesen Lokalen können Endnutzer nach einmaliger Registrierung einchecken. Während des Aufenthaltes können sich Lokal-Inhaber mit einem QR-Code, welcher auf dem Endgerät des Kunden angezeigt wird, über die erfolgte Anmeldung informieren, sodass zusätzlich die analoge Kontaktverfolgung ermöglicht wird. Beim Verlassen eines Lokals muss der Kunde sich selbstständig auschecken. Wenn er dies nicht tut, erfolgt ein automatischer Check-Out jeweils zu einer vom Lokal-Inhaber bestimmten Uhrzeit (bspw. 03:30 Uhr). Zu dieser Uhrzeit werden außerdem alle Einträge, welcher älter sind als es die rechtliche Aufbewahrungsfrist vorsieht, gelöscht.
 
-*We recommend that you open this README in another tab as you perform the tasks below. You can [watch our video](https://youtu.be/0ocf7u76WSo) for a full demo of all the steps in this tutorial. Open the video in a new tab to avoid leaving Bitbucket.*
+## User Stories
 
----
+### U-N-00
 
-## Edit a file
+Ein Nutzer möchte sich gegenüber der Anwendung registrieren. Dafür gibt er folgende Daten an:
 
-You’ll start by editing this README file to learn how to edit a file in Bitbucket.
+* Name und Vorname
+* E-Mail-Adresse
+* Anwendungspasswort
+* Heimatbundesland und die erforderlichen Daten nach [Tab. 1]
 
-1. Click **Source** on the left side.
-2. Click the README.md link from the list of files.
-3. Click the **Edit** button.
-4. Delete the following text: *Delete this line to make a change to the README from Bitbucket.*
-5. After making your change, click **Commit** and then **Commit** again in the dialog. The commit page will open and you’ll see the change you just made.
-6. Go back to the **Source** page.
+Die Registrierung muss nicht vom Kunden per E-Mail bestätigt werden. [Zusatz: doch]
 
----
+Nur ein am System registrierter Nutzer kann sich am System anmelden.
 
-## Create a file
+### U-N-01
 
-Next, you’ll add a new file to this repository.
+Ein Nutzer möchte seinen Besuch in einem Qontakt-Lokal erfassen. Hierfür scannt er einen vom Lokal generierten QR-Code [U-L-05] am Eingang des Lokals und wird auf eine Willkommensseite weitergeleitet. Dort kann er sich registrieren [U-N-00] oder sich mit E-Mail-Adresse und Passwort anmelden. [Zusatz: Anonyme Check-Ins werden ebenfalls unterstützt.]
 
-1. Click the **New file** button at the top of the **Source** page.
-2. Give the file a filename of **contributors.txt**.
-3. Enter your name in the empty file space.
-4. Click **Commit** and then **Commit** again in the dialog.
-5. Go back to the **Source** page.
+Der Check-In wird vom Nutzer bestätigt, woraufhin er zur Hauptseite [U-N-02] weitergeleitet wird.
 
-Before you move on, go ahead and explore the repository. You've already seen the **Source** page, but check out the **Commits**, **Branches**, and **Settings** pages.
+### U-N-02
 
----
+Der Nutzer möchte sich Details zu in der Anwendung gespeicherten Daten anzeigen lassen. Auf der Hauptseite kann er seine Nutzerdaten einsehen und ändern, sowie eine Historie der gespeicherten Check-Ins für den Nutzer erhalten.
 
-## Clone a repository
+### U-N-03
 
-Use these steps to clone from SourceTree, our client for using the repository command-line free. Cloning allows you to work on your files locally. If you don't yet have SourceTree, [download and install first](https://www.sourcetreeapp.com/). If you prefer to clone from the command line, see [Clone a repository](https://confluence.atlassian.com/x/4whODQ).
+Der in einem Lokal eingecheckte Nutzer wird vom Personal aufgefordert, seinen Check-In nachzuweisen. Hierfür öffnet er auf der Hauptseite [U-N-02] seinen aktiven Check-In und bekommt einen QR-Code mit folgenden Informationen angezeigt:
 
-1. You’ll see the clone button under the **Source** heading. Click that button.
-2. Now click **Check out in SourceTree**. You may need to create a SourceTree account or log in.
-3. When you see the **Clone New** dialog in SourceTree, update the destination path and name if you’d like to and then click **Clone**.
-4. Open the directory you just created to see your repository’s files.
+* UUID des Nutzers [1]
+* UUID des Check-Ins [2]
+* Timestamp der Anforderung seit Epoch in Sekunden als 64-bit Integer [3]
 
-Now that you're more familiar with your Bitbucket repository, go ahead and add a new file locally. You can [push your change back to Bitbucket with SourceTree](https://confluence.atlassian.com/x/iqyBMg), or you can [add, commit,](https://confluence.atlassian.com/x/8QhODQ) and [push from the command line](https://confluence.atlassian.com/x/NQ0zDQ).
+Das Datenformat des kodierten Strings ist `///[1]/[2]//[3]///`.
+
+### U-N-04
+
+Der eingecheckte Nutzer möchte aus dem Lokal auschecken. Dafür scannt er erneut den QR-Code aus [U-N-01] und wird aufgrund des bestehenden Check-Ins auf die Übersichtsseite [U-N-02] weitergeleitet. Dort gibt es einen Button zum Durchführen des Check-Out. Nach dem Check-Out wird er auf die Übersichtsseite zurückgeleitet.
+
+### U-N-05
+
+Ein angemeldeter Nutzer kann sich am System abmelden.
+
+### U-L-01
+
+Jeder Nutzer möchte ein oder mehrere Lokal(e) anmelden können. Durch diese Aktion wird der anmeldende Nutzer zum **Lokal-Inhaber**. Hierfür müssen folgende Informationen eingegeben werden:
+
+* Name des Lokals
+* Anschrift und/oder Koordinaten
+* Benennung Datenschutzbeauftragter/Inhaber
+* E-Mail-Adresse
+* Auto-Checkout-Zeit
+* Bundesland (für die zu übergebenden Daten und die Aufbewahrungsfrist [siehe Tab. 1])
+
+Der Lokal-Inhaber bekommt eine UUID und ein Passwort für sein Lokal. Das Passwort wird nur gehasht gespeichert und kann dadurch nur einmal angezeigt werden und muss sicher notiert werden. Die UUID kann im Klartext gespeichert werden. Die Lokalverwaltungsseite wird dadurch freigeschaltet. Auf dieser kann ein Lokal-Inhaber im Namen des Lokals die untenstehenden User Stories [U-L-02], [U-L-03] und [U-L-04] durchführen.
+
+### U-L-02
+
+Um den Datenschutzanforderungen nachzukommen, möchte der Lokal-Inhaber Nutzerdaten löschen können. Dafür muss der Nutzer seine UUID (ein Pseudonym) dem Lokalinhaber mitteilen, welcher dann manuell die UUID eingibt und alle Besuche in einem von ihm verwalteten Lokal löscht. Hierbei sollte gemäß IfSG darauf hingewiesen werden, dass dadurch der Vorgang in Papierform übertragen wird.
+
+### U-L-03
+
+Der Laden-Inhaber möchte unter Einhaltung der Privatsphäre des Nutzers den Check-In eines Nutzers überprüfen. Dafür scannt er den QR-Code aus [U-N-03] und bekommt, falls der Check-In gültig ist, die Check-In-Zeit bestätigt. Ein Check-In ist gültig, wenn der Timestamp [3] nicht älter als 30 Sekunden ist UND der Check-In nicht älter ist als 24 Stunden UND es keinen mit dem Check-In asoziierten Check-Out gibt.
+
+### U-L-04
+
+Der Laden-Inhaber hat vom Gesundheitsamt die Aufforderung bekommen, Nutzerdaten preiszugeben. Der zu erstellende Datensatz ist eine Liste von Besuchen mit den folgenden Feldern:
+
+* Name und Vorname des Gastes
+* Persönliche Details je nach Bundesland
+* Datum sowie Check-In- und Check-Out-Zeit
+
+Um die Datensicherheit zu gewähren, wird die Datei mit dem öffentlichen RSA-Schlüssel des Gesundheitsamtes, welcher dem Lokalinhaber bspw. per E-Mail mitgeteilt wird und von diesem bei der Anfrage in die Anwendung geladen wird, verschlüsselt. Im Gesundheitsamt kann dieser Datensatz dann mit dem privaten Schlüssel entschlüsselt werden. Als Kryptosystem muss RSA mit 4096 bit langen Schlüsseln erzwungen werden.
+
+Die Ausgabe erfolgt als verschlüsselte CSV-Datei. [Zusatz: Ebenfalls wird ein verschlüsseltes PDF-Dokument erzeugt.]
+
+### Tabelle 1: Nachzuverfolgende Nutzerdaten nach Bundesland
+
+| Bundesland | Aufbewahrungsdauer | Daten                                                        | Stand      |
+| ---------- | ------------------ | ------------------------------------------------------------ | ---------- |
+| BW         | 28 Tage            | Vor- und Nachname, Anschrift, Datum und Zeitraum der Anwesenheit und, soweit vorhanden, die Telefonnummer | 18.11.2020 |
+| BY         | 31 Tage            | Vor- und Nachname, Datum und Zeitraum der Anwesenheit, sowie Telefonnummer oder E-Mail-Adresse oder Anschrift | 20.10.2020 |
+| BE         | 28 Tage            | Vor- und Nachname, Datum und Zeitraum der Anwesenheit, Wohnort, sowie Telefonnummer oder E-Mail-Adresse oder Anschrift | 17.11.2020 |
+| BB         | 28 Tage            | Vor- und Nachname, Datum und Zeitraum der Anwesenheit, sowie Telefonnummer oder E-Mail-Adresse oder Anschrift | 30.10.2020 |
+| HB         | 21 Tage            | Vor- und Nachname, Datum und Zeitraum der Anwesenheit, sowie Telefonnummer oder E-Mail-Adresse oder Anschrift | 31.10.2020 |
+| HH         | 28 Tage            | Vor- und Nachname, Anschrift, Datum und Zeitraum der Anwesenheit und, soweit vorhanden, die Telefonnummer | 23.11.2020 |
+| HE         | 31 Tage            | Vor- und Nachname, Anschrift, Datum und Zeitraum der Anwesenheit und, soweit vorhanden, die Telefonnummer | 15.05.2020 |
+| MV         | 28 Tage            | Vor- und Nachname, Anschrift, Datum und Zeitraum der Anwesenheit und, soweit vorhanden, die Telefonnummer | 11.05.2020 |
+| NI         | 21 Tage            | Vor- und Nachname, Anschrift, Datum und Zeitraum der Anwesenheit und, soweit vorhanden, die Telefonnummer | 02.11.2020 |
+| NW         | 28 Tage            | Vor- und Nachname, Anschrift, Datum und Zeitraum der Anwesenheit und, soweit vorhanden, die Telefonnummer | 06.11.2020 |
+| RP         | 31 Tage            | Vor- und Nachname, Anschrift, Datum und Zeitraum der Anwesenheit und, soweit vorhanden, die Telefonnummer | 09.06.2020 |
+| SL         | 31 Tage            | Vor- und Nachname, Datum und Zeitraum der Anwesenheit, Wohnort, sowie Telefonnummer oder E-Mail-Adresse oder Anschrift | 14.11.2020 |
+| SN         | 31 Tage            | Vor- und Nachname, Datum und Zeitraum der Anwesenheit, Wohnort, sowie Telefonnummer oder E-Mail-Adresse oder Anschrift | 10.11.2020 |
+| ST         | 28 Tage            | Vor- und Nachname, Datum und Zeitraum der Anwesenheit, vollständige Anschrift, Telefonnummer | 30.10.2020 |
+| SH         | 28 Tage            | Vor- und Nachname, Datum und Zeitraum der Anwesenheit, Anschrift, sowie Telefonnummer oder E-Mail-Adresse | 01.11.2020 |
+| TH         | 28 Tage            | Vor- und Nachname, Anschrift oder Telefonnummer, Datum und Zeitraum der Anwesenheit | 09.06.2020 |
+
+## Technische Spezifikation
+
+TODO
