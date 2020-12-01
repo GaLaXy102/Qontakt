@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="577ebf30-a68e-4efb-9688-54ea1afc8a6a" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/deploy/deploy.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/qontakt-host/qontakt-host.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/qontakt-user/qontakt-user.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/qontakt.iws" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="MavenImportPreferences">
+    <option name="generalSettings">
+      <MavenGeneralSettings>
+        <option name="mavenHome" value="$APPLICATION_HOME_DIR$/plugins/maven/lib/maven3" />
+      </MavenGeneralSettings>
+    </option>
+  </component>
+  <component name="ProjectId" id="1l3HIJvAPo6mRg5qRoGYj7Wl23e" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RequestMappingsPanelOrder0" value="0" />
+    <property name="RequestMappingsPanelOrder1" value="1" />
+    <property name="RequestMappingsPanelWidth0" value="75" />
+    <property name="RequestMappingsPanelWidth1" value="75" />
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="aspect.path.notification.shown" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/prepare-deploy.sh" />
+    <property name="nodejs_package_manager_path" value="npm" />
+    <property name="project.structure.last.edited" value="Modules" />
+    <property name="project.structure.proportion" value="0.15527344" />
+    <property name="project.structure.side.proportion" value="0.27816093" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/deploy" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/" />
+    </key>
+  </component>
+  <component name="RunDashboard">
+    <option name="configurationTypes">
+      <set>
+        <option value="SpringBootApplicationConfigurationType" />
+      </set>
+    </option>
+  </component>
+  <component name="RunManager" selected="Docker.docker-compose-insecure-local">
+    <configuration default="true" type="ArquillianTestNG" factoryName="" nameIsGenerated="true">
+      <option name="arquillianRunConfiguration">
+        <value>
+          <option name="containerStateName" value="" />
+        </value>
+      </option>
+      <option name="TEST_OBJECT" value="CLASS" />
+      <properties />
+      <listeners />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="package-host" type="MavenRunConfiguration" factoryName="Maven">
+      <MavenSettings>
+        <option name="myGeneralSettings" />
+        <option name="myRunnerSettings" />
+        <option name="myRunnerParameters">
+          <MavenRunnerParameters>
+            <option name="profiles">
+              <set />
+            </option>
+            <option name="goals">
+              <list>
+                <option value="package" />
+              </list>
+            </option>
+            <option name="pomFileName" />
+            <option name="profilesMap">
+              <map />
+            </option>
+            <option name="resolveToWorkspace" value="false" />
+            <option name="workingDirPath" value="$PROJECT_DIR$/qontakt-host" />
+          </MavenRunnerParameters>
+        </option>
+      </MavenSettings>
+      <method v="2" />
+    </configuration>
+    <configuration name="package-user" type="MavenRunConfiguration" factoryName="Maven">
+      <MavenSettings>
+        <option name="myGeneralSettings" />
+        <option name="myRunnerSettings" />
+        <option name="myRunnerParameters">
+          <MavenRunnerParameters>
+            <option name="profiles">
+              <set />
+            </option>
+            <option name="goals">
+              <list>
+                <option value="package" />
+              </list>
+            </option>
+            <option name="pomFileName" />
+            <option name="profilesMap">
+              <map />
+            </option>
+            <option name="resolveToWorkspace" value="false" />
+            <option name="workingDirPath" value="$PROJECT_DIR$/qontakt-user" />
+          </MavenRunnerParameters>
+        </option>
+      </MavenSettings>
+      <method v="2" />
+    </configuration>
+    <configuration name="QontaktHostApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+      <module name="qontakt-host" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="app.qontakt.host.QontaktHostApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="QontaktUserApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+      <module name="qontakt-user" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="app.qontakt.user.QontaktUserApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <list>
+      <item itemvalue="Docker.docker-compose-insecure-public" />
+      <item itemvalue="Docker.docker-compose-insecure-local" />
+      <item itemvalue="Maven.package-user" />
+      <item itemvalue="Maven.package-host" />
+      <item itemvalue="Shell Script.Copy children to Deploy" />
+      <item itemvalue="Spring Boot.QontaktHostApplication" />
+      <item itemvalue="Spring Boot.QontaktUserApplication" />
+    </list>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="577ebf30-a68e-4efb-9688-54ea1afc8a6a" name="Default Changelist" comment="" />
+      <created>1606818774063</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1606818774063</updated>
+      <workItem from="1606818775181" duration="506000" />
+      <workItem from="1606819285300" duration="1505000" />
+      <workItem from="1606823478421" duration="1626000" />
+      <workItem from="1606838199574" duration="5304000" />
+    </task>
+    <task id="LOCAL-00001" summary="Add Deploy Configuration">
+      <created>1606844628697</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1606844628697</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Add Deploy Configuration" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add Deploy Configuration" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="555" y="232" width="800" height="675" key="#Docker" timestamp="1606842531253">
+      <screen x="0" y="34" width="1920" height="1046" />
+    </state>
+    <state x="555" y="232" width="800" height="675" key="#Docker/0.34.1920.1046@0.34.1920.1046" timestamp="1606842531253" />
+    <state x="443" y="134" width="1024" height="843" key="#Project_Structure" timestamp="1606823708216">
+      <screen x="0" y="34" width="1920" height="1046" />
+    </state>
+    <state x="443" y="134" width="1024" height="843" key="#Project_Structure/0.34.1920.1046@0.34.1920.1046" timestamp="1606823708216" />
+    <state x="418" y="215" width="1117" height="704" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1606844188319">
+      <screen x="0" y="34" width="1920" height="1046" />
+    </state>
+    <state x="418" y="215" width="1117" height="704" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.34.1920.1046@0.34.1920.1046" timestamp="1606844188319" />
+    <state x="501" y="94" width="907" height="924" key="CommitChangelistDialog2" timestamp="1606844628600">
+      <screen x="0" y="34" width="1920" height="1046" />
+    </state>
+    <state x="501" y="94" width="907" height="924" key="CommitChangelistDialog2/0.34.1920.1046@0.34.1920.1046" timestamp="1606844628600" />
+    <state x="182" y="123" width="1536" height="864" key="DiffContextDialog" timestamp="1606844591183">
+      <screen x="0" y="34" width="1920" height="1046" />
+    </state>
+    <state x="182" y="123" width="1536" height="864" key="DiffContextDialog/0.34.1920.1046@0.34.1920.1046" timestamp="1606844591183" />
+    <state x="801" y="458" width="307" height="222" key="DockerComposeFileDialog" timestamp="1606842545672">
+      <screen x="0" y="34" width="1920" height="1046" />
+    </state>
+    <state x="801" y="458" width="307" height="222" key="DockerComposeFileDialog/0.34.1920.1046@0.34.1920.1046" timestamp="1606842545672" />
+    <state x="803" y="326" width="304" height="533" key="EnvironmentVariablesDialog" timestamp="1606842492510">
+      <screen x="0" y="34" width="1920" height="1046" />
+    </state>
+    <state x="803" y="326" width="304" height="533" key="EnvironmentVariablesDialog/0.34.1920.1046@0.34.1920.1046" timestamp="1606842492510" />
+    <state x="738" y="327" width="424" height="482" key="FileChooserDialogImpl" timestamp="1606843082689">
+      <screen x="0" y="34" width="1920" height="1046" />
+    </state>
+    <state x="738" y="327" width="424" height="482" key="FileChooserDialogImpl/0.34.1920.1046@0.34.1920.1046" timestamp="1606843082689" />
+    <state width="1874" height="276" key="GridCell.Tab.0.bottom" timestamp="1606844505982">
+      <screen x="0" y="34" width="1920" height="1046" />
+    </state>
+    <state width="1874" height="276" key="GridCell.Tab.0.bottom/0.34.1920.1046@0.34.1920.1046" timestamp="1606844505982" />
+    <state width="1874" height="276" key="GridCell.Tab.0.center" timestamp="1606844505981">
+      <screen x="0" y="34" width="1920" height="1046" />
+    </state>
+    <state width="1874" height="276" key="GridCell.Tab.0.center/0.34.1920.1046@0.34.1920.1046" timestamp="1606844505981" />
+    <state width="1874" height="276" key="GridCell.Tab.0.left" timestamp="1606844505981">
+      <screen x="0" y="34" width="1920" height="1046" />
+    </state>
+    <state width="1874" height="276" key="GridCell.Tab.0.left/0.34.1920.1046@0.34.1920.1046" timestamp="1606844505981" />
+    <state width="1874" height="276" key="GridCell.Tab.0.right" timestamp="1606844505982">
+      <screen x="0" y="34" width="1920" height="1046" />
+    </state>
+    <state width="1874" height="276" key="GridCell.Tab.0.right/0.34.1920.1046@0.34.1920.1046" timestamp="1606844505982" />
+    <state width="1291" height="276" key="GridCell.Tab.1.bottom" timestamp="1606823475856">
+      <screen x="0" y="34" width="1920" height="1046" />
+    </state>
+    <state width="1291" height="276" key="GridCell.Tab.1.bottom/0.34.1920.1046@0.34.1920.1046" timestamp="1606823475856" />
+    <state width="1291" height="276" key="GridCell.Tab.1.center" timestamp="1606823475856">
+      <screen x="0" y="34" width="1920" height="1046" />
+    </state>
+    <state width="1291" height="276" key="GridCell.Tab.1.center/0.34.1920.1046@0.34.1920.1046" timestamp="1606823475856" />
+    <state width="1291" height="276" key="GridCell.Tab.1.left" timestamp="1606823475855">
+      <screen x="0" y="34" width="1920" height="1046" />
+    </state>
+    <state width="1291" height="276" key="GridCell.Tab.1.left/0.34.1920.1046@0.34.1920.1046" timestamp="1606823475855" />
+    <state width="1291" height="276" key="GridCell.Tab.1.right" timestamp="1606823475856">
+      <screen x="0" y="34" width="1920" height="1046" />
+    </state>
+    <state width="1291" height="276" key="GridCell.Tab.1.right/0.34.1920.1046@0.34.1920.1046" timestamp="1606823475856" />
+    <state x="549" y="301" width="802" height="507" key="NewModule_or_Project.wizard" timestamp="1606823788780">
+      <screen x="0" y="34" width="1920" height="1046" />
+    </state>
+    <state x="549" y="301" width="802" height="507" key="NewModule_or_Project.wizard/0.34.1920.1046@0.34.1920.1046" timestamp="1606823788780" />
+    <state x="443" y="134" width="1024" height="843" key="SettingsEditor" timestamp="1606843300614">
+      <screen x="0" y="34" width="1920" height="1046" />
+    </state>
+    <state x="443" y="134" width="1024" height="843" key="SettingsEditor/0.34.1920.1046@0.34.1920.1046" timestamp="1606843300614" />
+    <state x="555" y="293" width="800" height="526" key="Vcs.Push.Dialog.v2" timestamp="1606844630078">
+      <screen x="0" y="34" width="1920" height="1046" />
+    </state>
+    <state x="555" y="293" width="800" height="526" key="Vcs.Push.Dialog.v2/0.34.1920.1046@0.34.1920.1046" timestamp="1606844630078" />
+  </component>
+</project>
