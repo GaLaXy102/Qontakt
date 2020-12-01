@@ -32,6 +32,28 @@
       <module name="qontakt-user" options="-parameters" />
     </option>
   </component>
+  <component name="JsonSchemaMappingsProjectConfiguration">
+    <state>
+      <map>
+        <entry key="compose-spec">
+          <value>
+            <SchemaInfo>
+              <option name="name" value="compose-spec" />
+              <option name="relativePathToSchema" value="https://raw.githubusercontent.com/compose-spec/compose-spec/master/schema/compose-spec.json" />
+              <option name="applicationDefined" value="true" />
+              <option name="patterns">
+                <list>
+                  <Item>
+                    <option name="path" value="deploy/docker-compose.yml" />
+                  </Item>
+                </list>
+              </option>
+            </SchemaInfo>
+          </value>
+        </entry>
+      </map>
+    </state>
+  </component>
   <component name="MavenProjectsManager">
     <option name="originalFiles">
       <list>
@@ -68,12 +90,75 @@
   </component>
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/deploy/deploy.iml" filepath="$PROJECT_DIR$/deploy/deploy.iml" />
       <module fileurl="file://$PROJECT_DIR$/qontakt-host/qontakt-host.iml" filepath="$PROJECT_DIR$/qontakt-host/qontakt-host.iml" />
       <module fileurl="file://$PROJECT_DIR$/qontakt-user/qontakt-user.iml" filepath="$PROJECT_DIR$/qontakt-user/qontakt-user.iml" />
     </modules>
   </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_14" default="false">
     <output url="file://$PROJECT_DIR$/out" />
+  </component>
+  <component name="ProjectRunConfigurationManager">
+    <configuration default="false" name="Copy children to Deploy" type="ShConfigurationType">
+      <option name="INDEPENDENT_SCRIPT_PATH" value="true" />
+      <option name="SCRIPT_PATH" value="$PROJECT_DIR$/prepare-deploy.sh" />
+      <option name="SCRIPT_OPTIONS" value="qontakt-host qontakt-user" />
+      <option name="INDEPENDENT_SCRIPT_WORKING_DIRECTORY" value="true" />
+      <option name="SCRIPT_WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="INDEPENDENT_INTERPRETER_PATH" value="true" />
+      <option name="INTERPRETER_PATH" value="/bin/bash" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <method v="2">
+        <option name="RunConfigurationTask" enabled="true" run_configuration_name="package-user" run_configuration_type="MavenRunConfiguration" />
+        <option name="RunConfigurationTask" enabled="true" run_configuration_name="package-host" run_configuration_type="MavenRunConfiguration" />
+      </method>
+    </configuration>
+    <configuration default="false" name="docker-compose-insecure-local" type="docker-deploy" factoryName="docker-compose.yml" server-name="Docker">
+      <deployment type="docker-compose.yml">
+        <settings>
+          <option name="envVars">
+            <list>
+              <DockerEnvVarImpl>
+                <option name="name" value="COMPOSE_PROJECT_NAME" />
+                <option name="value" value="qontakt-insecure" />
+              </DockerEnvVarImpl>
+              <DockerEnvVarImpl>
+                <option name="name" value="DOMAIN" />
+                <option name="value" value="localhost" />
+              </DockerEnvVarImpl>
+            </list>
+          </option>
+          <option name="commandLineOptions" value="--build" />
+          <option name="sourceFilePath" value="deploy/docker-compose-insecure.yml" />
+        </settings>
+      </deployment>
+      <method v="2">
+        <option name="RunConfigurationTask" enabled="true" run_configuration_name="Copy children to Deploy" run_configuration_type="ShConfigurationType" />
+      </method>
+    </configuration>
+    <configuration default="false" name="docker-compose-insecure-public" type="docker-deploy" factoryName="docker-compose.yml" server-name="Docker">
+      <deployment type="docker-compose.yml">
+        <settings>
+          <option name="envVars">
+            <list>
+              <DockerEnvVarImpl>
+                <option name="name" value="COMPOSE_PROJECT_NAME" />
+                <option name="value" value="qontakt-insecure" />
+              </DockerEnvVarImpl>
+              <DockerEnvVarImpl>
+                <option name="name" value="DOMAIN" />
+                <option name="value" value="qontakt.me" />
+              </DockerEnvVarImpl>
+            </list>
+          </option>
+          <option name="commandLineOptions" value="--build" />
+          <option name="sourceFilePath" value="deploy/docker-compose-insecure.yml" />
+        </settings>
+      </deployment>
+      <method v="2">
+        <option name="RunConfigurationTask" enabled="true" run_configuration_name="Copy children to Deploy" run_configuration_type="ShConfigurationType" />
+      </method>
+    </configuration>
   </component>
   <component name="RemoteRepositoriesConfiguration">
     <remote-repository>
@@ -160,6 +245,17 @@
       </JAVADOC>
       <SOURCES>
         <root url="jar://$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-databind/2.11.3/jackson-databind-2.11.3-sources.jar!/" />
+      </SOURCES>
+    </library>
+    <library name="Maven: com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.11.3">
+      <CLASSES>
+        <root url="jar://$MAVEN_REPOSITORY$/com/fasterxml/jackson/dataformat/jackson-dataformat-yaml/2.11.3/jackson-dataformat-yaml-2.11.3.jar!/" />
+      </CLASSES>
+      <JAVADOC>
+        <root url="jar://$MAVEN_REPOSITORY$/com/fasterxml/jackson/dataformat/jackson-dataformat-yaml/2.11.3/jackson-dataformat-yaml-2.11.3-javadoc.jar!/" />
+      </JAVADOC>
+      <SOURCES>
+        <root url="jar://$MAVEN_REPOSITORY$/com/fasterxml/jackson/dataformat/jackson-dataformat-yaml/2.11.3/jackson-dataformat-yaml-2.11.3-sources.jar!/" />
       </SOURCES>
     </library>
     <library name="Maven: com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.11.3">
@@ -283,6 +379,61 @@
         <root url="jar://$MAVEN_REPOSITORY$/com/zaxxer/HikariCP/3.4.5/HikariCP-3.4.5-sources.jar!/" />
       </SOURCES>
     </library>
+    <library name="Maven: io.github.classgraph:classgraph:4.8.44">
+      <CLASSES>
+        <root url="jar://$MAVEN_REPOSITORY$/io/github/classgraph/classgraph/4.8.44/classgraph-4.8.44.jar!/" />
+      </CLASSES>
+      <JAVADOC>
+        <root url="jar://$MAVEN_REPOSITORY$/io/github/classgraph/classgraph/4.8.44/classgraph-4.8.44-javadoc.jar!/" />
+      </JAVADOC>
+      <SOURCES>
+        <root url="jar://$MAVEN_REPOSITORY$/io/github/classgraph/classgraph/4.8.44/classgraph-4.8.44-sources.jar!/" />
+      </SOURCES>
+    </library>
+    <library name="Maven: io.swagger.core.v3:swagger-annotations:2.1.1">
+      <CLASSES>
+        <root url="jar://$MAVEN_REPOSITORY$/io/swagger/core/v3/swagger-annotations/2.1.1/swagger-annotations-2.1.1.jar!/" />
+      </CLASSES>
+      <JAVADOC>
+        <root url="jar://$MAVEN_REPOSITORY$/io/swagger/core/v3/swagger-annotations/2.1.1/swagger-annotations-2.1.1-javadoc.jar!/" />
+      </JAVADOC>
+      <SOURCES>
+        <root url="jar://$MAVEN_REPOSITORY$/io/swagger/core/v3/swagger-annotations/2.1.1/swagger-annotations-2.1.1-sources.jar!/" />
+      </SOURCES>
+    </library>
+    <library name="Maven: io.swagger.core.v3:swagger-core:2.1.1">
+      <CLASSES>
+        <root url="jar://$MAVEN_REPOSITORY$/io/swagger/core/v3/swagger-core/2.1.1/swagger-core-2.1.1.jar!/" />
+      </CLASSES>
+      <JAVADOC>
+        <root url="jar://$MAVEN_REPOSITORY$/io/swagger/core/v3/swagger-core/2.1.1/swagger-core-2.1.1-javadoc.jar!/" />
+      </JAVADOC>
+      <SOURCES>
+        <root url="jar://$MAVEN_REPOSITORY$/io/swagger/core/v3/swagger-core/2.1.1/swagger-core-2.1.1-sources.jar!/" />
+      </SOURCES>
+    </library>
+    <library name="Maven: io.swagger.core.v3:swagger-integration:2.1.1">
+      <CLASSES>
+        <root url="jar://$MAVEN_REPOSITORY$/io/swagger/core/v3/swagger-integration/2.1.1/swagger-integration-2.1.1.jar!/" />
+      </CLASSES>
+      <JAVADOC>
+        <root url="jar://$MAVEN_REPOSITORY$/io/swagger/core/v3/swagger-integration/2.1.1/swagger-integration-2.1.1-javadoc.jar!/" />
+      </JAVADOC>
+      <SOURCES>
+        <root url="jar://$MAVEN_REPOSITORY$/io/swagger/core/v3/swagger-integration/2.1.1/swagger-integration-2.1.1-sources.jar!/" />
+      </SOURCES>
+    </library>
+    <library name="Maven: io.swagger.core.v3:swagger-models:2.1.1">
+      <CLASSES>
+        <root url="jar://$MAVEN_REPOSITORY$/io/swagger/core/v3/swagger-models/2.1.1/swagger-models-2.1.1.jar!/" />
+      </CLASSES>
+      <JAVADOC>
+        <root url="jar://$MAVEN_REPOSITORY$/io/swagger/core/v3/swagger-models/2.1.1/swagger-models-2.1.1-javadoc.jar!/" />
+      </JAVADOC>
+      <SOURCES>
+        <root url="jar://$MAVEN_REPOSITORY$/io/swagger/core/v3/swagger-models/2.1.1/swagger-models-2.1.1-sources.jar!/" />
+      </SOURCES>
+    </library>
     <library name="Maven: jakarta.activation:jakarta.activation-api:1.2.2">
       <CLASSES>
         <root url="jar://$MAVEN_REPOSITORY$/jakarta/activation/jakarta.activation-api/1.2.2/jakarta.activation-api-1.2.2.jar!/" />
@@ -338,6 +489,17 @@
         <root url="jar://$MAVEN_REPOSITORY$/jakarta/xml/bind/jakarta.xml.bind-api/2.3.3/jakarta.xml.bind-api-2.3.3-sources.jar!/" />
       </SOURCES>
     </library>
+    <library name="Maven: javax.activation:javax.activation-api:1.2.0">
+      <CLASSES>
+        <root url="jar://$MAVEN_REPOSITORY$/javax/activation/javax.activation-api/1.2.0/javax.activation-api-1.2.0.jar!/" />
+      </CLASSES>
+      <JAVADOC>
+        <root url="jar://$MAVEN_REPOSITORY$/javax/activation/javax.activation-api/1.2.0/javax.activation-api-1.2.0-javadoc.jar!/" />
+      </JAVADOC>
+      <SOURCES>
+        <root url="jar://$MAVEN_REPOSITORY$/javax/activation/javax.activation-api/1.2.0/javax.activation-api-1.2.0-sources.jar!/" />
+      </SOURCES>
+    </library>
     <library name="Maven: javax.servlet:javax.servlet-api:4.0.1">
       <CLASSES>
         <root url="jar://$MAVEN_REPOSITORY$/javax/servlet/javax.servlet-api/4.0.1/javax.servlet-api-4.0.1.jar!/" />
@@ -347,6 +509,28 @@
       </JAVADOC>
       <SOURCES>
         <root url="jar://$MAVEN_REPOSITORY$/javax/servlet/javax.servlet-api/4.0.1/javax.servlet-api-4.0.1-sources.jar!/" />
+      </SOURCES>
+    </library>
+    <library name="Maven: javax.validation:validation-api:2.0.1.Final">
+      <CLASSES>
+        <root url="jar://$MAVEN_REPOSITORY$/javax/validation/validation-api/2.0.1.Final/validation-api-2.0.1.Final.jar!/" />
+      </CLASSES>
+      <JAVADOC>
+        <root url="jar://$MAVEN_REPOSITORY$/javax/validation/validation-api/2.0.1.Final/validation-api-2.0.1.Final-javadoc.jar!/" />
+      </JAVADOC>
+      <SOURCES>
+        <root url="jar://$MAVEN_REPOSITORY$/javax/validation/validation-api/2.0.1.Final/validation-api-2.0.1.Final-sources.jar!/" />
+      </SOURCES>
+    </library>
+    <library name="Maven: javax.xml.bind:jaxb-api:2.3.1">
+      <CLASSES>
+        <root url="jar://$MAVEN_REPOSITORY$/javax/xml/bind/jaxb-api/2.3.1/jaxb-api-2.3.1.jar!/" />
+      </CLASSES>
+      <JAVADOC>
+        <root url="jar://$MAVEN_REPOSITORY$/javax/xml/bind/jaxb-api/2.3.1/jaxb-api-2.3.1-javadoc.jar!/" />
+      </JAVADOC>
+      <SOURCES>
+        <root url="jar://$MAVEN_REPOSITORY$/javax/xml/bind/jaxb-api/2.3.1/jaxb-api-2.3.1-sources.jar!/" />
       </SOURCES>
     </library>
     <library name="Maven: net.bytebuddy:byte-buddy-agent:1.10.18">
@@ -391,6 +575,17 @@
       </JAVADOC>
       <SOURCES>
         <root url="jar://$MAVEN_REPOSITORY$/net/minidev/json-smart/2.3/json-smart-2.3-sources.jar!/" />
+      </SOURCES>
+    </library>
+    <library name="Maven: org.apache.commons:commons-lang3:3.11">
+      <CLASSES>
+        <root url="jar://$MAVEN_REPOSITORY$/org/apache/commons/commons-lang3/3.11/commons-lang3-3.11.jar!/" />
+      </CLASSES>
+      <JAVADOC>
+        <root url="jar://$MAVEN_REPOSITORY$/org/apache/commons/commons-lang3/3.11/commons-lang3-3.11-javadoc.jar!/" />
+      </JAVADOC>
+      <SOURCES>
+        <root url="jar://$MAVEN_REPOSITORY$/org/apache/commons/commons-lang3/3.11/commons-lang3-3.11-sources.jar!/" />
       </SOURCES>
     </library>
     <library name="Maven: org.apache.logging.log4j:log4j-api:2.13.3">
@@ -743,6 +938,39 @@
       </JAVADOC>
       <SOURCES>
         <root url="jar://$MAVEN_REPOSITORY$/org/slf4j/slf4j-api/1.7.30/slf4j-api-1.7.30-sources.jar!/" />
+      </SOURCES>
+    </library>
+    <library name="Maven: org.springdoc:springdoc-openapi-common:1.2.32">
+      <CLASSES>
+        <root url="jar://$MAVEN_REPOSITORY$/org/springdoc/springdoc-openapi-common/1.2.32/springdoc-openapi-common-1.2.32.jar!/" />
+      </CLASSES>
+      <JAVADOC>
+        <root url="jar://$MAVEN_REPOSITORY$/org/springdoc/springdoc-openapi-common/1.2.32/springdoc-openapi-common-1.2.32-javadoc.jar!/" />
+      </JAVADOC>
+      <SOURCES>
+        <root url="jar://$MAVEN_REPOSITORY$/org/springdoc/springdoc-openapi-common/1.2.32/springdoc-openapi-common-1.2.32-sources.jar!/" />
+      </SOURCES>
+    </library>
+    <library name="Maven: org.springdoc:springdoc-openapi-ui:1.2.32">
+      <CLASSES>
+        <root url="jar://$MAVEN_REPOSITORY$/org/springdoc/springdoc-openapi-ui/1.2.32/springdoc-openapi-ui-1.2.32.jar!/" />
+      </CLASSES>
+      <JAVADOC>
+        <root url="jar://$MAVEN_REPOSITORY$/org/springdoc/springdoc-openapi-ui/1.2.32/springdoc-openapi-ui-1.2.32-javadoc.jar!/" />
+      </JAVADOC>
+      <SOURCES>
+        <root url="jar://$MAVEN_REPOSITORY$/org/springdoc/springdoc-openapi-ui/1.2.32/springdoc-openapi-ui-1.2.32-sources.jar!/" />
+      </SOURCES>
+    </library>
+    <library name="Maven: org.springdoc:springdoc-openapi-webmvc-core:1.2.32">
+      <CLASSES>
+        <root url="jar://$MAVEN_REPOSITORY$/org/springdoc/springdoc-openapi-webmvc-core/1.2.32/springdoc-openapi-webmvc-core-1.2.32.jar!/" />
+      </CLASSES>
+      <JAVADOC>
+        <root url="jar://$MAVEN_REPOSITORY$/org/springdoc/springdoc-openapi-webmvc-core/1.2.32/springdoc-openapi-webmvc-core-1.2.32-javadoc.jar!/" />
+      </JAVADOC>
+      <SOURCES>
+        <root url="jar://$MAVEN_REPOSITORY$/org/springdoc/springdoc-openapi-webmvc-core/1.2.32/springdoc-openapi-webmvc-core-1.2.32-sources.jar!/" />
       </SOURCES>
     </library>
     <library name="Maven: org.springframework.boot:spring-boot-autoconfigure:2.4.0">
@@ -1117,6 +1345,39 @@
       </JAVADOC>
       <SOURCES>
         <root url="jar://$MAVEN_REPOSITORY$/org/springframework/spring-webmvc/5.3.1/spring-webmvc-5.3.1-sources.jar!/" />
+      </SOURCES>
+    </library>
+    <library name="Maven: org.webjars:swagger-ui:3.25.0">
+      <CLASSES>
+        <root url="jar://$MAVEN_REPOSITORY$/org/webjars/swagger-ui/3.25.0/swagger-ui-3.25.0.jar!/" />
+      </CLASSES>
+      <JAVADOC>
+        <root url="jar://$MAVEN_REPOSITORY$/org/webjars/swagger-ui/3.25.0/swagger-ui-3.25.0-javadoc.jar!/" />
+      </JAVADOC>
+      <SOURCES>
+        <root url="jar://$MAVEN_REPOSITORY$/org/webjars/swagger-ui/3.25.0/swagger-ui-3.25.0-sources.jar!/" />
+      </SOURCES>
+    </library>
+    <library name="Maven: org.webjars:webjars-locator-core:0.46">
+      <CLASSES>
+        <root url="jar://$MAVEN_REPOSITORY$/org/webjars/webjars-locator-core/0.46/webjars-locator-core-0.46.jar!/" />
+      </CLASSES>
+      <JAVADOC>
+        <root url="jar://$MAVEN_REPOSITORY$/org/webjars/webjars-locator-core/0.46/webjars-locator-core-0.46-javadoc.jar!/" />
+      </JAVADOC>
+      <SOURCES>
+        <root url="jar://$MAVEN_REPOSITORY$/org/webjars/webjars-locator-core/0.46/webjars-locator-core-0.46-sources.jar!/" />
+      </SOURCES>
+    </library>
+    <library name="Maven: org.webjars:webjars-locator:0.38">
+      <CLASSES>
+        <root url="jar://$MAVEN_REPOSITORY$/org/webjars/webjars-locator/0.38/webjars-locator-0.38.jar!/" />
+      </CLASSES>
+      <JAVADOC>
+        <root url="jar://$MAVEN_REPOSITORY$/org/webjars/webjars-locator/0.38/webjars-locator-0.38-javadoc.jar!/" />
+      </JAVADOC>
+      <SOURCES>
+        <root url="jar://$MAVEN_REPOSITORY$/org/webjars/webjars-locator/0.38/webjars-locator-0.38-sources.jar!/" />
       </SOURCES>
     </library>
     <library name="Maven: org.xmlunit:xmlunit-core:2.7.0">
