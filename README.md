@@ -80,24 +80,24 @@ Die Ausgabe erfolgt als verschlüsselte CSV-Datei. [Zusatz: Ebenfalls wird ein v
 
 ### Tabelle 1: Nachzuverfolgende Nutzerdaten nach Bundesland
 
-| Bundesland | Aufbewahrungsdauer | Daten                                                        | Stand      |
-| ---------- | ------------------ | ------------------------------------------------------------ | ---------- |
-| BW         | 28 Tage            | Vor- und Nachname, Anschrift, Datum und Zeitraum der Anwesenheit und, soweit vorhanden, die Telefonnummer | 18.11.2020 |
-| BY         | 31 Tage            | Vor- und Nachname, Datum und Zeitraum der Anwesenheit, sowie Telefonnummer oder E-Mail-Adresse oder Anschrift | 20.10.2020 |
-| BE         | 28 Tage            | Vor- und Nachname, Datum und Zeitraum der Anwesenheit, Wohnort, sowie Telefonnummer oder E-Mail-Adresse oder Anschrift | 17.11.2020 |
-| BB         | 28 Tage            | Vor- und Nachname, Datum und Zeitraum der Anwesenheit, sowie Telefonnummer oder E-Mail-Adresse oder Anschrift | 30.10.2020 |
-| HB         | 21 Tage            | Vor- und Nachname, Datum und Zeitraum der Anwesenheit, sowie Telefonnummer oder E-Mail-Adresse oder Anschrift | 31.10.2020 |
-| HH         | 28 Tage            | Vor- und Nachname, Anschrift, Datum und Zeitraum der Anwesenheit und, soweit vorhanden, die Telefonnummer | 23.11.2020 |
-| HE         | 31 Tage            | Vor- und Nachname, Anschrift, Datum und Zeitraum der Anwesenheit und, soweit vorhanden, die Telefonnummer | 15.05.2020 |
-| MV         | 28 Tage            | Vor- und Nachname, Anschrift, Datum und Zeitraum der Anwesenheit und, soweit vorhanden, die Telefonnummer | 11.05.2020 |
-| NI         | 21 Tage            | Vor- und Nachname, Anschrift, Datum und Zeitraum der Anwesenheit und, soweit vorhanden, die Telefonnummer | 02.11.2020 |
-| NW         | 28 Tage            | Vor- und Nachname, Anschrift, Datum und Zeitraum der Anwesenheit und, soweit vorhanden, die Telefonnummer | 06.11.2020 |
-| RP         | 31 Tage            | Vor- und Nachname, Anschrift, Datum und Zeitraum der Anwesenheit und, soweit vorhanden, die Telefonnummer | 09.06.2020 |
-| SL         | 31 Tage            | Vor- und Nachname, Datum und Zeitraum der Anwesenheit, Wohnort, sowie Telefonnummer oder E-Mail-Adresse oder Anschrift | 14.11.2020 |
-| SN         | 31 Tage            | Vor- und Nachname, Datum und Zeitraum der Anwesenheit, Wohnort, sowie Telefonnummer oder E-Mail-Adresse oder Anschrift | 10.11.2020 |
-| ST         | 28 Tage            | Vor- und Nachname, Datum und Zeitraum der Anwesenheit, vollständige Anschrift, Telefonnummer | 30.10.2020 |
-| SH         | 28 Tage            | Vor- und Nachname, Datum und Zeitraum der Anwesenheit, Anschrift, sowie Telefonnummer oder E-Mail-Adresse | 01.11.2020 |
-| TH         | 28 Tage            | Vor- und Nachname, Anschrift oder Telefonnummer, Datum und Zeitraum der Anwesenheit | 09.06.2020 |
+| Bundesland | Aufbewahrungsdauer | Name | Aufenthaltszeit | Wohnort | Anschrift | Telefonnummer | E-Mail    | Stand      |
+| ---------- | ------------------ | ---- | --------------- | ------- | --------- | ------------- | --------- | ---------- |
+| BW         | 28 Tage            | y    | y               | y       | y         | o             | n         | 18.11.2020 |
+| BY         | 31 Tage            | y    | y               | x       | x         | x             | x         | 20.10.2020 |
+| BE         | 28 Tage            | y    | y               | y       | x         | x             | x         | 17.11.2020 |
+| BB         | 28 Tage            | y    | y               | x       | x         | x             | x         | 30.10.2020 |
+| HB         | 21 Tage            | y    | y               | x       | x         | x             | x         | 31.10.2020 |
+| HH         | 28 Tage            | y    | y               | y       | y         | o             | n         | 23.11.2020 |
+| HE         | 31 Tage            | y    | y               | y       | y         | o             | n         | 15.05.2020 |
+| MV         | 28 Tage            | y    | y               | y       | y         | o             | n         | 11.05.2020 |
+| NI         | 21 Tage            | y    | y               | y       | y         | o             | n         | 02.11.2020 |
+| NW         | 28 Tage            | y    | y               | y       | y         | o             | n         | 06.11.2020 |
+| RP         | 31 Tage            | y    | y               | y       | y         | o             | n         | 09.06.2020 |
+| SL         | 31 Tage            | y    | y               | y       | x         | x             | x         | 14.11.2020 |
+| SN         | 31 Tage            | y    | y               | y       | x         | x             | x         | 10.11.2020 |
+| ST         | 28 Tage            | y    | y               | y       | y         | y             | n         | 30.10.2020 |
+| SH         | 28 Tage            | y    | y               | y       | y         | x             | x         | 01.11.2020 |
+| TH         | 28 Tage            | y    | y               | x       | x         | x             | n         | 09.06.2020 |
 
 ## Technische Spezifikation
 
