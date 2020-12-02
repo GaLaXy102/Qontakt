@@ -11,10 +11,10 @@ import java.util.Objects;
 
 @Entity
 @IdClass(FederalStateRuleSet.Code.class)
-class FederalStateRuleSet {
+public class FederalStateRuleSet {
 
     /* Primary Key */
-    static class Code implements Serializable {
+    public static class Code implements Serializable {
         private final String countryCode;
         private final String shortName;
 
