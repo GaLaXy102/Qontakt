@@ -18,4 +18,5 @@ public interface LokalDataRepository extends CrudRepository<LokalData, String> {
      */
     Streamable<LokalData> findAllByOwner(String owner);
 
+    Streamable<LokalData> findAll();
 }

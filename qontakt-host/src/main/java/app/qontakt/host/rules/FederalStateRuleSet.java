@@ -41,6 +41,24 @@ public class FederalStateRuleSet {
         public int hashCode() {
             return Objects.hash(countryCode, shortName);
         }
+
+        /**
+         * Getter for Code's countryCode
+         *
+         * @return countryCode as java.lang.String
+         */
+        public String getCountryCode() {
+            return this.countryCode;
+        }
+
+        /**
+         * Getter for Code's shortName
+         *
+         * @return shortName as java.lang.String
+         */
+        public String getShortName() {
+            return this.shortName;
+        }
     }
 
     /* Actual data structure */

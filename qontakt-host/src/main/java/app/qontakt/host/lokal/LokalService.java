@@ -1,10 +1,11 @@
 package app.qontakt.host.lokal;
 
+import app.qontakt.host.uihelper.LokalDataPublic;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -41,7 +42,7 @@ public class LokalService {
     @Transactional
     public String createLokal(LokalData data) {
         if (data.getLocal_uid() == null) {
-            data = new LokalData(data);
+            data = new LokalData(data, true);
         }
         if (this.lokalDataRepository.existsById(data.getLocal_uid())) {
             throw new IllegalArgumentException("Lokal exists already!");
@@ -73,5 +74,18 @@ public class LokalService {
         }
         return foundLokal.get().getOwner().equals(user_uid)
                 && this.passwordEncoder.matches(password, foundPassword.get().getHashedPassword());
+    }
+
+    /**
+     * Find all Lokals with the possiblity to restrict to a given user, yielding more information
+     * @param user_uid user_uid of Owner
+     * @return List of all Lokals, with missing checkoutTime and owner information when requesting all Lokals
+     */
+    public List<? extends LokalData> findAll(Optional<String> user_uid) {
+        if (user_uid.isEmpty()) {
+            return this.lokalDataRepository.findAll().map(LokalDataPublic::new).toList();
+        } else {
+            return this.lokalDataRepository.findAllByOwner(user_uid.get()).toList();
+        }
     }
 }

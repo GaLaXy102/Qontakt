@@ -13,13 +13,13 @@ public class LokalData {
 
     @Id
     private final String local_uid;
-    private final String name;
-    private final String address;
-    private final Point coordinates;
-    private final String owner;
-    private final String gdpr_contact;
-    private final LocalTime checkout_time;
-    private final FederalStateRuleSet.Code fed_state;
+    private String name;
+    private String address;
+    private Point coordinates;
+    private String owner;
+    private String gdpr_contact;
+    private LocalTime checkout_time;
+    private FederalStateRuleSet.Code fed_state;
 
     public LokalData(String name, String address, Point coordinates, String owner, String gdpr_contact,
                      LocalTime checkout_time, FederalStateRuleSet.Code fed_state) {
@@ -34,10 +34,10 @@ public class LokalData {
     }
 
     /**
-     * Generate a new Lokal with an overwritten UUID
+     * Generate a new Lokal with an optional overwritten UUID
      */
-    LokalData(LokalData old) {
-        this.local_uid = UUID.randomUUID().toString();
+    public LokalData(LokalData old, boolean overwriteUUID) {
+        this.local_uid = overwriteUUID ? UUID.randomUUID().toString() : old.local_uid;
         this.name = old.name;
         this.address = old.address;
         this.coordinates = old.coordinates;
@@ -128,5 +128,34 @@ public class LokalData {
      */
     public FederalStateRuleSet.Code getFed_state() {
         return this.fed_state;
+    }
+
+    /* Setters for Subclasses and update Method */
+    protected void setName(String name) {
+        this.name = name;
+    }
+
+    protected void setAddress(String address) {
+        this.address = address;
+    }
+
+    protected void setCoordinates(Point coordinates) {
+        this.coordinates = coordinates;
+    }
+
+    protected void setOwner(String owner) {
+        this.owner = owner;
+    }
+
+    protected void setGdpr_contact(String gdpr_contact) {
+        this.gdpr_contact = gdpr_contact;
+    }
+
+    protected void setCheckout_time(LocalTime checkout_time) {
+        this.checkout_time = checkout_time;
+    }
+
+    protected void setFed_state(FederalStateRuleSet.Code fed_state) {
+        this.fed_state = fed_state;
     }
 }
