@@ -23,7 +23,7 @@ public class RestController {
     /**
      * Check if User with the given UID is logged in
      *
-     * @param request
+     * @param request  incoming HTTP request
      * @param user_uid UID of the User
      * @return true if User is logged in
      */
@@ -40,7 +40,7 @@ public class RestController {
      *
      * @param user_uid  UID of the User
      * @param local_uid UID of the Lokal
-     * @param request
+     * @param request incoming HTTP request
      * @return true if creation of Visit is successful and User has no unterminated Visits
      */
     @PutMapping("/visit")
