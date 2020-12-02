@@ -39,6 +39,21 @@ services:
       - "traefik.http.routers.dashboard.entrypoints=web-alt"
       - "traefik.http.routers.dashboard.service=api@internal"
       - "traefik.http.routers.dashboard.tls=true"
+      - "traefik.http.middlewares.secHeaders.headers.accesscontrolallowcredentials=true"
+      - "traefik.http.middlewares.secHeaders.headers.accesscontrolallowheaders=*"
+      - "traefik.http.middlewares.secHeaders.headers.accesscontrolallowmethods=post,options"
+      - "traefik.http.middlewares.secHeaders.headers.accesscontrolalloworiginlist=${DOMAIN}"
+      - "traefik.http.middlewares.secHeaders.headers.accesscontrolalloworigin=${DOMAIN}"
+      - "traefik.http.middlewares.secHeaders.headers.framedeny=true"
+      - "traefik.http.middlewares.secHeaders.headers.sslredirect=true"
+      - "traefik.http.middlewares.secHeaders.headers.browserxssfilter=true"
+      - "traefik.http.middlewares.secHeaders.headers.contenttypenosniff=true"
+      - "traefik.http.middlewares.secHeaders.headers.referrerpolicy=strict-origin"
+      - "traefik.http.middlewares.secHeaders.headers.stspreload=true"
+      - "traefik.http.middlewares.secHeaders.headers.stsincludesubdomains=true"
+      - "traefik.http.middlewares.secHeaders.headers.customresponseheaders.X-Powered-By="
+      - "traefik.http.middlewares.secHeaders.headers.customresponseheaders.X-DNS-Prefetch-Control=off"
+      - "traefik.http.middlewares.secHeaders.headers.customresponseheaders.X-Permitted-Cross-Domain-Policies=none"
 
   host:
     build: qontakt-host
@@ -47,11 +62,14 @@ services:
       dmz:
         aliases:
           - q-host-service
+    environment:
+      - DOMAIN
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.q-host.rule=Host(`${DOMAIN}`) && PathPrefix(`/api/v1/host`)"
       - "traefik.http.routers.q-host.entrypoints=websecure"
       - "traefik.http.routers.q-host.tls=true"
+      - "traefik.http.routers.q-host.middlewares=secHeaders"
 
   user:
     build: qontakt-user
@@ -60,8 +78,11 @@ services:
       dmz:
         aliases:
           - q-user-service
+    environment:
+      - DOMAIN
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.q-user.rule=Host(`${DOMAIN}`) && PathPrefix(`/api/v1/user`)"
       - "traefik.http.routers.q-user.entrypoints=websecure"
       - "traefik.http.routers.q-user.tls=true"
+      - "traefik.http.routers.q-user.middlewares=secHeaders"
