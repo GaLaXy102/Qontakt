@@ -23,7 +23,7 @@ public class UserService {
      * @return true if User has unterminated Visits
      */
     private boolean hasOpenVisit(String user_uid) {
-        return !this.visitRepository.findAllByUserUidAndEndIsNull(user_uid).isEmpty();
+        return !this.visitRepository.findAllByUserUidAndCheckOutIsNull(user_uid).isEmpty();
     }
 
     /**
