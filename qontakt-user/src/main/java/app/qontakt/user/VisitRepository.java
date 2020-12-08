@@ -15,7 +15,7 @@ public interface VisitRepository extends CrudRepository<Visit, String> {
      * @param user_uid UID of the User
      * @return Streamable of all Visits belonging to the given User
      */
-    Streamable<Visit> findAllByUser_uid(String user_uid);
+    Streamable<Visit> findAllByUserUid(String user_uid);
 
     /**
      * Find all unterminated Visits for a given User
@@ -23,7 +23,7 @@ public interface VisitRepository extends CrudRepository<Visit, String> {
      * @param user_uid UID of the User
      * @return Streamable of all unterminated Visits belonging to the given User
      */
-    Streamable<Visit> findAllByUser_uidAndEndIsNull(String user_uid);
+    Streamable<Visit> findAllByUserUidAndEndIsNull(String user_uid);
 
     /**
      * Find all Visits for a given Lokal
@@ -31,5 +31,5 @@ public interface VisitRepository extends CrudRepository<Visit, String> {
      * @param lokal_uid UID of the Lokal
      * @return Streamable of all Visits belonging to the given Lokal
      */
-    Streamable<Visit> findAllByLokal_uid(String lokal_uid);
+    Streamable<Visit> findAllByLokalUid(String lokal_uid);
 }
