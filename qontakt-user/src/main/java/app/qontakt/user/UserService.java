@@ -3,6 +3,7 @@ package app.qontakt.user;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * Handle all transactions concerning Users
@@ -22,7 +23,7 @@ public class UserService {
      * @return true if User has unterminated Visits
      */
     private boolean hasOpenVisit(String user_uid) {
-        return !this.visitRepository.findAllByUserUidAndEndIsNull(user_uid).isEmpty();
+        return !this.visitRepository.findAllByUserUidAndCheckOutIsNull(user_uid).isEmpty();
     }
 
     /**
@@ -44,6 +45,16 @@ public class UserService {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    /**
+     * Get all Visits for the given User
+     *
+     * @param user_uid UID of the User
+     * @return List of Visits if the User already has some
+     */
+    public List<Visit> getVisits(String user_uid) {
+        return visitRepository.findAllByUserUid(user_uid).toList();
     }
 
 

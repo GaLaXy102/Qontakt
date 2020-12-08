@@ -23,7 +23,7 @@ public interface VisitRepository extends CrudRepository<Visit, String> {
      * @param user_uid UID of the User
      * @return Streamable of all unterminated Visits belonging to the given User
      */
-    Streamable<Visit> findAllByUserUidAndEndIsNull(String user_uid);
+    Streamable<Visit> findAllByUserUidAndCheckOutIsNull(String user_uid);
 
     /**
      * Find all Visits for a given Lokal
