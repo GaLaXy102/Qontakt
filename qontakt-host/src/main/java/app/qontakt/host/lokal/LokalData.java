@@ -1,6 +1,7 @@
 package app.qontakt.host.lokal;
 
 import app.qontakt.host.rules.FederalStateRuleSet;
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.data.geo.Point;
 
 import javax.persistence.Entity;
@@ -18,6 +19,7 @@ public class LokalData {
     private Point coordinates;
     private String owner;
     private String gdpr_contact;
+    @Schema(type = "string", example = "12:34:56")
     private LocalTime checkout_time;
     private FederalStateRuleSet.Code fed_state;
 

@@ -58,10 +58,10 @@ services:
         aliases:
           - q-host-service
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.q-host.rule=Host(`${DOMAIN}`) && PathPrefix(`/api/v1/host`)"
-      - "traefik.http.routers.q-host.entrypoints=websecure"
-      - "traefik.http.routers.q-host.tls=true"
+      traefik.enable: "true"
+      traefik.http.routers.q-host.rule: HostRegexp(`{prefix:[www\.]?}${DOMAIN}`) && PathPrefix(`/api/v1/host`)
+      traefik.http.routers.q-host.entrypoints: websecure
+      traefik.http.routers.q-host.tls: "true"
 
   user:
     build: qontakt-user
@@ -71,7 +71,7 @@ services:
         aliases:
           - q-user-service
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.q-user.rule=Host(`${DOMAIN}`) && PathPrefix(`/api/v1/user`)"
-      - "traefik.http.routers.q-user.entrypoints=websecure"
-      - "traefik.http.routers.q-user.tls=true"
+      traefik.enable: "true"
+      traefik.http.routers.q-user.rule: HostRegexp(`{prefix:[www\.]?}${DOMAIN}`) && PathPrefix(`/api/v1/user`)
+      traefik.http.routers.q-user.entrypoints: websecure
+      traefik.http.routers.q-user.tls: "true"
