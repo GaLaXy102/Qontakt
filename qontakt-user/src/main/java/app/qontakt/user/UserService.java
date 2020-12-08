@@ -61,6 +61,17 @@ public class UserService {
     }
 
     /**
+     * Get all Visits for the given User at a given Local
+     *
+     * @param user_uid UID of the User
+     * @param local_uid UID of the Local
+     * @return List of Visits
+     */
+    public List<Visit> getVisits(String user_uid, String local_uid) {
+        return this.visitRepository.findAllByUserUidAndLokalUid(user_uid, local_uid).toList();
+    }
+
+    /**
      * Delete a single Visit
      * @param user_uid UID of the User
      * @param visit_uid UID of the Visit

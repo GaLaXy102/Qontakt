@@ -11,6 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -30,6 +31,10 @@ public class RestController {
 
     private final UserService userService;
 
+    public RestController(UserService userService) {
+        this.userService = userService;
+    }
+
     /**
      * Check if User with the given UID is logged in
      *
@@ -43,10 +48,6 @@ public class RestController {
 
     public static boolean isAuthorized(HttpServletRequest request) {
         return request.getHeader("X-User") != null;
-    }
-
-    public RestController(UserService userService) {
-        this.userService = userService;
     }
 
     @Operation(summary = "Create a new Visit for the given User and Lokal.", security = @SecurityRequirement(name = "user-header"))
@@ -91,6 +92,30 @@ public class RestController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         }
         return ResponseEntity.ok(userService.getVisits(user_uid.get()));
+    }
+
+    @Operation(summary = "Get all Visits for the given User at a given Lokal.", security = @SecurityRequirement(name =
+            "user-header"))
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "401", description = "User has no Authorization", content = @Content),
+            @ApiResponse(responseCode = "403", description = "user_uid doesn't match Authorization header", content =
+            @Content),
+            @ApiResponse(responseCode = "200", description = "List of all Visits for the given User at the given Lokal",
+                    content = {
+                            @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = Visit.class))
+                    })
+    })
+    @GetMapping("/visit/{user_uid}")
+    ResponseEntity<List<Visit>> getVisitsForLokal(@PathVariable String user_uid, @RequestParam String local_uid,
+                                                  HttpServletRequest request) {
+        if (!RestController.isAuthorized(request)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+        if (!RestController.isAuthorized(request, user_uid)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+        return ResponseEntity.ok(this.userService.getVisits(user_uid, local_uid));
     }
 
     @Operation(summary = "Delete a single Visit.", security = @SecurityRequirement(name = "user-header"))

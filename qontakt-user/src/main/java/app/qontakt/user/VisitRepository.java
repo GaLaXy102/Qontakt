@@ -40,5 +40,5 @@ public interface VisitRepository extends CrudRepository<Visit, String> {
      * @param lokal_uid UID of the Lokal
      * @return Streamable of all Visits belonging to the given Lokal
      */
-    Streamable<Visit> findAllByLokalUid(String lokal_uid);
+    Streamable<Visit> findAllByUserUidAndLokalUid(String user_uid, String lokal_uid);
 }
