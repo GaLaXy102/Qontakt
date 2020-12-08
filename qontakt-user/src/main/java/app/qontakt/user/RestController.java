@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,6 +39,10 @@ public class RestController {
      */
     public static boolean isAuthorized(HttpServletRequest request, String user_uid) {
         return user_uid.equals(request.getHeader("X-User"));
+    }
+
+    public static boolean isAuthorized(HttpServletRequest request) {
+        return request.getHeader("X-User") != null;
     }
 
     public RestController(UserService userService) {
@@ -86,5 +91,28 @@ public class RestController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         }
         return ResponseEntity.ok(userService.getVisits(user_uid.get()));
+    }
+
+    @Operation(summary = "Delete a single Visit.", security = @SecurityRequirement(name = "user-header"))
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "401", description = "Missing Authorization Header", content = @Content),
+            @ApiResponse(responseCode = "403", description = "user_uid doesn't match Authorization header or Visit " +
+                    "with UID visit_uid doesn't belong to specified user_uid.", content = @Content),
+            @ApiResponse(responseCode = "200", description = "true -> Visit deleted; false -> No such Visit")
+    })
+    @DeleteMapping("/visit")
+    ResponseEntity<Boolean> deleteSingleVisit(@RequestParam String user_uid, @RequestParam String visit_uid,
+                                              HttpServletRequest request) {
+        if (!RestController.isAuthorized(request)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+        if (!RestController.isAuthorized(request, user_uid)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+        try {
+            return ResponseEntity.ok(this.userService.deleteVisit(user_uid, visit_uid));
+        } catch (IllegalAccessError e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
     }
 }

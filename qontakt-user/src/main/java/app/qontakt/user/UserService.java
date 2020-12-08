@@ -2,8 +2,10 @@ package app.qontakt.user;
 
 import org.springframework.stereotype.Component;
 
+import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Handle all transactions concerning Users
@@ -34,6 +36,7 @@ public class UserService {
      * @param time      current time as start of Visit
      * @return true if creation of Visit is successful and User has no unterminated Visits
      */
+    @Transactional
     public boolean saveVisit(String user_uid, String local_uid, LocalDateTime time) {
         //to be dealt with in Frontend
         if (hasOpenVisit(user_uid)) {
@@ -57,5 +60,22 @@ public class UserService {
         return visitRepository.findAllByUserUid(user_uid).toList();
     }
 
-
+    /**
+     * Delete a single Visit
+     * @param user_uid UID of the User
+     * @param visit_uid UID of the Visit
+     * @return true if and only if operation was successful
+     */
+    @Transactional
+    public boolean deleteVisit(String user_uid, String visit_uid) {
+        Optional<Visit> found = this.visitRepository.findByVisitUid(visit_uid);
+        if (found.isEmpty()) {
+            return false;
+        }
+        if (!user_uid.equals(found.get().getUserUid())) {
+            throw new IllegalAccessError("Visit does not belong to User.");
+        }
+        this.visitRepository.delete(found.get());
+        return true;
+    }
 }
