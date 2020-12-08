@@ -31,6 +31,10 @@ public class RestController {
         return user_uid.equals(request.getHeader("X-User"));
     }
 
+    public static boolean isAuthorized(HttpServletRequest request) {
+        return request.getHeader("X-User") != null;
+    }
+
     public RestController(UserService userService) {
         this.userService = userService;
     }
