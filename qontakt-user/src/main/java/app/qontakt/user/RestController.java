@@ -2,6 +2,7 @@ package app.qontakt.user;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -56,5 +58,23 @@ public class RestController {
         } else {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(false);
         }
+    }
+
+    /**
+     * Show all Visits for the given User
+     *
+     * @param user_uid UID of the User
+     * @param request  incoming HTTP request
+     * @return List of all Visits for the given User if he already has some
+     */
+    @GetMapping("/visit")
+    ResponseEntity<List<Visit>> showVisits(@RequestParam Optional<String> user_uid, HttpServletRequest request) {
+        if (user_uid.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+        if (!RestController.isAuthorized(request, user_uid.get())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+        return ResponseEntity.ok(userService.getVisits(user_uid.get()));
     }
 }
