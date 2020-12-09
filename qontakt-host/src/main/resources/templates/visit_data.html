@@ -1,0 +1,41 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<h3 style="text-align: center">
+    <span th:text="'Qontakt v'"></span> <!-- TODO -->
+</h3>
+<p>
+    <span th:text="${lokal.name} + ', ' + ${lokal.address} + ', ' + #{owner} + ': ' + ${lokal.owner} + ', ' +
+    #{gdpr_contact} + ': ' + ${lokal.gdpr_contact}"></span>
+</p>
+<p th:text="#{fed_state_rs} + ': ' + ${lokal.fed_state}"></p>
+<table>
+    <thead>
+    <tr>
+        <th th:text="#{firstname}"></th>
+        <th th:text="#{lastname}"></th>
+        <th th:text="#{checkin}"></th>
+        <th th:text="#{checkout}"></th>
+        <th th:text="#{homeaddress}"></th>
+        <th th:text="#{homezip}"></th>
+        <th th:text="#{homecity}"></th>
+        <th th:text="#{phone}"></th>
+        <th th:text="#{email}"></th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="visit : ${visits}">
+        <td th:text="${visit.getFirst().getFirstName()}"></td>
+        <td th:text="${visit.getFirst().getLastName()}"></td>
+        <td th:text="${visit.getSecond().getCheckIn()}"></td>
+        <td th:text="${visit.getSecond().getCheckOut()}"></td>
+        <td th:text="${visit.getFirst().getHomeAddress()}"></td>
+        <td th:text="${visit.getFirst().getHomeZip()}"></td>
+        <td th:text="${visit.getFirst().getHomeCity()}"></td>
+        <td th:text="${visit.getFirst().getTelephoneNumber()}"></td>
+        <td th:text="${visit.getFirst().getEmail()}"></td>
+    </tr>
+    </tbody>
+</table>
+<p th:text="${#execInfo.now}"></p>
+</body>
+</html>

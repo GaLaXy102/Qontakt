@@ -1,11 +1,27 @@
 package app.qontakt.host.lokal;
 
 import app.qontakt.host.uihelper.LokalDataPublic;
+import app.qontakt.host.uihelper.ThymeleafPdfPrinter;
+import app.qontakt.user.Visit;
+import app.qontakt.user.identity.QUserData;
+import com.lowagie.text.DocumentException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
 
+import java.io.ByteArrayOutputStream;
+import java.net.URI;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -78,6 +94,7 @@ public class LokalService {
 
     /**
      * Find all Lokals with the possiblity to restrict to a given user, yielding more information
+     *
      * @param user_uid user_uid of Owner
      * @return List of all Lokals, with missing checkoutTime and owner information when requesting all Lokals
      */
@@ -86,6 +103,33 @@ public class LokalService {
             return this.lokalDataRepository.findAll().map(LokalDataPublic::new).toList();
         } else {
             return this.lokalDataRepository.findAllByOwner(user_uid.get()).toList();
+        }
+    }
+
+    private QUserData getUserData(String userUid) {
+        WebClient client = WebClient.create("http://q-user-service:8080");
+        String remote = "/api/v1/user/identity";
+        return client.get()
+                .uri(uriBuilder -> uriBuilder.path(remote).queryParam("userUid", userUid).build())
+                .accept(MediaType.APPLICATION_JSON)
+                .header("X-User", userUid)
+                .retrieve()
+                .bodyToMono(QUserData.class)
+                .block();
+
+    }
+
+    public byte[] print(Locale locale, String lokalUid, Map<String, List<Visit>> visits) {
+        // Existence already checked
+        LokalData lokalData = this.lokalDataRepository.findById(lokalUid).orElse(null);
+        try {
+            Map<QUserData, List<Visit>> filledDataset = new HashMap<>();
+            visits.keySet().forEach(u -> {
+                filledDataset.put(this.getUserData(u), visits.get(u));
+            });
+            return ThymeleafPdfPrinter.renderContactTracingPdf(locale, lokalData, filledDataset);
+        } catch (DocumentException e) {
+            return new ByteArrayOutputStream().toByteArray();
         }
     }
 }

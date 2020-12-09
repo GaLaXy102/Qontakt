@@ -1,15 +1,19 @@
 package app.qontakt.host.lokal;
 
+import app.qontakt.user.Visit;
+import app.qontakt.user.identity.QUserData;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,7 +22,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -28,18 +35,18 @@ import java.util.Optional;
 @RequestMapping("/api/v1/host")
 public class LokalRestController {
 
+    private final LokalService lokalService;
+
+    public LokalRestController(LokalService lokalService) {
+        this.lokalService = lokalService;
+    }
+
     public static boolean isAuthorized(HttpServletRequest request, String user_uid) {
         return user_uid.equals(request.getHeader("X-User"));
     }
 
     public static boolean isAuthorized(HttpServletRequest request) {
         return request.getHeader("X-User") != null;
-    }
-
-    private final LokalService lokalService;
-
-    public LokalRestController(LokalService lokalService) {
-        this.lokalService = lokalService;
     }
 
     @Operation(summary = "Create a new Lokal", security = @SecurityRequirement(name = "user-header"))
@@ -73,7 +80,7 @@ public class LokalRestController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "401", description = "Missing Authorization header", content = @Content),
             @ApiResponse(responseCode = "403", description = "user_uid doesn't match Authorization header", content =
-                    @Content),
+            @Content),
             @ApiResponse(responseCode = "200", description = "List of all (owned) Lokals", content = {
                     @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
                             schema = @Schema(implementation = LokalData.class))
@@ -81,7 +88,7 @@ public class LokalRestController {
     })
     @GetMapping("/lokal")
     public ResponseEntity<List<? extends LokalData>> getLokals(@RequestParam Optional<String> user_uid,
-                                                     HttpServletRequest request) {
+                                                               HttpServletRequest request) {
         if (!LokalRestController.isAuthorized(request)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
@@ -89,5 +96,37 @@ public class LokalRestController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         }
         return ResponseEntity.ok(this.lokalService.findAll(user_uid));
+    }
+
+    @Operation(summary = "Get a PDF of all sent visits", security = @SecurityRequirement(name = "user-header"))
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "401", description = "Missing Authorization header", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Lokal's owner doesn't match Authorization header",
+                    content = @Content),
+            @ApiResponse(responseCode = "200", description = "PDF of all sent visits", content = {
+                    @Content(mediaType = MediaType.APPLICATION_PDF_VALUE)
+            })
+    })
+    @PostMapping("/lokal/print")
+    public ResponseEntity<byte[]> printVisitData(@RequestBody Map<String, List<Visit>> visits,
+                                                 @RequestParam String lokal_uid, @RequestParam String password,
+                                                 HttpServletRequest request) {
+        if (!LokalRestController.isAuthorized(request)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+        if (!this.lokalService.isAuthorized(request.getHeader("X-User"), lokal_uid, password)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+        String fileName = "report-"
+                + DateTimeFormatter.ISO_DATE_TIME.format(LocalDateTime.now())
+                + "-"
+                + lokal_uid
+                + ".pdf";
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentDispositionFormData(fileName, fileName);
+        headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
+        return ResponseEntity.ok().headers(headers).body(this.lokalService.print(request.getLocale(), lokal_uid,
+                visits));
     }
 }

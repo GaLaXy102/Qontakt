@@ -13,11 +13,16 @@ import java.util.UUID;
 public class LokalData {
 
     @Id
+    @Schema(hidden = true)
     private final String local_uid;
+    @Schema(example = "Zur Fröhlichen Reblaus")
     private String name;
+    @Schema(example = "Weinstraße 3, 01069 Dresden")
     private String address;
     private Point coordinates;
+    @Schema(example = "UID-of-Owner")
     private String owner;
+    @Schema(example = "gdpr@qontakt.me")
     private String gdpr_contact;
     @Schema(type = "string", example = "12:34:56")
     private LocalTime checkout_time;
