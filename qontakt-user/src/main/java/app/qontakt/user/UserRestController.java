@@ -27,11 +27,11 @@ import java.util.Optional;
  */
 @org.springframework.web.bind.annotation.RestController
 @RequestMapping("/api/v1/user")
-public class RestController {
+public class UserRestController {
 
     private final UserService userService;
 
-    public RestController(UserService userService) {
+    public UserRestController(UserService userService) {
         this.userService = userService;
     }
 
@@ -59,14 +59,14 @@ public class RestController {
             @ApiResponse(responseCode = "201", description = "The Visit with the given data was created.")
     })
     @PutMapping("/visit")
-    ResponseEntity<Boolean> newVisit(@RequestParam Optional<String> user_uid, @RequestParam String local_uid, HttpServletRequest request) {
-        if (user_uid.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(false);
+    ResponseEntity<Boolean> newVisit(@RequestParam String user_uid, @RequestParam String lokal_uid, HttpServletRequest request) {
+        if (!UserRestController.isAuthorized(request)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
-        if (!RestController.isAuthorized(request, user_uid.get())) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(false);
+        if (!UserRestController.isAuthorized(request, user_uid)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         }
-        if (userService.saveVisit(user_uid.get(), local_uid, LocalDateTime.now())) {
+        if (userService.saveVisit(user_uid, lokal_uid, LocalDateTime.now())) {
             return ResponseEntity.created(URI.create("")).body(true);
         } else {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(false);
@@ -84,14 +84,14 @@ public class RestController {
             })
     })
     @GetMapping("/visit")
-    ResponseEntity<List<Visit>> showVisits(@RequestParam Optional<String> user_uid, HttpServletRequest request) {
-        if (user_uid.isEmpty()) {
+    ResponseEntity<List<Visit>> showVisits(@RequestParam String user_uid, HttpServletRequest request) {
+        if (!UserRestController.isAuthorized(request)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
-        if (!RestController.isAuthorized(request, user_uid.get())) {
+        if (!UserRestController.isAuthorized(request, user_uid)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         }
-        return ResponseEntity.ok(userService.getVisits(user_uid.get()));
+        return ResponseEntity.ok(userService.getVisits(user_uid));
     }
 
     @Operation(summary = "Get all Visits for the given User at a given Lokal.", security = @SecurityRequirement(name =
@@ -109,10 +109,10 @@ public class RestController {
     @GetMapping("/visit/{user_uid}")
     ResponseEntity<List<Visit>> getVisitsForLokal(@PathVariable String user_uid, @RequestParam String local_uid,
                                                   HttpServletRequest request) {
-        if (!RestController.isAuthorized(request)) {
+        if (!UserRestController.isAuthorized(request)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
-        if (!RestController.isAuthorized(request, user_uid)) {
+        if (!UserRestController.isAuthorized(request, user_uid.get())) {  // TODO or (PREF) X-Lokal matches lokal_uid
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         }
         return ResponseEntity.ok(this.userService.getVisits(user_uid, local_uid));
@@ -128,10 +128,10 @@ public class RestController {
     @DeleteMapping("/visit")
     ResponseEntity<Boolean> deleteSingleVisit(@RequestParam String user_uid, @RequestParam String visit_uid,
                                               HttpServletRequest request) {
-        if (!RestController.isAuthorized(request)) {
+        if (!UserRestController.isAuthorized(request)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
-        if (!RestController.isAuthorized(request, user_uid)) {
+        if (!UserRestController.isAuthorized(request, user_uid)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         }
         try {
