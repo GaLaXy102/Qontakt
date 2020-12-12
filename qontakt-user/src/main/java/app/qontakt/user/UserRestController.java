@@ -9,12 +9,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
@@ -25,7 +20,7 @@ import java.util.Optional;
 /**
  * REST Controller for User administration
  */
-@org.springframework.web.bind.annotation.RestController
+@RestController
 @RequestMapping("/api/v1/user")
 public class UserRestController {
 
@@ -94,7 +89,7 @@ public class UserRestController {
         return ResponseEntity.ok(userService.getVisits(user_uid));
     }
 
-    @Operation(summary = "Get all Visits for the given User at a given Lokal.", security = @SecurityRequirement(name =
+    @Operation(summary = "Get all Visits at a given Lokal for the given User.", security = @SecurityRequirement(name =
             "user-header"))
     @ApiResponses(value = {
             @ApiResponse(responseCode = "401", description = "User has no Authorization", content = @Content),
@@ -106,8 +101,8 @@ public class UserRestController {
                                     schema = @Schema(implementation = Visit.class))
                     })
     })
-    @GetMapping("/visit/{user_uid}")
-    ResponseEntity<List<Visit>> getVisitsForLokal(@PathVariable String user_uid, @RequestParam String local_uid,
+    @GetMapping("/visit/{lokal_uid}")
+    ResponseEntity<List<Visit>> getVisitsForLokal(@RequestParam Optional<String> user_uid, @PathVariable String lokal_uid,
                                                   HttpServletRequest request) {
         if (!UserRestController.isAuthorized(request)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
@@ -115,7 +110,7 @@ public class UserRestController {
         if (!UserRestController.isAuthorized(request, user_uid.get())) {  // TODO or (PREF) X-Lokal matches lokal_uid
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         }
-        return ResponseEntity.ok(this.userService.getVisits(user_uid, local_uid));
+        return ResponseEntity.ok(this.userService.getVisits(lokal_uid, user_uid));
     }
 
     @Operation(summary = "Delete a single Visit.", security = @SecurityRequirement(name = "user-header"))

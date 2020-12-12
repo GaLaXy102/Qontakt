@@ -6,6 +6,8 @@ import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Handle all transactions concerning Users
@@ -32,18 +34,18 @@ public class UserService {
      * Create a new Visit for the given User and Lokal
      *
      * @param user_uid  UID of the User
-     * @param local_uid UID of the Lokal
+     * @param lokal_uid UID of the Lokal
      * @param time      current time as start of Visit
      * @return true if creation of Visit is successful and User has no unterminated Visits
      */
     @Transactional
-    public boolean saveVisit(String user_uid, String local_uid, LocalDateTime time) {
+    public boolean saveVisit(String user_uid, String lokal_uid, LocalDateTime time) {
         //to be dealt with in Frontend
         if (hasOpenVisit(user_uid)) {
             return false;
         }
         try {
-            visitRepository.save(new Visit(user_uid, local_uid, time));
+            visitRepository.save(new Visit(user_uid, lokal_uid, time));
             return true;
         } catch (Exception e) {
             return false;
@@ -61,14 +63,18 @@ public class UserService {
     }
 
     /**
-     * Get all Visits for the given User at a given Local
+     * Get all Visits for the given User at a given Lokal
      *
-     * @param user_uid UID of the User
-     * @param local_uid UID of the Local
+     * @param lokal_uid UID of the Lokal
+     * @param user_uid  UID of the User
      * @return List of Visits
      */
-    public List<Visit> getVisits(String user_uid, String local_uid) {
-        return this.visitRepository.findAllByUserUidAndLokalUid(user_uid, local_uid).toList();
+    public List<Visit> getVisits(String lokal_uid, Optional<String> user_uid) {
+        Stream<Visit> data = this.visitRepository.findAllByLokalUid(lokal_uid).stream();
+        return user_uid
+                .map(s -> data.filter(v -> v.getUserUid().equals(s)))
+                .orElse(data)
+                .collect(Collectors.toList());
     }
 
     /**
