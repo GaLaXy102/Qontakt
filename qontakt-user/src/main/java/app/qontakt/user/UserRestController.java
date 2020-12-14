@@ -31,6 +31,19 @@ public class UserRestController {
     }
 
     /**
+     * Check if User with the given UID is logged in or the given lokal is authorized
+     *
+     * @param request  incoming HTTP request
+     * @param lokalUid  UID of the Lokal
+     * @param user_uid UID of the User
+     * @return true if User is logged in or Lokal Header matches
+     */
+    public static boolean isAuthorized(HttpServletRequest request, String lokalUid, Optional<String> user_uid) {
+        return lokalUid.equals(request.getHeader("X-Lokal"))
+                || user_uid.map(s -> s.equals(request.getHeader("X-User"))).orElse(false);
+    }
+
+    /**
      * Check if User with the given UID is logged in
      *
      * @param request  incoming HTTP request
@@ -107,7 +120,7 @@ public class UserRestController {
         if (!UserRestController.isAuthorized(request)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
-        if (!UserRestController.isAuthorized(request, user_uid.get())) {  // TODO or (PREF) X-Lokal matches lokal_uid
+        if (!UserRestController.isAuthorized(request, lokal_uid, user_uid)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         }
         return ResponseEntity.ok(this.userService.getVisits(lokal_uid, user_uid));
