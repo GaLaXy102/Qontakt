@@ -17,7 +17,7 @@ public class FederalStateRuleSet {
 
     /* Primary Key */
     public static class Code implements Serializable {
-        @Schema(example = "DE")
+        @Schema(example = "DEU")
         private final String countryCode;
         @Schema(example = "SN")
         private final String shortName;
