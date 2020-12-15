@@ -4,6 +4,8 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.util.Streamable;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 /**
  * Repository to save data of Visits
  */
@@ -18,12 +20,19 @@ public interface VisitRepository extends CrudRepository<Visit, String> {
     Streamable<Visit> findAllByUserUid(String user_uid);
 
     /**
+     * Get a single Visit
+     * @param visit_uid UID of the Visit
+     * @return Optional of eventually found Visit
+     */
+    Optional<Visit> findByVisitUid(String visit_uid);
+
+    /**
      * Find all unterminated Visits for a given User
      *
      * @param user_uid UID of the User
      * @return Streamable of all unterminated Visits belonging to the given User
      */
-    Streamable<Visit> findAllByUserUidAndEndIsNull(String user_uid);
+    Streamable<Visit> findAllByUserUidAndCheckOutIsNull(String user_uid);
 
     /**
      * Find all Visits for a given Lokal

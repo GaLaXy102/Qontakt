@@ -30,7 +30,7 @@ public class QontaktUserApplication {
                         )
                 )
                 .addServersItem(new Server().url("https://localhost"))
-                .addServersItem(new Server().url("https://qontakt.me"))
+                .addServersItem(new Server().url("https://staging.qontakt.me"))
                 .info(new Info()
                         .title("Qontakt User Service")
                         .contact(new Contact()

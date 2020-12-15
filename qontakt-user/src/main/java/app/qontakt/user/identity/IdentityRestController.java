@@ -62,13 +62,13 @@ public class IdentityRestController {
     })
     @PostMapping("")
     public ResponseEntity<Boolean> updateUser(@RequestBody QUserData data, HttpServletRequest request) {
-        if (!app.qontakt.user.RestController.isAuthorized(request)) {
+        if (!app.qontakt.user.UserRestController.isAuthorized(request)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
         if (data.getUserUid() == null) {
             data.setUserUid(request.getHeader("X-User"));
         }
-        if (!app.qontakt.user.RestController.isAuthorized(request, data.getUserUid())) {
+        if (!app.qontakt.user.UserRestController.isAuthorized(request, data.getUserUid())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         }
         try {
@@ -87,10 +87,10 @@ public class IdentityRestController {
     })
     @GetMapping("")
     public ResponseEntity<QUserData> getUser(@RequestParam String userUid, HttpServletRequest request) {
-        if (!app.qontakt.user.RestController.isAuthorized(request)) {
+        if (!app.qontakt.user.UserRestController.isAuthorized(request)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
-        if (!app.qontakt.user.RestController.isAuthorized(request, userUid)) {
+        if (!app.qontakt.user.UserRestController.isAuthorized(request, userUid)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         }
         return ResponseEntity.ok(this.identityService.get(userUid));
@@ -107,10 +107,10 @@ public class IdentityRestController {
     })
     @DeleteMapping("")
     public ResponseEntity<Boolean> deleteUser(@RequestParam String userUid, HttpServletRequest request) {
-        if (!app.qontakt.user.RestController.isAuthorized(request)) {
+        if (!app.qontakt.user.UserRestController.isAuthorized(request)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
-        if (!app.qontakt.user.RestController.isAuthorized(request, userUid)) {
+        if (!app.qontakt.user.UserRestController.isAuthorized(request, userUid)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         }
         try {

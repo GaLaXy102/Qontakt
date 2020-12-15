@@ -11,66 +11,66 @@ public class Visit {
     private final String visitUid;
     private final String userUid;
     private final String lokalUid;
-    private final LocalDateTime start;
-    private LocalDateTime end;
+    private final LocalDateTime checkIn;
+    private LocalDateTime checkOut;
 
-    public Visit(String userUid, String lokalUid, LocalDateTime start) {
+    public Visit(String userUid, String lokalUid, LocalDateTime checkIn) {
         this.visitUid = UUID.randomUUID().toString();
         this.userUid = userUid;
         this.lokalUid = lokalUid;
-        this.start = start;
-        this.end = null;
+        this.checkIn = checkIn;
+        this.checkOut = null;
     }
 
     protected Visit() {
         this.visitUid = null;
         this.userUid = null;
         this.lokalUid = null;
-        this.start = null;
+        this.checkIn = null;
     }
 
     /**
-     * Getter for Visit's visit_uid
+     * Getter for Visit's visitUid
      *
-     * @return visit_uid as Java.lang.String
+     * @return visitUid as Java.lang.String
      */
     public String getVisitUid() {
         return visitUid;
     }
 
     /**
-     * Getter for Visit's user_uid
+     * Getter for Visit's userUid
      *
-     * @return user_uid as Java.lang.String
+     * @return userUid as Java.lang.String
      */
     public String getUserUid() {
         return userUid;
     }
 
     /**
-     * Getter for Visit's lokal_uid
+     * Getter for Visit's lokalUid
      *
-     * @return lokal_uid as Java.lang.String
+     * @return lokalUid as Java.lang.String
      */
     public String getLokalUid() {
         return lokalUid;
     }
 
     /**
-     * Getter for Visit's start time
+     * Getter for Visit's check in time
      *
-     * @return start time as Java.time.LocalDateTime
+     * @return check in time as Java.time.LocalDateTime
      */
-    public LocalDateTime getStart() {
-        return start;
+    public LocalDateTime getCheckIn() {
+        return checkIn;
     }
 
     /**
-     * Getter for Visit's end time
+     * Getter for Visit's check out time
      *
-     * @return end time as Java.time.LocalDateTime
+     * @return check out time as Java.time.LocalDateTime
      */
-    public LocalDateTime getEnd() {
-        return end;
+    public LocalDateTime getCheckOut() {
+        return checkOut;
     }
 }

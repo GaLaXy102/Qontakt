@@ -1,5 +1,7 @@
 package app.qontakt.host.rules;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -15,7 +17,9 @@ public class FederalStateRuleSet {
 
     /* Primary Key */
     public static class Code implements Serializable {
+        @Schema(example = "DEU")
         private final String countryCode;
+        @Schema(example = "SN")
         private final String shortName;
 
         public Code(String countryCode, String shortName) {
@@ -58,6 +62,11 @@ public class FederalStateRuleSet {
          */
         public String getShortName() {
             return this.shortName;
+        }
+
+        @Override
+        public String toString() {
+            return this.shortName + ", " + this.countryCode;
         }
     }
 
