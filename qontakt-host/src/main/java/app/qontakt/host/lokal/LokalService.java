@@ -5,19 +5,13 @@ import app.qontakt.host.uihelper.ThymeleafPdfPrinter;
 import app.qontakt.user.Visit;
 import app.qontakt.user.identity.QUserData;
 import com.lowagie.text.DocumentException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.io.ByteArrayOutputStream;
-import java.net.URI;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -58,10 +52,10 @@ public class LokalService {
      */
     @Transactional
     public String createLokal(LokalData data) {
-        if (data.getLocal_uid() == null) {
+        if (data.getLokalUid() == null) {
             data = new LokalData(data, true);
         }
-        if (this.lokalDataRepository.existsById(data.getLocal_uid())) {
+        if (this.lokalDataRepository.existsById(data.getLokalUid())) {
             throw new IllegalArgumentException("Lokal exists already!");
         }
         String password = UUID.randomUUID().toString();
@@ -73,13 +67,13 @@ public class LokalService {
     /**
      * Check whether a user with a given UID is entitled to administer a Lokal with a given UID
      *
-     * @param user_uid  User UID
-     * @param lokal_uid Lokal UID
+     * @param userUid  User UID
+     * @param lokalUid Lokal UID
      * @param password  Lokal Password
      * @return true if and only if the user is authorized to administer the Lokal
      */
-    public boolean isAuthorized(String user_uid, String lokal_uid, String password) {
-        Optional<LokalData> foundLokal = this.lokalDataRepository.findById(lokal_uid);
+    public boolean isAuthorized(String userUid, String lokalUid, String password) {
+        Optional<LokalData> foundLokal = this.lokalDataRepository.findById(lokalUid);
         if (foundLokal.isEmpty()) {
             // This Lokal does not exist.
             return false;
@@ -89,21 +83,21 @@ public class LokalService {
             // Lokal exists but has no password.
             throw new IllegalStateException("This Lokal has no password!");
         }
-        return foundLokal.get().getOwner().equals(user_uid)
+        return foundLokal.get().getOwner().equals(userUid)
                 && this.passwordEncoder.matches(password, foundPassword.get().getHashedPassword());
     }
 
     /**
      * Find all Lokals with the possiblity to restrict to a given user, yielding more information
      *
-     * @param user_uid user_uid of Owner
+     * @param userUid userUid of Owner
      * @return List of all Lokals, with missing checkoutTime and owner information when requesting all Lokals
      */
-    public List<? extends LokalData> findAll(Optional<String> user_uid) {
-        if (user_uid.isEmpty()) {
+    public List<? extends LokalData> findAll(Optional<String> userUid) {
+        if (userUid.isEmpty()) {
             return this.lokalDataRepository.findAll().map(LokalDataPublic::new).toList();
         } else {
-            return this.lokalDataRepository.findAllByOwner(user_uid.get()).toList();
+            return this.lokalDataRepository.findAllByOwner(userUid.get()).toList();
         }
     }
 

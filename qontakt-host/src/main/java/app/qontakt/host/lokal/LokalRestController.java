@@ -39,8 +39,8 @@ public class LokalRestController {
         this.lokalService = lokalService;
     }
 
-    public static boolean isAuthorized(HttpServletRequest request, String user_uid) {
-        return user_uid.equals(request.getHeader("X-User"));
+    public static boolean isAuthorized(HttpServletRequest request, String userUid) {
+        return userUid.equals(request.getHeader("X-User"));
     }
 
     public static boolean isAuthorized(HttpServletRequest request) {
@@ -73,11 +73,11 @@ public class LokalRestController {
         }
     }
 
-    @Operation(summary = "Get all Lokals. Level of detail depends on user_uid.", security =
+    @Operation(summary = "Get all Lokals. Level of detail depends on userUid.", security =
     @SecurityRequirement(name = "user-header"))
     @ApiResponses(value = {
             @ApiResponse(responseCode = "401", description = "Missing Authorization header", content = @Content),
-            @ApiResponse(responseCode = "403", description = "user_uid doesn't match Authorization header", content =
+            @ApiResponse(responseCode = "403", description = "userUid doesn't match Authorization header", content =
             @Content),
             @ApiResponse(responseCode = "200", description = "List of all (owned) Lokals", content = {
                     @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
@@ -85,15 +85,15 @@ public class LokalRestController {
             })
     })
     @GetMapping("/lokal")
-    public ResponseEntity<List<? extends LokalData>> getLokals(@RequestParam Optional<String> user_uid,
+    public ResponseEntity<List<? extends LokalData>> getLokals(@RequestParam Optional<String> userUid,
                                                                HttpServletRequest request) {
         if (!LokalRestController.isAuthorized(request)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
-        if (user_uid.isPresent() && !LokalRestController.isAuthorized(request, user_uid.get())) {
+        if (userUid.isPresent() && !LokalRestController.isAuthorized(request, userUid.get())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         }
-        return ResponseEntity.ok(this.lokalService.findAll(user_uid));
+        return ResponseEntity.ok(this.lokalService.findAll(userUid));
     }
 
     @Operation(summary = "Get a PDF of all sent visits", security = @SecurityRequirement(name = "user-header"))
@@ -106,24 +106,24 @@ public class LokalRestController {
     })
     @PostMapping("/lokal/print")
     public ResponseEntity<byte[]> printVisitData(@RequestBody List<Visit> visits,
-                                                 @RequestParam String lokal_uid, @RequestParam String password,
+                                                 @RequestParam String lokalUid, @RequestParam String password,
                                                  HttpServletRequest request) {
         if (!LokalRestController.isAuthorized(request)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
-        if (!this.lokalService.isAuthorized(request.getHeader("X-User"), lokal_uid, password)) {
+        if (!this.lokalService.isAuthorized(request.getHeader("X-User"), lokalUid, password)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         }
         String fileName = "report-"
                 + DateTimeFormatter.ISO_DATE_TIME.format(LocalDateTime.now())
                 + "-"
-                + lokal_uid
+                + lokalUid
                 + ".pdf";
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_PDF);
         headers.setContentDispositionFormData(fileName, fileName);
         headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
-        return ResponseEntity.ok().headers(headers).body(this.lokalService.print(request.getLocale(), lokal_uid,
+        return ResponseEntity.ok().headers(headers).body(this.lokalService.print(request.getLocale(), lokalUid,
                 visits));
     }
 }

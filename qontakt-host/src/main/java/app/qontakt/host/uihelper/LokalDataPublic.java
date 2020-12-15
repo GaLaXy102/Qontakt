@@ -9,6 +9,6 @@ public class LokalDataPublic extends LokalData {
     public LokalDataPublic(LokalData data) {
         super(data, false);
         this.setOwner(null);
-        this.setCheckout_time(null);
+        this.setCheckoutTime(null);
     }
 }

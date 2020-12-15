@@ -14,7 +14,7 @@ public class LokalData {
 
     @Id
     @Schema(hidden = true)
-    private final String local_uid;
+    private final String lokalUid;
     @Schema(example = "Zur Fröhlichen Reblaus")
     private String name;
     @Schema(example = "Weinstraße 3, 01069 Dresden")
@@ -23,55 +23,55 @@ public class LokalData {
     @Schema(example = "UID-of-Owner")
     private String owner;
     @Schema(example = "gdpr@qontakt.me")
-    private String gdpr_contact;
+    private String gdprContact;
     @Schema(type = "string", example = "12:34:56")
-    private LocalTime checkout_time;
-    private FederalStateRuleSet.Code fed_state;
+    private LocalTime checkoutTime;
+    private FederalStateRuleSet.Code federalState;
 
-    public LokalData(String name, String address, Point coordinates, String owner, String gdpr_contact,
-                     LocalTime checkout_time, FederalStateRuleSet.Code fed_state) {
-        this.local_uid = null;
+    public LokalData(String name, String address, Point coordinates, String owner, String gdprContact,
+                     LocalTime checkoutTime, FederalStateRuleSet.Code federalState) {
+        this.lokalUid = null;
         this.name = name;
         this.address = address;
         this.coordinates = coordinates;
         this.owner = owner;
-        this.gdpr_contact = gdpr_contact;
-        this.checkout_time = checkout_time;
-        this.fed_state = fed_state;
+        this.gdprContact = gdprContact;
+        this.checkoutTime = checkoutTime;
+        this.federalState = federalState;
     }
 
     /**
      * Generate a new Lokal with an optional overwritten UUID
      */
     public LokalData(LokalData old, boolean overwriteUUID) {
-        this.local_uid = overwriteUUID ? UUID.randomUUID().toString() : old.local_uid;
+        this.lokalUid = overwriteUUID ? UUID.randomUUID().toString() : old.lokalUid;
         this.name = old.name;
         this.address = old.address;
         this.coordinates = old.coordinates;
         this.owner = old.owner;
-        this.gdpr_contact = old.gdpr_contact;
-        this.checkout_time = old.checkout_time;
-        this.fed_state = old.fed_state;
+        this.gdprContact = old.gdprContact;
+        this.checkoutTime = old.checkoutTime;
+        this.federalState = old.federalState;
     }
 
     public LokalData() {
-        this.local_uid = null;
+        this.lokalUid = null;
         this.name = null;
         this.address = null;
         this.coordinates = null;
         this.owner = null;
-        this.gdpr_contact = null;
-        this.checkout_time = null;
-        this.fed_state = null;
+        this.gdprContact = null;
+        this.checkoutTime = null;
+        this.federalState = null;
     }
 
     /**
-     * Getter for LokalData's local_uid
+     * Getter for LokalData's lokalUid
      *
-     * @return local_uid as java.lang.String
+     * @return lokalUid as java.lang.String
      */
-    public String getLocal_uid() {
-        return this.local_uid;
+    public String getLokalUid() {
+        return this.lokalUid;
     }
 
     /**
@@ -115,8 +115,8 @@ public class LokalData {
      *
      * @return gdpr_contact as java.lang.String
      */
-    public String getGdpr_contact() {
-        return this.gdpr_contact;
+    public String getGdprContact() {
+        return this.gdprContact;
     }
 
     /**
@@ -124,8 +124,8 @@ public class LokalData {
      *
      * @return checkout_time as java.time.LocalTime
      */
-    public LocalTime getCheckout_time() {
-        return this.checkout_time;
+    public LocalTime getCheckoutTime() {
+        return this.checkoutTime;
     }
 
     /**
@@ -133,8 +133,8 @@ public class LokalData {
      *
      * @return fed_state as app.qontakt.host.rules.FederalStateRuleSet.Code
      */
-    public FederalStateRuleSet.Code getFed_state() {
-        return this.fed_state;
+    public FederalStateRuleSet.Code getFederalState() {
+        return this.federalState;
     }
 
     /* Setters for Subclasses and update Method */
@@ -154,15 +154,15 @@ public class LokalData {
         this.owner = owner;
     }
 
-    protected void setGdpr_contact(String gdpr_contact) {
-        this.gdpr_contact = gdpr_contact;
+    protected void setGdprContact(String gdpr_contact) {
+        this.gdprContact = gdpr_contact;
     }
 
-    protected void setCheckout_time(LocalTime checkout_time) {
-        this.checkout_time = checkout_time;
+    protected void setCheckoutTime(LocalTime checkout_time) {
+        this.checkoutTime = checkout_time;
     }
 
-    protected void setFed_state(FederalStateRuleSet.Code fed_state) {
-        this.fed_state = fed_state;
+    protected void setFederalState(FederalStateRuleSet.Code fed_state) {
+        this.federalState = fed_state;
     }
 }

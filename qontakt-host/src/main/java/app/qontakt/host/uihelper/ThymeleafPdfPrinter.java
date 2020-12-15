@@ -55,7 +55,7 @@ public class ThymeleafPdfPrinter {
         context.setVariable("lokal", lokal);
         List<Pair<QUserData, Visit>> visitList = ThymeleafPdfPrinter.sortChronological(visits);
         context.setVariable("visits", visitList);
-        LoggerFactory.getLogger(ThymeleafPdfPrinter.class).info("Printing [%d] datasets for %s.".formatted(visitList.size(), lokal.getLocal_uid()));
+        LoggerFactory.getLogger(ThymeleafPdfPrinter.class).info("Printing [%d] datasets for %s.".formatted(visitList.size(), lokal.getLokalUid()));
         String html = templateEngine.process("visit_data", context);
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         ITextRenderer renderer = new ITextRenderer();
