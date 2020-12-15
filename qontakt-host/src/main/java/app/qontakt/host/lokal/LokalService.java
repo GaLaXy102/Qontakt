@@ -19,6 +19,7 @@ import java.io.ByteArrayOutputStream;
 import java.net.URI;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -106,27 +107,48 @@ public class LokalService {
         }
     }
 
+    /**
+     * Get the identity data associated with a given userUid from our identity service
+     *
+     * @param userUid userUid to get information of
+     * @return Dataset of found user
+     */
     private QUserData getUserData(String userUid) {
         WebClient client = WebClient.create("http://q-user-service:8080");
         String remote = "/api/v1/user/identity";
         return client.get()
                 .uri(uriBuilder -> uriBuilder.path(remote).queryParam("userUid", userUid).build())
                 .accept(MediaType.APPLICATION_JSON)
-                .header("X-User", userUid)
+                .header("X-User", userUid)  // Spoofing User Header to allow access to identity data
                 .retrieve()
                 .bodyToMono(QUserData.class)
                 .block();
 
     }
 
-    public byte[] print(Locale locale, String lokalUid, Map<String, List<Visit>> visits) {
+    /**
+     * Print Data to PDF
+     *
+     * @param locale   Locale of Document to generate
+     * @param lokalUid Uid of Lokal for which the report is
+     * @param visits   List of Visit data
+     * @return PDF document
+     */
+    public byte[] print(Locale locale, String lokalUid, List<Visit> visits) {
         // Existence already checked
         LokalData lokalData = this.lokalDataRepository.findById(lokalUid).orElse(null);
+        // Map to User-specific data
+        Map<QUserData, List<Visit>> filledDataset = new HashMap<>();
+        visits.stream()
+                .filter(visit -> lokalUid.equals(visit.getLokalUid()))
+                .forEach(v -> {
+                            QUserData userData = this.getUserData(v.getUserUid());
+                            List<Visit> visitList = filledDataset.getOrDefault(userData, new LinkedList<>());
+                            visitList.add(v);
+                            filledDataset.put(userData, visitList);
+                        }
+                );
         try {
-            Map<QUserData, List<Visit>> filledDataset = new HashMap<>();
-            visits.keySet().forEach(u -> {
-                filledDataset.put(this.getUserData(u), visits.get(u));
-            });
             return ThymeleafPdfPrinter.renderContactTracingPdf(locale, lokalData, filledDataset);
         } catch (DocumentException e) {
             return new ByteArrayOutputStream().toByteArray();

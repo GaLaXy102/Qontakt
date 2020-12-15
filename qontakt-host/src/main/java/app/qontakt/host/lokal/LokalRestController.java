@@ -1,7 +1,6 @@
 package app.qontakt.host.lokal;
 
 import app.qontakt.user.Visit;
-import app.qontakt.user.identity.QUserData;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -25,7 +24,6 @@ import java.net.URI;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -103,12 +101,11 @@ public class LokalRestController {
             @ApiResponse(responseCode = "401", description = "Missing Authorization header", content = @Content),
             @ApiResponse(responseCode = "403", description = "Lokal's owner doesn't match Authorization header",
                     content = @Content),
-            @ApiResponse(responseCode = "200", description = "PDF of all sent visits", content = {
-                    @Content(mediaType = MediaType.APPLICATION_PDF_VALUE)
-            })
+            @ApiResponse(responseCode = "200", description = "PDF of all sent visits",
+                    content = @Content(mediaType = MediaType.APPLICATION_PDF_VALUE))
     })
     @PostMapping("/lokal/print")
-    public ResponseEntity<byte[]> printVisitData(@RequestBody Map<String, List<Visit>> visits,
+    public ResponseEntity<byte[]> printVisitData(@RequestBody List<Visit> visits,
                                                  @RequestParam String lokal_uid, @RequestParam String password,
                                                  HttpServletRequest request) {
         if (!LokalRestController.isAuthorized(request)) {

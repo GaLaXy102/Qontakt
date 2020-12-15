@@ -1,41 +1,573 @@
 <html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <style>
+        /**
+ * Specific Elements
+ */
+
+        #page-header {
+            display: inline;
+        }
+
+        #page-footer {
+            text-align: left;
+        }
+
+        /**
+         * Flying Saucer custom stuff
+         */
+
+        @page {
+            size: A4 landscape; /*letter landscape*/
+            background: white;
+            margin-top: 8em;
+            margin-bottom: 4em;
+
+            @top-center {
+                content: element(hdr);
+            }
+
+            @bottom-left {
+                content: element(ftr);
+            }
+        }
+
+        table {
+            -fs-table-paginate: paginate;
+            page-break-inside: avoid;
+        }
+
+        .table td .table th {
+            font-size: 7px;
+        }
+
+        table, th, td {
+            border: 1px solid black;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 5px;
+            text-align: left;
+        }
+    </style>
+</head>
 <body>
-<h3 style="text-align: center">
-    <span th:text="'Qontakt v'"></span> <!-- TODO -->
-</h3>
-<p>
-    <span th:text="${lokal.name} + ', ' + ${lokal.address} + ', ' + #{owner} + ': ' + ${lokal.owner} + ', ' +
-    #{gdpr_contact} + ': ' + ${lokal.gdpr_contact}"></span>
-</p>
-<p th:text="#{fed_state_rs} + ': ' + ${lokal.fed_state}"></p>
-<table>
-    <thead>
-    <tr>
-        <th th:text="#{firstname}"></th>
-        <th th:text="#{lastname}"></th>
-        <th th:text="#{checkin}"></th>
-        <th th:text="#{checkout}"></th>
-        <th th:text="#{homeaddress}"></th>
-        <th th:text="#{homezip}"></th>
-        <th th:text="#{homecity}"></th>
-        <th th:text="#{phone}"></th>
-        <th th:text="#{email}"></th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="visit : ${visits}">
-        <td th:text="${visit.getFirst().getFirstName()}"></td>
-        <td th:text="${visit.getFirst().getLastName()}"></td>
-        <td th:text="${visit.getSecond().getCheckIn()}"></td>
-        <td th:text="${visit.getSecond().getCheckOut()}"></td>
-        <td th:text="${visit.getFirst().getHomeAddress()}"></td>
-        <td th:text="${visit.getFirst().getHomeZip()}"></td>
-        <td th:text="${visit.getFirst().getHomeCity()}"></td>
-        <td th:text="${visit.getFirst().getTelephoneNumber()}"></td>
-        <td th:text="${visit.getFirst().getEmail()}"></td>
-    </tr>
-    </tbody>
-</table>
-<p th:text="${#execInfo.now}"></p>
+<div style="-fs-page-sequence: start">
+    <div style="position: running(hdr);">
+        <div id="page-header">
+            <h1 th:text="'Qontakt'">Qontakt</h1>
+            <p th:text="${lokal.name} + ', ' + ${lokal.address} + ', ' +
+    #{gdpr_contact} + ': ' + ${lokal.gdpr_contact} + '; ' + #{fed_state_rs} + ': ' + ${lokal.fed_state}">Zur
+                fr&ouml;hlichen Reblaus, Weinstra&szlig;e 3, 01069
+                Dresden,
+                Datenschutzbeauftragter: gdpr@qontakt.me; Regelsatz f&uuml;r Bundesland: SN, DEU</p>
+        </div>
+    </div>
+
+    <div style="position: running(ftr);">
+        <div id="page-footer">
+            <h3 th:text="#{generated.at} + ' ' + ${#dates.format(#dates.createNow(),'YYYY-MM-dd HH:mm')}">2020-12-14
+                23:59</h3>
+        </div>
+    </div>
+    <table>
+        <thead>
+        <tr>
+            <th th:text="#{firstname}">Vorname</th>
+            <th th:text="#{lastname}">Nachname</th>
+            <th th:text="#{checkin}">Check-In</th>
+            <th th:text="#{checkout}">Check-Out</th>
+            <th th:text="#{homeaddress}">Anschrift</th>
+            <th th:text="#{homezip}">PLZ</th>
+            <th th:text="#{homecity}">Stadt</th>
+            <th th:text="#{phone}">Telefonnummer</th>
+            <th th:text="#{email}">E-Mail-Adresse</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="visit : ${visits}">
+            <td th:text="${visit.getFirst().getFirstName()}">Sam</td>
+            <td th:text="${visit.getFirst().getLastName()}">Muster</td>
+            <td th:text="${#temporals.format(visit.getSecond().getCheckIn(), 'yyyy-MM-dd HH:mm')}">2020-12-14 12:34</td>
+            <td th:text="${#temporals.format(visit.getSecond().getCheckOut(), 'yyyy-MM-dd HH:mm')}">2020-12-14 13:37
+            </td>
+            <td th:text="${visit.getFirst().getHomeAddress()}">Musterstra&szlig;e 42</td>
+            <td th:text="${visit.getFirst().getHomeZip()}">01337</td>
+            <td th:text="${visit.getFirst().getHomeCity()}">Musterstadt</td>
+            <td th:text="${visit.getFirst().getTelephoneNumber()}">0123-456789</td>
+            <td th:text="${visit.getFirst().getEmail()}">sam.muster@qontakt.me</td>
+        </tr>
+        <tr>
+            <td>Langer Vorname</td>
+            <td>Langer Nachname</td>
+            <td>2020-12-14 12:34</td>
+            <td>2020-12-14 13:37
+            </td>
+            <td>Sehr lange Adresse, mit Zusatz</td>
+            <td>01337</td>
+            <td>Musterstadt OT Neurathshausen</td>
+            <td>0123-45678901234</td>
+            <td>langer_vorname.langer_nachname@mailbox.lange_domain.tld</td>
+        </tr>
+        <tr>
+            <td>Langer Vorname</td>
+            <td>Langer Nachname</td>
+            <td>2020-12-14 12:34</td>
+            <td>2020-12-14 13:37
+            </td>
+            <td>Sehr lange Adresse, mit Zusatz</td>
+            <td>01337</td>
+            <td>Musterstadt OT Neurathshausen</td>
+            <td>0123-45678901234</td>
+            <td>langer_vorname.langer_nachname@mailbox.lange_domain.tld</td>
+        </tr>
+        <tr>
+            <td>Langer Vorname</td>
+            <td>Langer Nachname</td>
+            <td>2020-12-14 12:34</td>
+            <td>2020-12-14 13:37
+            </td>
+            <td>Sehr lange Adresse, mit Zusatz</td>
+            <td>01337</td>
+            <td>Musterstadt OT Neurathshausen</td>
+            <td>0123-45678901234</td>
+            <td>langer_vorname.langer_nachname@mailbox.lange_domain.tld</td>
+        </tr>
+        <tr>
+            <td>Langer Vorname</td>
+            <td>Langer Nachname</td>
+            <td>2020-12-14 12:34</td>
+            <td>2020-12-14 13:37
+            </td>
+            <td>Sehr lange Adresse, mit Zusatz</td>
+            <td>01337</td>
+            <td>Musterstadt OT Neurathshausen</td>
+            <td>0123-45678901234</td>
+            <td>langer_vorname.langer_nachname@mailbox.lange_domain.tld</td>
+        </tr>
+        <tr>
+            <td>Langer Vorname</td>
+            <td>Langer Nachname</td>
+            <td>2020-12-14 12:34</td>
+            <td>2020-12-14 13:37
+            </td>
+            <td>Sehr lange Adresse, mit Zusatz</td>
+            <td>01337</td>
+            <td>Musterstadt OT Neurathshausen</td>
+            <td>0123-45678901234</td>
+            <td>langer_vorname.langer_nachname@mailbox.lange_domain.tld</td>
+        </tr>
+        <tr>
+            <td>Langer Vorname</td>
+            <td>Langer Nachname</td>
+            <td>2020-12-14 12:34</td>
+            <td>2020-12-14 13:37
+            </td>
+            <td>Sehr lange Adresse, mit Zusatz</td>
+            <td>01337</td>
+            <td>Musterstadt OT Neurathshausen</td>
+            <td>0123-45678901234</td>
+            <td>langer_vorname.langer_nachname@mailbox.lange_domain.tld</td>
+        </tr>
+        <tr>
+            <td>Langer Vorname</td>
+            <td>Langer Nachname</td>
+            <td>2020-12-14 12:34</td>
+            <td>2020-12-14 13:37
+            </td>
+            <td>Sehr lange Adresse, mit Zusatz</td>
+            <td>01337</td>
+            <td>Musterstadt OT Neurathshausen</td>
+            <td>0123-45678901234</td>
+            <td>langer_vorname.langer_nachname@mailbox.lange_domain.tld</td>
+        </tr>
+        <tr>
+            <td>Langer Vorname</td>
+            <td>Langer Nachname</td>
+            <td>2020-12-14 12:34</td>
+            <td>2020-12-14 13:37
+            </td>
+            <td>Sehr lange Adresse, mit Zusatz</td>
+            <td>01337</td>
+            <td>Musterstadt OT Neurathshausen</td>
+            <td>0123-45678901234</td>
+            <td>langer_vorname.langer_nachname@mailbox.lange_domain.tld</td>
+        </tr>
+        <tr>
+            <td>Langer Vorname</td>
+            <td>Langer Nachname</td>
+            <td>2020-12-14 12:34</td>
+            <td>2020-12-14 13:37
+            </td>
+            <td>Sehr lange Adresse, mit Zusatz</td>
+            <td>01337</td>
+            <td>Musterstadt OT Neurathshausen</td>
+            <td>0123-45678901234</td>
+            <td>langer_vorname.langer_nachname@mailbox.lange_domain.tld</td>
+        </tr>
+        <tr>
+            <td>Langer Vorname</td>
+            <td>Langer Nachname</td>
+            <td>2020-12-14 12:34</td>
+            <td>2020-12-14 13:37
+            </td>
+            <td>Sehr lange Adresse, mit Zusatz</td>
+            <td>01337</td>
+            <td>Musterstadt OT Neurathshausen</td>
+            <td>0123-45678901234</td>
+            <td>langer_vorname.langer_nachname@mailbox.lange_domain.tld</td>
+        </tr>
+        <tr>
+            <td>Langer Vorname</td>
+            <td>Langer Nachname</td>
+            <td>2020-12-14 12:34</td>
+            <td>2020-12-14 13:37
+            </td>
+            <td>Sehr lange Adresse, mit Zusatz</td>
+            <td>01337</td>
+            <td>Musterstadt OT Neurathshausen</td>
+            <td>0123-45678901234</td>
+            <td>langer_vorname.langer_nachname@mailbox.lange_domain.tld</td>
+        </tr>
+        <tr>
+            <td>Langer Vorname</td>
+            <td>Langer Nachname</td>
+            <td>2020-12-14 12:34</td>
+            <td>2020-12-14 13:37
+            </td>
+            <td>Sehr lange Adresse, mit Zusatz</td>
+            <td>01337</td>
+            <td>Musterstadt OT Neurathshausen</td>
+            <td>0123-45678901234</td>
+            <td>langer_vorname.langer_nachname@mailbox.lange_domain.tld</td>
+        </tr>
+        <tr>
+            <td>Langer Vorname</td>
+            <td>Langer Nachname</td>
+            <td>2020-12-14 12:34</td>
+            <td>2020-12-14 13:37
+            </td>
+            <td>Sehr lange Adresse, mit Zusatz</td>
+            <td>01337</td>
+            <td>Musterstadt OT Neurathshausen</td>
+            <td>0123-45678901234</td>
+            <td>langer_vorname.langer_nachname@mailbox.lange_domain.tld</td>
+        </tr>
+        <tr>
+            <td>Langer Vorname</td>
+            <td>Langer Nachname</td>
+            <td>2020-12-14 12:34</td>
+            <td>2020-12-14 13:37
+            </td>
+            <td>Sehr lange Adresse, mit Zusatz</td>
+            <td>01337</td>
+            <td>Musterstadt OT Neurathshausen</td>
+            <td>0123-45678901234</td>
+            <td>langer_vorname.langer_nachname@mailbox.lange_domain.tld</td>
+        </tr>
+        <tr>
+            <td>Langer Vorname</td>
+            <td>Langer Nachname</td>
+            <td>2020-12-14 12:34</td>
+            <td>2020-12-14 13:37
+            </td>
+            <td>Sehr lange Adresse, mit Zusatz</td>
+            <td>01337</td>
+            <td>Musterstadt OT Neurathshausen</td>
+            <td>0123-45678901234</td>
+            <td>langer_vorname.langer_nachname@mailbox.lange_domain.tld</td>
+        </tr>
+        <tr>
+            <td>Langer Vorname</td>
+            <td>Langer Nachname</td>
+            <td>2020-12-14 12:34</td>
+            <td>2020-12-14 13:37
+            </td>
+            <td>Sehr lange Adresse, mit Zusatz</td>
+            <td>01337</td>
+            <td>Musterstadt OT Neurathshausen</td>
+            <td>0123-45678901234</td>
+            <td>langer_vorname.langer_nachname@mailbox.lange_domain.tld</td>
+        </tr>
+        <tr>
+            <td>Langer Vorname</td>
+            <td>Langer Nachname</td>
+            <td>2020-12-14 12:34</td>
+            <td>2020-12-14 13:37
+            </td>
+            <td>Sehr lange Adresse, mit Zusatz</td>
+            <td>01337</td>
+            <td>Musterstadt OT Neurathshausen</td>
+            <td>0123-45678901234</td>
+            <td>langer_vorname.langer_nachname@mailbox.lange_domain.tld</td>
+        </tr>
+        <tr>
+            <td>Langer Vorname</td>
+            <td>Langer Nachname</td>
+            <td>2020-12-14 12:34</td>
+            <td>2020-12-14 13:37
+            </td>
+            <td>Sehr lange Adresse, mit Zusatz</td>
+            <td>01337</td>
+            <td>Musterstadt OT Neurathshausen</td>
+            <td>0123-45678901234</td>
+            <td>langer_vorname.langer_nachname@mailbox.lange_domain.tld</td>
+        </tr>
+        <tr>
+            <td>Langer Vorname</td>
+            <td>Langer Nachname</td>
+            <td>2020-12-14 12:34</td>
+            <td>2020-12-14 13:37
+            </td>
+            <td>Sehr lange Adresse, mit Zusatz</td>
+            <td>01337</td>
+            <td>Musterstadt OT Neurathshausen</td>
+            <td>0123-45678901234</td>
+            <td>langer_vorname.langer_nachname@mailbox.lange_domain.tld</td>
+        </tr>
+        <tr>
+            <td>Langer Vorname</td>
+            <td>Langer Nachname</td>
+            <td>2020-12-14 12:34</td>
+            <td>2020-12-14 13:37
+            </td>
+            <td>Sehr lange Adresse, mit Zusatz</td>
+            <td>01337</td>
+            <td>Musterstadt OT Neurathshausen</td>
+            <td>0123-45678901234</td>
+            <td>langer_vorname.langer_nachname@mailbox.lange_domain.tld</td>
+        </tr>
+        <tr>
+            <td>Langer Vorname</td>
+            <td>Langer Nachname</td>
+            <td>2020-12-14 12:34</td>
+            <td>2020-12-14 13:37
+            </td>
+            <td>Sehr lange Adresse, mit Zusatz</td>
+            <td>01337</td>
+            <td>Musterstadt OT Neurathshausen</td>
+            <td>0123-45678901234</td>
+            <td>langer_vorname.langer_nachname@mailbox.lange_domain.tld</td>
+        </tr>
+        <tr>
+            <td>Langer Vorname</td>
+            <td>Langer Nachname</td>
+            <td>2020-12-14 12:34</td>
+            <td>2020-12-14 13:37
+            </td>
+            <td>Sehr lange Adresse, mit Zusatz</td>
+            <td>01337</td>
+            <td>Musterstadt OT Neurathshausen</td>
+            <td>0123-45678901234</td>
+            <td>langer_vorname.langer_nachname@mailbox.lange_domain.tld</td>
+        </tr>
+        <tr>
+            <td>Langer Vorname</td>
+            <td>Langer Nachname</td>
+            <td>2020-12-14 12:34</td>
+            <td>2020-12-14 13:37
+            </td>
+            <td>Sehr lange Adresse, mit Zusatz</td>
+            <td>01337</td>
+            <td>Musterstadt OT Neurathshausen</td>
+            <td>0123-45678901234</td>
+            <td>langer_vorname.langer_nachname@mailbox.lange_domain.tld</td>
+        </tr>
+        <tr>
+            <td>Langer Vorname</td>
+            <td>Langer Nachname</td>
+            <td>2020-12-14 12:34</td>
+            <td>2020-12-14 13:37
+            </td>
+            <td>Sehr lange Adresse, mit Zusatz</td>
+            <td>01337</td>
+            <td>Musterstadt OT Neurathshausen</td>
+            <td>0123-45678901234</td>
+            <td>langer_vorname.langer_nachname@mailbox.lange_domain.tld</td>
+        </tr>
+        <tr>
+            <td>Langer Vorname</td>
+            <td>Langer Nachname</td>
+            <td>2020-12-14 12:34</td>
+            <td>2020-12-14 13:37
+            </td>
+            <td>Sehr lange Adresse, mit Zusatz</td>
+            <td>01337</td>
+            <td>Musterstadt OT Neurathshausen</td>
+            <td>0123-45678901234</td>
+            <td>langer_vorname.langer_nachname@mailbox.lange_domain.tld</td>
+        </tr>
+        <tr>
+            <td>Langer Vorname</td>
+            <td>Langer Nachname</td>
+            <td>2020-12-14 12:34</td>
+            <td>2020-12-14 13:37
+            </td>
+            <td>Sehr lange Adresse, mit Zusatz</td>
+            <td>01337</td>
+            <td>Musterstadt OT Neurathshausen</td>
+            <td>0123-45678901234</td>
+            <td>langer_vorname.langer_nachname@mailbox.lange_domain.tld</td>
+        </tr>
+        <tr>
+            <td>Langer Vorname</td>
+            <td>Langer Nachname</td>
+            <td>2020-12-14 12:34</td>
+            <td>2020-12-14 13:37
+            </td>
+            <td>Sehr lange Adresse, mit Zusatz</td>
+            <td>01337</td>
+            <td>Musterstadt OT Neurathshausen</td>
+            <td>0123-45678901234</td>
+            <td>langer_vorname.langer_nachname@mailbox.lange_domain.tld</td>
+        </tr>
+        <tr>
+            <td>Langer Vorname</td>
+            <td>Langer Nachname</td>
+            <td>2020-12-14 12:34</td>
+            <td>2020-12-14 13:37
+            </td>
+            <td>Sehr lange Adresse, mit Zusatz</td>
+            <td>01337</td>
+            <td>Musterstadt OT Neurathshausen</td>
+            <td>0123-45678901234</td>
+            <td>langer_vorname.langer_nachname@mailbox.lange_domain.tld</td>
+        </tr>
+        <tr>
+            <td>Langer Vorname</td>
+            <td>Langer Nachname</td>
+            <td>2020-12-14 12:34</td>
+            <td>2020-12-14 13:37
+            </td>
+            <td>Sehr lange Adresse, mit Zusatz</td>
+            <td>01337</td>
+            <td>Musterstadt OT Neurathshausen</td>
+            <td>0123-45678901234</td>
+            <td>langer_vorname.langer_nachname@mailbox.lange_domain.tld</td>
+        </tr>
+        <tr>
+            <td>Langer Vorname</td>
+            <td>Langer Nachname</td>
+            <td>2020-12-14 12:34</td>
+            <td>2020-12-14 13:37
+            </td>
+            <td>Sehr lange Adresse, mit Zusatz</td>
+            <td>01337</td>
+            <td>Musterstadt OT Neurathshausen</td>
+            <td>0123-45678901234</td>
+            <td>langer_vorname.langer_nachname@mailbox.lange_domain.tld</td>
+        </tr>
+        <tr>
+            <td>Langer Vorname</td>
+            <td>Langer Nachname</td>
+            <td>2020-12-14 12:34</td>
+            <td>2020-12-14 13:37
+            </td>
+            <td>Sehr lange Adresse, mit Zusatz</td>
+            <td>01337</td>
+            <td>Musterstadt OT Neurathshausen</td>
+            <td>0123-45678901234</td>
+            <td>langer_vorname.langer_nachname@mailbox.lange_domain.tld</td>
+        </tr>
+        <tr>
+            <td>Langer Vorname</td>
+            <td>Langer Nachname</td>
+            <td>2020-12-14 12:34</td>
+            <td>2020-12-14 13:37
+            </td>
+            <td>Sehr lange Adresse, mit Zusatz</td>
+            <td>01337</td>
+            <td>Musterstadt OT Neurathshausen</td>
+            <td>0123-45678901234</td>
+            <td>langer_vorname.langer_nachname@mailbox.lange_domain.tld</td>
+        </tr>
+        <tr>
+            <td>Langer Vorname</td>
+            <td>Langer Nachname</td>
+            <td>2020-12-14 12:34</td>
+            <td>2020-12-14 13:37
+            </td>
+            <td>Sehr lange Adresse, mit Zusatz</td>
+            <td>01337</td>
+            <td>Musterstadt OT Neurathshausen</td>
+            <td>0123-45678901234</td>
+            <td>langer_vorname.langer_nachname@mailbox.lange_domain.tld</td>
+        </tr>
+        <tr>
+            <td>Langer Vorname</td>
+            <td>Langer Nachname</td>
+            <td>2020-12-14 12:34</td>
+            <td>2020-12-14 13:37
+            </td>
+            <td>Sehr lange Adresse, mit Zusatz</td>
+            <td>01337</td>
+            <td>Musterstadt OT Neurathshausen</td>
+            <td>0123-45678901234</td>
+            <td>langer_vorname.langer_nachname@mailbox.lange_domain.tld</td>
+        </tr>
+        <tr>
+            <td>Langer Vorname</td>
+            <td>Langer Nachname</td>
+            <td>2020-12-14 12:34</td>
+            <td>2020-12-14 13:37
+            </td>
+            <td>Sehr lange Adresse, mit Zusatz</td>
+            <td>01337</td>
+            <td>Musterstadt OT Neurathshausen</td>
+            <td>0123-45678901234</td>
+            <td>langer_vorname.langer_nachname@mailbox.lange_domain.tld</td>
+        </tr>
+        <tr>
+            <td>Langer Vorname</td>
+            <td>Langer Nachname</td>
+            <td>2020-12-14 12:34</td>
+            <td>2020-12-14 13:37
+            </td>
+            <td>Sehr lange Adresse, mit Zusatz</td>
+            <td>01337</td>
+            <td>Musterstadt OT Neurathshausen</td>
+            <td>0123-45678901234</td>
+            <td>langer_vorname.langer_nachname@mailbox.lange_domain.tld</td>
+        </tr>
+        <tr>
+            <td>Langer Vorname</td>
+            <td>Langer Nachname</td>
+            <td>2020-12-14 12:34</td>
+            <td>2020-12-14 13:37
+            </td>
+            <td>Sehr lange Adresse, mit Zusatz</td>
+            <td>01337</td>
+            <td>Musterstadt OT Neurathshausen</td>
+            <td>0123-45678901234</td>
+            <td>langer_vorname.langer_nachname@mailbox.lange_domain.tld</td>
+        </tr>
+        <tr>
+            <td>Langer Vorname</td>
+            <td>Langer Nachname</td>
+            <td>2020-12-14 12:34</td>
+            <td>2020-12-14 13:37
+            </td>
+            <td>Sehr lange Adresse, mit Zusatz</td>
+            <td>01337</td>
+            <td>Musterstadt OT Neurathshausen</td>
+            <td>0123-45678901234</td>
+            <td>langer_vorname.langer_nachname@mailbox.lange_domain.tld</td>
+        </tr>
+        <tr>
+            <td>Langer Vorname</td>
+            <td>Langer Nachname</td>
+            <td>2020-12-14 12:34</td>
+            <td>2020-12-14 13:37
+            </td>
+            <td>Sehr lange Adresse, mit Zusatz</td>
+            <td>01337</td>
+            <td>Musterstadt OT Neurathshausen</td>
+            <td>0123-45678901234</td>
+            <td>langer_vorname.langer_nachname@mailbox.lange_domain.tld</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
 </body>
 </html>
