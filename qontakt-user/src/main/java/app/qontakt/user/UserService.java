@@ -54,12 +54,20 @@ public class UserService {
     }
 
     /**
-     * Get all Visits for the given User
+     * Get all Visits or a specific one for the given User
      *
      * @param user_uid UID of the User
+     * @param visitUid UID of the Visit, if any
      * @return List of Visits if the User already has some
      */
-    public List<Visit> getVisits(String user_uid) {
+    public List<Visit> getVisitsForUser(String user_uid, Optional<String> visitUid) {
+        if (visitUid.isPresent()) {
+            Visit found = this.visitRepository.findByVisitUid(visitUid.get()).orElseThrow(() -> new IllegalArgumentException("No such visit"));
+            if (!found.getUserUid().equals(user_uid)) {
+                throw new SecurityException("UserUid doesn't match Visit's associated user");
+            }
+            return List.of(found);
+        }
         return visitRepository.findAllByUserUid(user_uid).toList();
     }
 

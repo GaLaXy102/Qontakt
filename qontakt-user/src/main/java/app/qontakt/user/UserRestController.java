@@ -81,25 +81,32 @@ public class UserRestController {
         }
     }
 
-    @Operation(summary = "Get all Visits for the given User.", security = @SecurityRequirement(name = "user-header"))
+    @Operation(summary = "Get all Visits or a specific one for the given User.", security = @SecurityRequirement(name = "user-header"))
     @ApiResponses(value = {
             @ApiResponse(responseCode = "401", description = "User has no Authorization", content = @Content),
-            @ApiResponse(responseCode = "403", description = "user_uid doesn't match Authorization header", content =
+            @ApiResponse(responseCode = "403", description = "user_uid doesn't match Authorization header or Visit's associated user", content =
             @Content),
+            @ApiResponse(responseCode = "400", description = "VisitUid was specified, but there is no such visit", content = @Content),
             @ApiResponse(responseCode = "200", description = "List of all Visits for the given User", content = {
                     @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
                             schema = @Schema(implementation = Visit.class))
             })
     })
     @GetMapping("/visit")
-    ResponseEntity<List<Visit>> showVisits(@RequestParam String user_uid, HttpServletRequest request) {
+    ResponseEntity<List<Visit>> showVisits(@RequestParam String user_uid, @RequestParam Optional<String> visitUid, HttpServletRequest request) {
         if (!UserRestController.isAuthorized(request)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
         if (!UserRestController.isAuthorized(request, user_uid)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         }
-        return ResponseEntity.ok(userService.getVisits(user_uid));
+        try {
+            return ResponseEntity.ok(userService.getVisitsForUser(user_uid, visitUid));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        } catch (SecurityException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
     }
 
     @Operation(summary = "Get all Visits at a given Lokal for the given User.", security = @SecurityRequirement(name =
@@ -123,7 +130,7 @@ public class UserRestController {
         if (!UserRestController.isAuthorized(request, lokal_uid, user_uid)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         }
-        return ResponseEntity.ok(this.userService.getVisits(lokal_uid, user_uid));
+        return ResponseEntity.ok(this.userService.getVisitsForLokal(lokal_uid, user_uid));
     }
 
     @Operation(summary = "Delete a single Visit.", security = @SecurityRequirement(name = "user-header"))
