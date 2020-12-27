@@ -148,4 +148,27 @@ public class UserRestController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         }
     }
+
+    @Operation(summary = "Get Verification string for current visit", security = @SecurityRequirement(name = "user-header"))
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "401", description = "User has no Authorization", content = @Content),
+            @ApiResponse(responseCode = "403", description = "user_uid doesn't match Authorization header", content =
+            @Content),
+            @ApiResponse(responseCode = "400", description = "User has no current Visit", content = @Content),
+            @ApiResponse(responseCode = "200", description = "Current Visit data")
+    })
+    @GetMapping("/visit/verify")
+    ResponseEntity<String> getCurrentVisitVerificationString(@RequestParam String user_uid, HttpServletRequest request) {
+        if (!UserRestController.isAuthorized(request)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+        if (!UserRestController.isAuthorized(request, user_uid)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+        try {
+            return ResponseEntity.ok(this.userService.calculateCurrentVisitVerificationString(user_uid));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+    }
 }
