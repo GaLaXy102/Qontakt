@@ -3,6 +3,7 @@ package app.qontakt.user;
 import org.springframework.stereotype.Component;
 
 import javax.transaction.Transactional;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -94,5 +95,24 @@ public class UserService {
         }
         this.visitRepository.delete(found.get());
         return true;
+    }
+
+    /**
+     * Calculate verification string
+     * @param user_uid UserUID to check
+     * @return Verification String (///user_uid/visit_uid//timestamp(int64 as base64)///)
+     * @throws IllegalStateException User has no open Visit
+     */
+    public String calculateCurrentVisitVerificationString(String user_uid) {
+        // Out data format: ///user_uid/visit_uid//timestamp(int64)///
+        return "///" +
+                user_uid +
+                "/" +
+                this.visitRepository.findByUserUidAndCheckOutIsNull(user_uid)
+                        .orElseThrow(() -> new IllegalStateException("User has no open Visit"))
+                        .getVisitUid() +
+                "//" +
+                Instant.now().getEpochSecond() +
+                "///";
     }
 }
