@@ -27,12 +27,12 @@ public interface VisitRepository extends CrudRepository<Visit, String> {
     Optional<Visit> findByVisitUid(String visit_uid);
 
     /**
-     * Find all unterminated Visits for a given User
+     * Find an unterminated Visit for a given User
      *
      * @param user_uid UID of the User
-     * @return Streamable of all unterminated Visits belonging to the given User
+     * @return unterminated Visit belonging to the given User
      */
-    Streamable<Visit> findAllByUserUidAndCheckOutIsNull(String user_uid);
+    Optional<Visit> findByUserUidAndCheckOutIsNull(String user_uid);
 
     /**
      * Find all Visits for a given Lokal
