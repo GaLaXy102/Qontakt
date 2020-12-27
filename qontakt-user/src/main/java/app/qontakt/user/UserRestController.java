@@ -166,7 +166,7 @@ public class UserRestController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         }
         try {
-            return ResponseEntity.ok(this.userService.calculateCurrentVisitVerificationString(user_uid));
+            return ResponseEntity.ok(this.userService.calculateCurrentVisitVerificationString(user_uid).toString());
         } catch (IllegalStateException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
