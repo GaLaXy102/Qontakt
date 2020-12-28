@@ -4,6 +4,12 @@ package app.qontakt.host.helper;
  * JSON Strings for QUserData
  */
 public enum QUiData {
+    CHECK_IN {
+        final String uiName = "checkIn";
+    },
+    CHECK_OUT {
+        final String uiName = "checkOut";
+    },
     FIRST_NAME {
         final String uiName = "firstName";
     },
