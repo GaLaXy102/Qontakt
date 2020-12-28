@@ -54,12 +54,20 @@ public class UserService {
     }
 
     /**
-     * Get all Visits for the given User
+     * Get all Visits or a specific one for the given User
      *
      * @param user_uid UID of the User
+     * @param visitUid UID of the Visit, if any
      * @return List of Visits if the User already has some
      */
-    public List<Visit> getVisits(String user_uid) {
+    public List<Visit> getVisitsForUser(String user_uid, Optional<String> visitUid) {
+        if (visitUid.isPresent()) {
+            Visit found = this.visitRepository.findByVisitUid(visitUid.get()).orElseThrow(() -> new IllegalArgumentException("No such visit"));
+            if (!found.getUserUid().equals(user_uid)) {
+                throw new SecurityException("UserUid doesn't match Visit's associated user");
+            }
+            return List.of(found);
+        }
         return visitRepository.findAllByUserUid(user_uid).toList();
     }
 
@@ -70,7 +78,7 @@ public class UserService {
      * @param user_uid  UID of the User
      * @return List of Visits
      */
-    public List<Visit> getVisits(String lokal_uid, Optional<String> user_uid) {
+    public List<Visit> getVisitsForLokal(String lokal_uid, Optional<String> user_uid) {
         Stream<Visit> data = this.visitRepository.findAllByLokalUid(lokal_uid).stream();
         return user_uid
                 .map(s -> data.filter(v -> v.getUserUid().equals(s)))
@@ -100,19 +108,11 @@ public class UserService {
     /**
      * Calculate verification string
      * @param user_uid UserUID to check
-     * @return Verification String (///user_uid/visit_uid//timestamp(int64 as base64)///)
+     * @return Verification Code (///user_uid/visit_uid//timestamp(int64 as base64)///)
      * @throws IllegalStateException User has no open Visit
      */
-    public String calculateCurrentVisitVerificationString(String user_uid) {
-        // Out data format: ///user_uid/visit_uid//timestamp(int64)///
-        return "///" +
-                user_uid +
-                "/" +
-                this.visitRepository.findByUserUidAndCheckOutIsNull(user_uid)
-                        .orElseThrow(() -> new IllegalStateException("User has no open Visit"))
-                        .getVisitUid() +
-                "//" +
-                Instant.now().getEpochSecond() +
-                "///";
+    public VerificationQrCodeData calculateCurrentVisitVerificationString(String user_uid) {
+        return new VerificationQrCodeData(user_uid, this.visitRepository.findByUserUidAndCheckOutIsNull(user_uid)
+                .orElseThrow(() -> new IllegalStateException("User has no open Visit")).getVisitUid(), Instant.now());
     }
 }

@@ -1,5 +1,6 @@
 package app.qontakt.host.lokal;
 
+import app.qontakt.user.VerificationQrCodeData;
 import app.qontakt.user.Visit;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -125,5 +126,19 @@ public class LokalRestController {
         headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
         return ResponseEntity.ok().headers(headers).body(this.lokalService.print(request.getLocale(), lokalUid,
                 visits));
+    }
+
+    @Operation(summary = "Verify Visit data (from /api/v1/user/visit/verify)", security = @SecurityRequirement(name = "user-header"))
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "401", description = "Missing Authorization header", content = @Content),
+            @ApiResponse(responseCode = "200", description = "Verification was possible")
+    })
+    @GetMapping("/lokal/verify")
+    ResponseEntity<Boolean> verifyQrData(String lokalUid, String qrData, HttpServletRequest request) {
+        if (!LokalRestController.isAuthorized(request)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+        VerificationQrCodeData data = VerificationQrCodeData.fromString(qrData);
+        return ResponseEntity.ok(this.lokalService.verifyVisit(lokalUid, data));
     }
 }

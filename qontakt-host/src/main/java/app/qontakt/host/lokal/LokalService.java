@@ -2,6 +2,7 @@ package app.qontakt.host.lokal;
 
 import app.qontakt.host.uihelper.LokalDataPublic;
 import app.qontakt.host.uihelper.ThymeleafPdfPrinter;
+import app.qontakt.user.VerificationQrCodeData;
 import app.qontakt.user.Visit;
 import app.qontakt.user.identity.QUserData;
 import com.lowagie.text.DocumentException;
@@ -12,6 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.io.ByteArrayOutputStream;
+import java.time.Instant;
+import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -25,6 +28,15 @@ import java.util.UUID;
  */
 @Component
 public class LokalService {
+
+    /**
+     * Verfication timeout for verifyVisit in seconds
+     */
+    public static final int visitVerificationTimeout = 30;
+    /**
+     * Timeout in seconds for which a visit is considered valid
+     */
+    public static final int visitTimeout = 60*60*24;
 
     private final LokalDataRepository lokalDataRepository;
     private final LokalPasswordRepository lokalPasswordRepository;
@@ -117,7 +129,25 @@ public class LokalService {
                 .retrieve()
                 .bodyToMono(QUserData.class)
                 .block();
+    }
 
+    /**
+     * Get the visit data associated with a given visitUid from our user service
+     *
+     * @param visitUid visitUid to get information of
+     * @param userUid userUid of visitUid
+     * @return Dataset of found Visit
+     */
+    private Visit getVisitData(String userUid, String visitUid) {
+        WebClient client = WebClient.create("http://q-user-service:8080");
+        String remote = "/api/v1/user/visit";
+        return client.get()
+                .uri(uriBuilder -> uriBuilder.path(remote).queryParam("user_uid", userUid).queryParam("visitUid", visitUid).build())
+                .accept(MediaType.APPLICATION_JSON)
+                .header("X-User", userUid)
+                .retrieve()
+                .bodyToFlux(Visit.class)
+                .blockFirst();
     }
 
     /**
@@ -147,5 +177,28 @@ public class LokalService {
         } catch (DocumentException e) {
             return new ByteArrayOutputStream().toByteArray();
         }
+    }
+
+    /**
+     * A verification is issued if
+     * - the Timestamp is not older than 30 seconds
+     * - the Visit is not older than 24 hours
+     * - the Visit matches the Lokal
+     * @param lokalUid Uid of Lokal
+     * @param data Data to verify
+     * @return true if and only if all all above conditions are met
+     */
+    public boolean verifyVisit(String lokalUid, VerificationQrCodeData data) {
+        Visit visit;
+        //try {
+            visit = this.getVisitData(data.getUserUid(), data.getVisitUid());
+        //} catch (Exception e) {
+        //    return false;
+        //}
+        Instant checkIn = visit.getCheckIn().atZone(ZoneId.systemDefault()).toInstant();
+        System.out.println();
+        return data.getCreated().isBefore(Instant.now()) && data.getCreated().isAfter(Instant.now().minusSeconds(visitVerificationTimeout))
+                && checkIn.isBefore(Instant.now()) && checkIn.isAfter(Instant.now().minusSeconds(visitTimeout))
+                && visit.getLokalUid().equals(lokalUid);
     }
 }
