@@ -1,7 +1,7 @@
 package app.qontakt.host.lokal;
 
-import app.qontakt.host.uihelper.LokalDataPublic;
-import app.qontakt.host.uihelper.ThymeleafPdfPrinter;
+import app.qontakt.host.helper.LokalDataPublic;
+import app.qontakt.host.helper.ThymeleafPdfPrinter;
 import app.qontakt.user.VerificationQrCodeData;
 import app.qontakt.user.Visit;
 import app.qontakt.user.identity.QUserData;
@@ -190,11 +190,11 @@ public class LokalService {
      */
     public boolean verifyVisit(String lokalUid, VerificationQrCodeData data) {
         Visit visit;
-        //try {
+        try {
             visit = this.getVisitData(data.getUserUid(), data.getVisitUid());
-        //} catch (Exception e) {
-        //    return false;
-        //}
+        } catch (Exception e) {
+            return false;
+        }
         Instant checkIn = visit.getCheckIn().atZone(ZoneId.systemDefault()).toInstant();
         System.out.println();
         return data.getCreated().isBefore(Instant.now()) && data.getCreated().isAfter(Instant.now().minusSeconds(visitVerificationTimeout))

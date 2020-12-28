@@ -1,4 +1,4 @@
-package app.qontakt.host.uihelper;
+package app.qontakt.host.helper;
 
 /**
  * JSON Strings for QUserData

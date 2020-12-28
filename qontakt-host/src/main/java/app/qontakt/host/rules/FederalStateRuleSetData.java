@@ -1,6 +1,6 @@
 package app.qontakt.host.rules;
 
-import app.qontakt.host.uihelper.QUserDataFields;
+import app.qontakt.host.helper.QUserDataFields;
 
 import java.time.Period;
 import java.util.List;
