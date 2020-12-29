@@ -28,9 +28,9 @@ public class LokalData {
     private LocalTime checkoutTime;
     private FederalStateRuleSet.Code federalState;
 
-    public LokalData(String name, String address, Point coordinates, String owner, String gdprContact,
+    public LokalData(String lokalUid, String name, String address, Point coordinates, String owner, String gdprContact,
                      LocalTime checkoutTime, FederalStateRuleSet.Code federalState) {
-        this.lokalUid = null;
+        this.lokalUid = lokalUid;
         this.name = name;
         this.address = address;
         this.coordinates = coordinates;

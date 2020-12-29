@@ -7,6 +7,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -46,7 +47,7 @@ public class UserService {
             return false;
         }
         try {
-            visitRepository.save(new Visit(user_uid, lokal_uid, time));
+            visitRepository.save(new Visit(UUID.randomUUID().toString(), user_uid, lokal_uid, time));
             return true;
         } catch (Exception e) {
             return false;
