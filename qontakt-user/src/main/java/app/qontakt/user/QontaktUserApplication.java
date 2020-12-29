@@ -28,6 +28,12 @@ public class QontaktUserApplication {
                                         .in(SecurityScheme.In.HEADER)
                                         .name("X-User")
                         )
+                        .addSecuritySchemes("lokal-header",
+                                new SecurityScheme()
+                                        .type(SecurityScheme.Type.APIKEY)
+                                        .in(SecurityScheme.In.HEADER)
+                                        .name("X-Lokal")
+                        )
                 )
                 .addServersItem(new Server().url("https://localhost"))
                 .addServersItem(new Server().url("https://staging.qontakt.me"))
