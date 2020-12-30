@@ -9,13 +9,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
@@ -166,7 +160,7 @@ public class UserRestController {
         }
         try {
             return ResponseEntity.ok(this.userService.deleteVisit(user_uid, visit_uid));
-        } catch (IllegalAccessError e) {
+        } catch (SecurityException e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         }
     }
@@ -189,6 +183,31 @@ public class UserRestController {
         }
         try {
             return ResponseEntity.ok(this.userService.calculateCurrentVisitVerificationString(user_uid).toString());
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+    }
+
+    @Operation(summary = "Close a single Visit", security = @SecurityRequirement(name = "user-header"))
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "401", description = "User has no Authorization", content = @Content),
+            @ApiResponse(responseCode = "403", description = "user_uid doesn't match Authorization header or Visit " +
+                    "with UID visit_uid doesn't belong to specified user_uid.", content = @Content),
+            @ApiResponse(responseCode = "400", description = "Visit is already terminated.", content = @Content),
+            @ApiResponse(responseCode = "200", description = "true -> Visit terminated; false -> No such Visit")
+    })
+    @PostMapping("/visit")
+    ResponseEntity<Boolean> closeVisit(@RequestParam String user_uid, @RequestParam String visit_uid, HttpServletRequest request) {
+        if (!UserRestController.isAuthorizedUser(request)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+        if (!UserRestController.isAuthorized(request, user_uid)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+        try {
+            return ResponseEntity.ok(this.userService.closeVisit(user_uid, visit_uid));
+        } catch (SecurityException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         } catch (IllegalStateException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
