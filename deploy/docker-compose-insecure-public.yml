@@ -50,6 +50,16 @@ services:
       - "traefik.http.routers.dashboard.tls.domains[0].main=${DOMAIN}"
       - "traefik.http.routers.dashboard.tls.domains[0].sans=*.${DOMAIN}"
 
+  crypto:
+    build: qontakt-crypto
+    networks:
+      frontend0:
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.q-crypto.rule: HostRegexp(`{prefix:[www\.]?}${DOMAIN}`) && PathPrefix(`/api/v1/crypto`)"
+      traefik.http.routers.q-crypto.entrypoints: websecure
+      traefik.http.routers.q-crypto.tls: "true"
+
   host:
     build: qontakt-host
     networks:
