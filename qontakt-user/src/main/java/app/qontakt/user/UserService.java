@@ -6,7 +6,6 @@ import javax.transaction.Transactional;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -134,7 +133,7 @@ public class UserService {
         if (!user_uid.equals(found.get().getUserUid())) {
             throw new SecurityException("Visit does not belong to User.");
         }
-        if (Objects.nonNull(found.get().getCheckOut())) {
+        if (found.get().getCheckOut() != null) {
             throw new IllegalStateException("Visit is already terminated.");
         }
         found.get().setCheckOut(LocalDateTime.now());
