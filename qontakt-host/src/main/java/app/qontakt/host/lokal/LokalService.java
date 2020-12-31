@@ -1,7 +1,8 @@
 package app.qontakt.host.lokal;
 
-import app.qontakt.host.uihelper.LokalDataPublic;
-import app.qontakt.host.uihelper.ThymeleafPdfPrinter;
+import app.qontakt.host.helper.CsvExporter;
+import app.qontakt.host.helper.LokalDataPublic;
+import app.qontakt.host.helper.ThymeleafPdfPrinter;
 import app.qontakt.user.VerificationQrCodeData;
 import app.qontakt.user.Visit;
 import app.qontakt.user.identity.QUserData;
@@ -159,9 +160,37 @@ public class LokalService {
      * @return PDF document
      */
     public byte[] print(Locale locale, String lokalUid, List<Visit> visits) {
-        // Existence already checked
-        LokalData lokalData = this.lokalDataRepository.findById(lokalUid).orElse(null);
+        LokalData lokalData = this.lokalDataRepository.findById(lokalUid).orElseThrow(() -> new IllegalArgumentException("No such Lokal"));
         // Map to User-specific data
+        Map<QUserData, List<Visit>> filledDataset = this.prepareExportData(lokalUid, visits);
+        try {
+            return ThymeleafPdfPrinter.renderContactTracingPdf(locale, lokalData, filledDataset);
+        } catch (DocumentException e) {
+            return new ByteArrayOutputStream().toByteArray();
+        }
+    }
+
+    /**
+     * Export Data to CSV
+     *
+     * @param lokalUid Uid of Lokal for which the report is
+     * @param visits   List of Visit data
+     * @return CSV document
+     */
+    public byte[] export(String lokalUid, List<Visit> visits) {
+        LokalData lokalData = this.lokalDataRepository.findById(lokalUid).orElseThrow(() -> new IllegalArgumentException("No such Lokal"));
+        // Map to User-specific data
+        Map<QUserData, List<Visit>> filledDataset = this.prepareExportData(lokalUid, visits);
+        return CsvExporter.exportToCsv(lokalData, filledDataset);
+    }
+
+    /**
+     * Map data from a list of Visits to a Map of User to Visits
+     * @param lokalUid lokalUid (used for filtering as security mechanism)
+     * @param visits List of Visits to export
+     * @return prepared Data
+     */
+    private Map<QUserData, List<Visit>> prepareExportData(String lokalUid, List<Visit> visits) {
         Map<QUserData, List<Visit>> filledDataset = new HashMap<>();
         visits.stream()
                 .filter(visit -> lokalUid.equals(visit.getLokalUid()))
@@ -172,11 +201,7 @@ public class LokalService {
                             filledDataset.put(userData, visitList);
                         }
                 );
-        try {
-            return ThymeleafPdfPrinter.renderContactTracingPdf(locale, lokalData, filledDataset);
-        } catch (DocumentException e) {
-            return new ByteArrayOutputStream().toByteArray();
-        }
+        return filledDataset;
     }
 
     /**
@@ -190,11 +215,11 @@ public class LokalService {
      */
     public boolean verifyVisit(String lokalUid, VerificationQrCodeData data) {
         Visit visit;
-        //try {
+        try {
             visit = this.getVisitData(data.getUserUid(), data.getVisitUid());
-        //} catch (Exception e) {
-        //    return false;
-        //}
+        } catch (Exception e) {
+            return false;
+        }
         Instant checkIn = visit.getCheckIn().atZone(ZoneId.systemDefault()).toInstant();
         System.out.println();
         return data.getCreated().isBefore(Instant.now()) && data.getCreated().isAfter(Instant.now().minusSeconds(visitVerificationTimeout))

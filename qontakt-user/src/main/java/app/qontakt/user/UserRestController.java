@@ -9,7 +9,14 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
@@ -34,7 +41,7 @@ public class UserRestController {
      * Check if User with the given UID is logged in or the given lokal is authorized
      *
      * @param request  incoming HTTP request
-     * @param lokalUid  UID of the Lokal
+     * @param lokalUid UID of the Lokal
      * @param user_uid UID of the User
      * @return true if User is logged in or Lokal Header matches
      */
@@ -54,8 +61,12 @@ public class UserRestController {
         return user_uid.equals(request.getHeader("X-User"));
     }
 
-    public static boolean isAuthorized(HttpServletRequest request) {
-        return request.getHeader("X-User") != null;
+    public static boolean isAuthorizedUser(HttpServletRequest request) {
+        return request.getHeader("X-User") != null || request.getHeader("X-Lokal") != null;
+    }
+
+    public static boolean isAuthorizedLokal(HttpServletRequest request) {
+        return request.getHeader("X-Lokal") != null;
     }
 
     @Operation(summary = "Create a new Visit for the given User and Lokal.", security = @SecurityRequirement(name = "user-header"))
@@ -68,7 +79,7 @@ public class UserRestController {
     })
     @PutMapping("/visit")
     ResponseEntity<Boolean> newVisit(@RequestParam String user_uid, @RequestParam String lokal_uid, HttpServletRequest request) {
-        if (!UserRestController.isAuthorized(request)) {
+        if (!UserRestController.isAuthorizedUser(request)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
         if (!UserRestController.isAuthorized(request, user_uid)) {
@@ -94,7 +105,7 @@ public class UserRestController {
     })
     @GetMapping("/visit")
     ResponseEntity<List<Visit>> showVisits(@RequestParam String user_uid, @RequestParam Optional<String> visitUid, HttpServletRequest request) {
-        if (!UserRestController.isAuthorized(request)) {
+        if (!UserRestController.isAuthorizedUser(request)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
         if (!UserRestController.isAuthorized(request, user_uid)) {
@@ -109,8 +120,13 @@ public class UserRestController {
         }
     }
 
-    @Operation(summary = "Get all Visits at a given Lokal for the given User.", security = @SecurityRequirement(name =
-            "user-header"))
+    @Operation(
+            summary = "Get all Visits at a given Lokal for the given User.",
+            security = {
+                    @SecurityRequirement(name = "user-header"),
+                    @SecurityRequirement(name = "lokal-header")
+            }
+    )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "401", description = "User has no Authorization", content = @Content),
             @ApiResponse(responseCode = "403", description = "user_uid doesn't match Authorization header", content =
@@ -124,7 +140,7 @@ public class UserRestController {
     @GetMapping("/visit/{lokal_uid}")
     ResponseEntity<List<Visit>> getVisitsForLokal(@RequestParam Optional<String> user_uid, @PathVariable String lokal_uid,
                                                   HttpServletRequest request) {
-        if (!UserRestController.isAuthorized(request)) {
+        if (!UserRestController.isAuthorizedUser(request) && !UserRestController.isAuthorizedLokal(request)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
         if (!UserRestController.isAuthorized(request, lokal_uid, user_uid)) {
@@ -143,7 +159,7 @@ public class UserRestController {
     @DeleteMapping("/visit")
     ResponseEntity<Boolean> deleteSingleVisit(@RequestParam String user_uid, @RequestParam String visit_uid,
                                               HttpServletRequest request) {
-        if (!UserRestController.isAuthorized(request)) {
+        if (!UserRestController.isAuthorizedUser(request)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
         if (!UserRestController.isAuthorized(request, user_uid)) {
@@ -151,7 +167,7 @@ public class UserRestController {
         }
         try {
             return ResponseEntity.ok(this.userService.deleteVisit(user_uid, visit_uid));
-        } catch (IllegalAccessError e) {
+        } catch (SecurityException e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         }
     }
@@ -166,7 +182,7 @@ public class UserRestController {
     })
     @GetMapping("/visit/verify")
     ResponseEntity<String> getCurrentVisitVerificationString(@RequestParam String user_uid, HttpServletRequest request) {
-        if (!UserRestController.isAuthorized(request)) {
+        if (!UserRestController.isAuthorizedUser(request)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
         if (!UserRestController.isAuthorized(request, user_uid)) {
@@ -174,6 +190,31 @@ public class UserRestController {
         }
         try {
             return ResponseEntity.ok(this.userService.calculateCurrentVisitVerificationString(user_uid).toString());
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+    }
+
+    @Operation(summary = "Close a single Visit", security = @SecurityRequirement(name = "user-header"))
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "401", description = "User has no Authorization", content = @Content),
+            @ApiResponse(responseCode = "403", description = "user_uid doesn't match Authorization header or Visit " +
+                    "with UID visit_uid doesn't belong to specified user_uid.", content = @Content),
+            @ApiResponse(responseCode = "400", description = "Visit is already terminated.", content = @Content),
+            @ApiResponse(responseCode = "200", description = "true -> Visit terminated; false -> No such Visit")
+    })
+    @PostMapping("/visit")
+    ResponseEntity<Boolean> closeVisit(@RequestParam String user_uid, @RequestParam String visit_uid, HttpServletRequest request) {
+        if (!UserRestController.isAuthorizedUser(request)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+        if (!UserRestController.isAuthorized(request, user_uid)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+        try {
+            return ResponseEntity.ok(this.userService.closeVisit(user_uid, visit_uid));
+        } catch (SecurityException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         } catch (IllegalStateException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }

@@ -1,5 +1,6 @@
 package app.qontakt.host.rules;
 
+import app.qontakt.host.helper.QUiData;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import javax.persistence.ElementCollection;
@@ -77,11 +78,11 @@ public class FederalStateRuleSet {
     private final String shortName;
     private final Period retainPeriod;
     @ElementCollection
-    private final List<String> requiredFields;
+    private final List<QUiData> requiredFields;
     @ElementCollection
-    private final List<String> anyRequiredFields;
+    private final List<QUiData> anyRequiredFields;
     @ElementCollection
-    private final List<String> allowedFields;
+    private final List<QUiData> allowedFields;
 
     /**
      * Create a new Data Set for Rules of a Federal State
@@ -94,7 +95,8 @@ public class FederalStateRuleSet {
      * @param allowedFields     List of optionally accepted fields from QUserData
      */
     public FederalStateRuleSet(String countryCode, String shortName, Period retainPeriod,
-                               List<String> requiredFields, List<String> anyRequiredFields, List<String> allowedFields) {
+                               List<QUiData> requiredFields, List<QUiData> anyRequiredFields,
+                               List<QUiData> allowedFields) {
         this.countryCode = countryCode;
         this.shortName = shortName;
         this.retainPeriod = retainPeriod;
@@ -145,27 +147,27 @@ public class FederalStateRuleSet {
     /**
      * Getter for FederalStateRuleSet's requiredFields
      *
-     * @return requiredFields as java.util.List<java.lang.String>
+     * @return requiredFields as java.util.List<app.qontakt.host.helper.QUserDataFields>
      */
-    public List<String> getRequiredFields() {
+    public List<QUiData> getRequiredFields() {
         return this.requiredFields;
     }
 
     /**
      * Getter for FederalStateRuleSet's anyRequiredFields
      *
-     * @return anyRequiredFields as java.util.List<java.lang.String>
+     * @return anyRequiredFields as java.util.List<app.qontakt.host.helper.QUserDataFields>
      */
-    public List<String> getAnyRequiredFields() {
+    public List<QUiData> getAnyRequiredFields() {
         return this.anyRequiredFields;
     }
 
     /**
      * Getter for FederalStateRuleSet's allowedFields
      *
-     * @return allowedFields as java.util.List<java.lang.String>
+     * @return allowedFields as java.util.List<app.qontakt.host.helper.QUserDataFields>
      */
-    public List<String> getAllowedFields() {
+    public List<QUiData> getAllowedFields() {
         return this.allowedFields;
     }
 }

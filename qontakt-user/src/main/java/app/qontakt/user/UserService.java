@@ -7,6 +7,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -46,7 +47,7 @@ public class UserService {
             return false;
         }
         try {
-            visitRepository.save(new Visit(user_uid, lokal_uid, time));
+            visitRepository.save(new Visit(UUID.randomUUID().toString(), user_uid, lokal_uid, time));
             return true;
         } catch (Exception e) {
             return false;
@@ -99,7 +100,7 @@ public class UserService {
             return false;
         }
         if (!user_uid.equals(found.get().getUserUid())) {
-            throw new IllegalAccessError("Visit does not belong to User.");
+            throw new SecurityException("Visit does not belong to User.");
         }
         this.visitRepository.delete(found.get());
         return true;
@@ -114,5 +115,29 @@ public class UserService {
     public VerificationQrCodeData calculateCurrentVisitVerificationString(String user_uid) {
         return new VerificationQrCodeData(user_uid, this.visitRepository.findByUserUidAndCheckOutIsNull(user_uid)
                 .orElseThrow(() -> new IllegalStateException("User has no open Visit")).getVisitUid(), Instant.now());
+    }
+
+    /**
+     * Terminate Visit with the given visit_uid
+     * @param user_uid UID of the User
+     * @param visit_uid UID of the Visit
+     * @return true if and only if termination of the given Visit was successful
+     * @throws SecurityException given user_uid doesn't belong to given Visit
+     * @throws IllegalStateException given Visit is already terminated
+     */
+    public boolean closeVisit(String user_uid, String visit_uid) {
+        Optional<Visit> found = this.visitRepository.findByVisitUid(visit_uid);
+        if (found.isEmpty()) {
+            return false;
+        }
+        if (!user_uid.equals(found.get().getUserUid())) {
+            throw new SecurityException("Visit does not belong to User.");
+        }
+        if (found.get().getCheckOut() != null) {
+            throw new IllegalStateException("Visit is already terminated.");
+        }
+        found.get().setCheckOut(LocalDateTime.now());
+        this.visitRepository.save(found.get());
+        return true;
     }
 }

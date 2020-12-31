@@ -1,4 +1,4 @@
-package app.qontakt.host.uihelper;
+package app.qontakt.host.helper;
 
 import app.qontakt.host.lokal.LokalData;
 import app.qontakt.user.Visit;
@@ -14,31 +14,11 @@ import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 import org.xhtmlrenderer.pdf.ITextRenderer;
 
 import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
 public class ThymeleafPdfPrinter {
-
-    /**
-     * Chronologically sort Visits
-     *
-     * @param data Map<QUserData, List<Visit>>
-     * @return List<Pair < QUserData, Visit>> sorted by time of visit
-     */
-    private static List<Pair<QUserData, Visit>> sortChronological(Map<QUserData, List<Visit>> data) {
-        List<Pair<QUserData, Visit>> result = new ArrayList<>(data.size());
-        data.keySet().forEach(user ->
-                data.get(user)
-                        .stream()
-                        .map(v -> Pair.of(user, v))
-                        .forEach(result::add)
-        );
-        result.sort(Comparator.comparing(p -> p.getSecond().getCheckIn()));
-        return result;
-    }
 
     public static byte[] renderContactTracingPdf(Locale locale, LokalData lokal, Map<QUserData, List<Visit>> visits) throws DocumentException {
         ClassLoaderTemplateResolver templateResolver = new ClassLoaderTemplateResolver();
@@ -53,7 +33,7 @@ public class ThymeleafPdfPrinter {
         Context context = new Context();
         context.setLocale(locale);
         context.setVariable("lokal", lokal);
-        List<Pair<QUserData, Visit>> visitList = ThymeleafPdfPrinter.sortChronological(visits);
+        List<Pair<QUserData, Visit>> visitList = ExportHelper.sortChronological(visits);
         context.setVariable("visits", visitList);
         LoggerFactory.getLogger(ThymeleafPdfPrinter.class).info("Printing [%d] datasets for %s.".formatted(visitList.size(), lokal.getLokalUid()));
         String html = templateEngine.process("visit_data", context);
@@ -65,4 +45,5 @@ public class ThymeleafPdfPrinter {
 
         return os.toByteArray();
     }
+
 }

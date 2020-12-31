@@ -128,6 +128,36 @@ public class LokalRestController {
                 visits));
     }
 
+    @Operation(summary = "Get a CSV of all sent visits", security = @SecurityRequirement(name = "user-header"))
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "401", description = "Missing Authorization header", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Lokal's owner doesn't match Authorization header",
+                    content = @Content),
+            @ApiResponse(responseCode = "200", description = "CSV of all sent visits",
+                    content = @Content(mediaType = "text/csv"))
+    })
+    @PostMapping("/lokal/export")
+    public ResponseEntity<byte[]> exportVisitData(@RequestBody List<Visit> visits,
+                                                  @RequestParam String lokalUid, @RequestParam String password,
+                                                  HttpServletRequest request) {
+        if (!LokalRestController.isAuthorized(request)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+        if (!this.lokalService.isAuthorized(request.getHeader("X-User"), lokalUid, password)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+        String fileName = "report-"
+                + DateTimeFormatter.ISO_DATE_TIME.format(LocalDateTime.now())
+                + "-"
+                + lokalUid
+                + ".csv";
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.parseMediaType("text/csv"));
+        headers.setContentDispositionFormData(fileName, fileName);
+        headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
+        return ResponseEntity.ok().headers(headers).body(this.lokalService.export(lokalUid, visits));
+    }
+
     @Operation(summary = "Verify Visit data (from /api/v1/user/visit/verify)", security = @SecurityRequirement(name = "user-header"))
     @ApiResponses(value = {
             @ApiResponse(responseCode = "401", description = "Missing Authorization header", content = @Content),

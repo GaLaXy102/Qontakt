@@ -62,7 +62,7 @@ public class IdentityRestController {
     })
     @PostMapping("")
     public ResponseEntity<Boolean> updateUser(@RequestBody QUserData data, HttpServletRequest request) {
-        if (!app.qontakt.user.UserRestController.isAuthorized(request)) {
+        if (!app.qontakt.user.UserRestController.isAuthorizedUser(request)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
         if (data.getUserUid() == null) {
@@ -87,7 +87,7 @@ public class IdentityRestController {
     })
     @GetMapping("")
     public ResponseEntity<QUserData> getUser(@RequestParam String userUid, HttpServletRequest request) {
-        if (!app.qontakt.user.UserRestController.isAuthorized(request)) {
+        if (!app.qontakt.user.UserRestController.isAuthorizedUser(request)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
         if (!app.qontakt.user.UserRestController.isAuthorized(request, userUid)) {
@@ -107,7 +107,7 @@ public class IdentityRestController {
     })
     @DeleteMapping("")
     public ResponseEntity<Boolean> deleteUser(@RequestParam String userUid, HttpServletRequest request) {
-        if (!app.qontakt.user.UserRestController.isAuthorized(request)) {
+        if (!app.qontakt.user.UserRestController.isAuthorizedUser(request)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
         if (!app.qontakt.user.UserRestController.isAuthorized(request, userUid)) {

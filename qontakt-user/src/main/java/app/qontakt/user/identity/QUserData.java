@@ -27,9 +27,9 @@ public class QUserData {
     @Schema(example = "0123-456789")
     private String telephoneNumber;
 
-    public QUserData(String firstName, String lastName, String email, String homeAddress, String homeZip,
-                     String homeCity, String telephoneNumber) {
-        this.userUid = UUID.randomUUID().toString();
+    public QUserData(String userUid, String firstName, String lastName, String email, String homeAddress,
+                     String homeZip, String homeCity, String telephoneNumber) {
+        this.userUid = userUid;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;

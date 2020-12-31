@@ -14,8 +14,8 @@ public class Visit {
     private final LocalDateTime checkIn;
     private LocalDateTime checkOut;
 
-    public Visit(String userUid, String lokalUid, LocalDateTime checkIn) {
-        this.visitUid = UUID.randomUUID().toString();
+    public Visit(String visitUid, String userUid, String lokalUid, LocalDateTime checkIn) {
+        this.visitUid = visitUid;
         this.userUid = userUid;
         this.lokalUid = lokalUid;
         this.checkIn = checkIn;
@@ -72,5 +72,14 @@ public class Visit {
      */
     public LocalDateTime getCheckOut() {
         return checkOut;
+    }
+
+    /**
+     * Setter for Visit's check out time
+     *
+     * @param checkOut check out time as Java.time.LocalDateTime
+     */
+    public void setCheckOut(LocalDateTime checkOut) {
+        this.checkOut = checkOut;
     }
 }
