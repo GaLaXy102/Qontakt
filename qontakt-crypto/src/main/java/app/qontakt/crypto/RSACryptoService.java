@@ -2,6 +2,8 @@ package app.qontakt.crypto;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
+import java.security.interfaces.RSAPrivateKey;
+import java.security.interfaces.RSAPublicKey;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openssl.PEMEncryptedKeyPair;
@@ -10,6 +12,7 @@ import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
 import org.bouncycastle.openssl.jcajce.JcePEMDecryptorProviderBuilder;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -28,8 +31,8 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.Security;
 
-// Inspired by https://stackoverflow.com/a/27621696
-public class RSACryptoService implements ICryptoService {
+@Component
+public class RSACryptoService {
 
     public RSACryptoService() {
         Security.addProvider(new BouncyCastleProvider());
@@ -41,7 +44,7 @@ public class RSACryptoService implements ICryptoService {
      * @param password Passphrase for private key
      * @return read private key
      */
-    public PrivateKey readPrivateKey(InputStream pemFile, String password) {
+    public RSAPrivateKey readPrivateKey(InputStream pemFile, String password) {
         PEMParser pemParser = new PEMParser(new InputStreamReader(pemFile));
         PrivateKeyInfo keyInfo;
         try {
@@ -56,9 +59,9 @@ public class RSACryptoService implements ICryptoService {
             } else {
                 keyInfo = ((PEMKeyPair) keyPair).getPrivateKeyInfo();
             }
-            return new JcaPEMKeyConverter().getPrivateKey(keyInfo);
+            return (RSAPrivateKey) new JcaPEMKeyConverter().getPrivateKey(keyInfo);
         } catch (IOException | ClassCastException e) {
-            throw new IllegalArgumentException("Error reading key data");
+            throw new SecurityException("Error reading key data");
         }
     }
 
@@ -67,12 +70,13 @@ public class RSACryptoService implements ICryptoService {
      * @param pemFile Inputstream of .pem file
      * @return read public key
      */
-    public PublicKey readPublicKey(InputStream pemFile) {
+    public RSAPublicKey readPublicKey(InputStream pemFile) {
         PEMParser pemParser = new PEMParser(new InputStreamReader(pemFile));
         try {
-            return new JcaPEMKeyConverter().setProvider("BC").getPublicKey((SubjectPublicKeyInfo) pemParser.readObject());
+            return (RSAPublicKey) new JcaPEMKeyConverter().getPublicKey((SubjectPublicKeyInfo) pemParser.readObject());
+            //return new JcaPEMKeyConverter().setProvider("BC").getPublicKey((SubjectPublicKeyInfo) pemParser.readObject());
         } catch (IOException | ClassCastException e) {
-            throw new IllegalArgumentException("Error reading key data");
+            throw new SecurityException("Error reading key data");
         }
     }
 
@@ -122,7 +126,7 @@ public class RSACryptoService implements ICryptoService {
             LoggerFactory.getLogger(RSACryptoService.class).error("Something is wrong with your JRE. There is no RSA support with BouncyCastle.");
             throw new RuntimeException();
         } catch (InvalidKeyException e) {
-            throw new IllegalArgumentException("Invalid private key.");
+            throw new SecurityException("Invalid private key.");
         } catch (BadPaddingException | IllegalBlockSizeException e) {
             throw new IllegalArgumentException("Error during encryption");
         }
