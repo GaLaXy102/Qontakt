@@ -55,6 +55,17 @@ services:
       - "traefik.http.middlewares.secHeaders.headers.customresponseheaders.X-DNS-Prefetch-Control=off"
       - "traefik.http.middlewares.secHeaders.headers.customresponseheaders.X-Permitted-Cross-Domain-Policies=none"
 
+  crypto:
+    build: qontakt-crypto
+    networks:
+      frontend0:
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.q-crypto.rule=Host(`${DOMAIN}`) && PathPrefix(`/api/v1/crypto`)"
+      - "traefik.http.routers.q-crypto.entrypoints=websecure"
+      - "traefik.http.routers.q-crypto.tls=true"
+      - "traefik.http.routers.q-crypto.middlewares=secHeaders"
+
   host:
     build: qontakt-host
     networks:
@@ -62,8 +73,6 @@ services:
       dmz:
         aliases:
           - q-host-service
-    environment:
-      - DOMAIN
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.q-host.rule=Host(`${DOMAIN}`) && PathPrefix(`/api/v1/host`)"
@@ -78,8 +87,6 @@ services:
       dmz:
         aliases:
           - q-user-service
-    environment:
-      - DOMAIN
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.q-user.rule=Host(`${DOMAIN}`) && PathPrefix(`/api/v1/user`)"

@@ -4,27 +4,35 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="577ebf30-a68e-4efb-9688-54ea1afc8a6a" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/deploy/deploy.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/qontakt-host/qontakt-host.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/qontakt-user/qontakt-user.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/qontakt.iws" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+    <list default="true" id="577ebf30-a68e-4efb-9688-54ea1afc8a6a" name="Default Changelist" comment="Add crypto module">
+      <change afterPath="$PROJECT_DIR$/qontakt-crypto/src/main/java/app/qontakt/crypto/CryptoController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/qontakt-crypto/src/main/java/app/qontakt/crypto/CryptoService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/qontakt-crypto/src/main/java/app/qontakt/crypto/QontaktCryptoApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/qontakt-crypto/src/main/java/app/qontakt/crypto/QontaktCryptoApplication.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/qontakt.iws" beforeDir="false" afterPath="$PROJECT_DIR$/qontakt.iws" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="Git.Settings">
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
-  </component>
-  <component name="MavenImportPreferences">
-    <option name="generalSettings">
-      <MavenGeneralSettings>
-        <option name="mavenHome" value="$APPLICATION_HOME_DIR$/plugins/maven/lib/maven3" />
-      </MavenGeneralSettings>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
     </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="master" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="UPDATE_TYPE" value="REBASE" />
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedIndex" value="1" />
   </component>
   <component name="ProjectId" id="1l3HIJvAPo6mRg5qRoGYj7Wl23e" />
   <component name="ProjectViewState">
@@ -32,21 +40,27 @@
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
+    <property name="Git.Branch.Popup.ShowAllRemotes" value="true" />
     <property name="RequestMappingsPanelOrder0" value="0" />
     <property name="RequestMappingsPanelOrder1" value="1" />
     <property name="RequestMappingsPanelWidth0" value="75" />
     <property name="RequestMappingsPanelWidth1" value="75" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/prepare-deploy.sh" />
+    <property name="extract.method.default.visibility" value="private" />
+    <property name="ignore.preview.features.used" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/deploy/qontakt-crypto" />
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.15527344" />
     <property name="project.structure.side.proportion" value="0.27816093" />
+    <property name="settings.editor.selected.configurable" value="preferences.sourceCode.Java" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/deploy/qontakt-crypto" />
       <recent name="$PROJECT_DIR$/deploy" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
@@ -61,18 +75,41 @@
     </option>
   </component>
   <component name="RunManager" selected="Docker.docker-compose-insecure-local">
-    <configuration default="true" type="ArquillianTestNG" factoryName="" nameIsGenerated="true">
+    <configuration default="true" type="ArquillianJUnit" factoryName="" nameIsGenerated="true">
       <option name="arquillianRunConfiguration">
         <value>
           <option name="containerStateName" value="" />
         </value>
       </option>
-      <option name="TEST_OBJECT" value="CLASS" />
-      <properties />
-      <listeners />
+      <option name="TEST_OBJECT" value="class" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
+    </configuration>
+    <configuration name="package-crypto" type="MavenRunConfiguration" factoryName="Maven">
+      <MavenSettings>
+        <option name="myGeneralSettings" />
+        <option name="myRunnerSettings" />
+        <option name="myRunnerParameters">
+          <MavenRunnerParameters>
+            <option name="profiles">
+              <set />
+            </option>
+            <option name="goals">
+              <list>
+                <option value="package" />
+              </list>
+            </option>
+            <option name="pomFileName" />
+            <option name="profilesMap">
+              <map />
+            </option>
+            <option name="resolveToWorkspace" value="false" />
+            <option name="workingDirPath" value="$PROJECT_DIR$/qontakt-crypto" />
+          </MavenRunnerParameters>
+        </option>
+      </MavenSettings>
+      <method v="2" />
     </configuration>
     <configuration name="package-host" type="MavenRunConfiguration" factoryName="Maven">
       <MavenSettings>
@@ -124,6 +161,13 @@
       </MavenSettings>
       <method v="2" />
     </configuration>
+    <configuration name="QontaktCryptoApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+      <module name="qontakt-crypto" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="app.qontakt.crypto.QontaktCryptoApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="QontaktHostApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
       <module name="qontakt-host" />
       <option name="SPRING_BOOT_MAIN_CLASS" value="app.qontakt.host.QontaktHostApplication" />
@@ -141,11 +185,13 @@
     <list>
       <item itemvalue="Docker.docker-compose-insecure-public" />
       <item itemvalue="Docker.docker-compose-insecure-local" />
+      <item itemvalue="Maven.package-crypto" />
       <item itemvalue="Maven.package-user" />
       <item itemvalue="Maven.package-host" />
       <item itemvalue="Shell Script.Copy children to Deploy" />
       <item itemvalue="Spring Boot.QontaktHostApplication" />
       <item itemvalue="Spring Boot.QontaktUserApplication" />
+      <item itemvalue="Spring Boot.QontaktCryptoApplication" />
     </list>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
@@ -160,6 +206,13 @@
       <workItem from="1606819285300" duration="1505000" />
       <workItem from="1606823478421" duration="1626000" />
       <workItem from="1606838199574" duration="5304000" />
+      <workItem from="1609091805102" duration="6288000" />
+      <workItem from="1609101716850" duration="4551000" />
+      <workItem from="1609106626524" duration="1073000" />
+      <workItem from="1609192416293" duration="1230000" />
+      <workItem from="1609193687006" duration="8320000" />
+      <workItem from="1609351613351" duration="690000" />
+      <workItem from="1609414844735" duration="3186000" />
     </task>
     <task id="LOCAL-00001" summary="Add Deploy Configuration">
       <created>1606844628697</created>
@@ -168,92 +221,147 @@
       <option name="project" value="LOCAL" />
       <updated>1606844628697</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Refactor VisitRepository responses for minimum data output">
+      <created>1609098708826</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1609098708827</updated>
+    </task>
+    <task id="LOCAL-00003" summary="Implement U-N-03">
+      <created>1609098753362</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1609098753362</updated>
+    </task>
+    <task id="LOCAL-00004" summary="Refactor U-N-03's Emission strategy">
+      <created>1609106203751</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1609106203751</updated>
+    </task>
+    <task id="LOCAL-00005" summary="Implement U-L-03">
+      <created>1609106258355</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1609106258355</updated>
+    </task>
+    <task id="LOCAL-00006" summary="Refactor uihelper-Package&#10;* Rename to helper&#10;* Extract sortChronological for Visits">
+      <created>1609193982362</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1609193982362</updated>
+    </task>
+    <task id="LOCAL-00007" summary="Refactor uihelper-Package&#10;* Rename to helper&#10;* Extract sortChronological for Visits">
+      <created>1609194020343</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1609194020343</updated>
+    </task>
+    <task id="LOCAL-00008" summary="Refactor QUserDataFields to be an Enum">
+      <created>1609195237115</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1609195237115</updated>
+    </task>
+    <task id="LOCAL-00009" summary="Refactor QUserDataFields to be an Enum">
+      <created>1609195976766</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1609195976766</updated>
+    </task>
+    <task id="LOCAL-00010" summary="Add CheckIn and CheckOut fields to QUiData">
+      <created>1609196286019</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1609196286019</updated>
+    </task>
+    <task id="LOCAL-00011" summary="Extract UUID generation">
+      <created>1609200993028</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1609200993028</updated>
+    </task>
+    <task id="LOCAL-00012" summary="Add DataInitializers">
+      <created>1609201011226</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1609201011226</updated>
+    </task>
+    <task id="LOCAL-00013" summary="Implement CsvExporter">
+      <created>1609201072598</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1609201072598</updated>
+    </task>
+    <task id="LOCAL-00014" summary="Implement Visit retrieval by Lokal (not knowing UserUid)">
+      <created>1609202198703</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1609202198703</updated>
+    </task>
+    <task id="LOCAL-00015" summary="Add crypto module">
+      <created>1609423120913</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1609423120914</updated>
+    </task>
+    <task id="LOCAL-00016" summary="Add crypto module">
+      <created>1609424128118</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1609424128118</updated>
+    </task>
+    <option name="localTasksCounter" value="17" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="oldMeFiltersMigrated" value="true" />
+  </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Add Deploy Configuration" />
-    <option name="LAST_COMMIT_MESSAGE" value="Add Deploy Configuration" />
+    <MESSAGE value="Refactor VisitRepository responses for minimum data output" />
+    <MESSAGE value="Implement U-N-03" />
+    <MESSAGE value="Refactor U-N-03's Emission strategy" />
+    <MESSAGE value="Implement U-L-03" />
+    <MESSAGE value="Refactor uihelper-Package&#10;* Rename to helper&#10;* Extract sortChronological for Visits" />
+    <MESSAGE value="Refactor QUserDataFields to be an Enum" />
+    <MESSAGE value="Add CheckIn and CheckOut fields to QUiData" />
+    <MESSAGE value="Extract UUID generation" />
+    <MESSAGE value="Add DataInitializers" />
+    <MESSAGE value="Implement CsvExporter" />
+    <MESSAGE value="Implement Visit retrieval by Lokal (not knowing UserUid)" />
+    <MESSAGE value="Add crypto module" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add crypto module" />
   </component>
-  <component name="WindowStateProjectService">
-    <state x="555" y="232" width="800" height="675" key="#Docker" timestamp="1606842531253">
-      <screen x="0" y="34" width="1920" height="1046" />
-    </state>
-    <state x="555" y="232" width="800" height="675" key="#Docker/0.34.1920.1046@0.34.1920.1046" timestamp="1606842531253" />
-    <state x="443" y="134" width="1024" height="843" key="#Project_Structure" timestamp="1606823708216">
-      <screen x="0" y="34" width="1920" height="1046" />
-    </state>
-    <state x="443" y="134" width="1024" height="843" key="#Project_Structure/0.34.1920.1046@0.34.1920.1046" timestamp="1606823708216" />
-    <state x="418" y="215" width="1117" height="704" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1606844188319">
-      <screen x="0" y="34" width="1920" height="1046" />
-    </state>
-    <state x="418" y="215" width="1117" height="704" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.34.1920.1046@0.34.1920.1046" timestamp="1606844188319" />
-    <state x="501" y="94" width="907" height="924" key="CommitChangelistDialog2" timestamp="1606844628600">
-      <screen x="0" y="34" width="1920" height="1046" />
-    </state>
-    <state x="501" y="94" width="907" height="924" key="CommitChangelistDialog2/0.34.1920.1046@0.34.1920.1046" timestamp="1606844628600" />
-    <state x="182" y="123" width="1536" height="864" key="DiffContextDialog" timestamp="1606844591183">
-      <screen x="0" y="34" width="1920" height="1046" />
-    </state>
-    <state x="182" y="123" width="1536" height="864" key="DiffContextDialog/0.34.1920.1046@0.34.1920.1046" timestamp="1606844591183" />
-    <state x="801" y="458" width="307" height="222" key="DockerComposeFileDialog" timestamp="1606842545672">
-      <screen x="0" y="34" width="1920" height="1046" />
-    </state>
-    <state x="801" y="458" width="307" height="222" key="DockerComposeFileDialog/0.34.1920.1046@0.34.1920.1046" timestamp="1606842545672" />
-    <state x="803" y="326" width="304" height="533" key="EnvironmentVariablesDialog" timestamp="1606842492510">
-      <screen x="0" y="34" width="1920" height="1046" />
-    </state>
-    <state x="803" y="326" width="304" height="533" key="EnvironmentVariablesDialog/0.34.1920.1046@0.34.1920.1046" timestamp="1606842492510" />
-    <state x="738" y="327" width="424" height="482" key="FileChooserDialogImpl" timestamp="1606843082689">
-      <screen x="0" y="34" width="1920" height="1046" />
-    </state>
-    <state x="738" y="327" width="424" height="482" key="FileChooserDialogImpl/0.34.1920.1046@0.34.1920.1046" timestamp="1606843082689" />
-    <state width="1874" height="276" key="GridCell.Tab.0.bottom" timestamp="1606844505982">
-      <screen x="0" y="34" width="1920" height="1046" />
-    </state>
-    <state width="1874" height="276" key="GridCell.Tab.0.bottom/0.34.1920.1046@0.34.1920.1046" timestamp="1606844505982" />
-    <state width="1874" height="276" key="GridCell.Tab.0.center" timestamp="1606844505981">
-      <screen x="0" y="34" width="1920" height="1046" />
-    </state>
-    <state width="1874" height="276" key="GridCell.Tab.0.center/0.34.1920.1046@0.34.1920.1046" timestamp="1606844505981" />
-    <state width="1874" height="276" key="GridCell.Tab.0.left" timestamp="1606844505981">
-      <screen x="0" y="34" width="1920" height="1046" />
-    </state>
-    <state width="1874" height="276" key="GridCell.Tab.0.left/0.34.1920.1046@0.34.1920.1046" timestamp="1606844505981" />
-    <state width="1874" height="276" key="GridCell.Tab.0.right" timestamp="1606844505982">
-      <screen x="0" y="34" width="1920" height="1046" />
-    </state>
-    <state width="1874" height="276" key="GridCell.Tab.0.right/0.34.1920.1046@0.34.1920.1046" timestamp="1606844505982" />
-    <state width="1291" height="276" key="GridCell.Tab.1.bottom" timestamp="1606823475856">
-      <screen x="0" y="34" width="1920" height="1046" />
-    </state>
-    <state width="1291" height="276" key="GridCell.Tab.1.bottom/0.34.1920.1046@0.34.1920.1046" timestamp="1606823475856" />
-    <state width="1291" height="276" key="GridCell.Tab.1.center" timestamp="1606823475856">
-      <screen x="0" y="34" width="1920" height="1046" />
-    </state>
-    <state width="1291" height="276" key="GridCell.Tab.1.center/0.34.1920.1046@0.34.1920.1046" timestamp="1606823475856" />
-    <state width="1291" height="276" key="GridCell.Tab.1.left" timestamp="1606823475855">
-      <screen x="0" y="34" width="1920" height="1046" />
-    </state>
-    <state width="1291" height="276" key="GridCell.Tab.1.left/0.34.1920.1046@0.34.1920.1046" timestamp="1606823475855" />
-    <state width="1291" height="276" key="GridCell.Tab.1.right" timestamp="1606823475856">
-      <screen x="0" y="34" width="1920" height="1046" />
-    </state>
-    <state width="1291" height="276" key="GridCell.Tab.1.right/0.34.1920.1046@0.34.1920.1046" timestamp="1606823475856" />
-    <state x="549" y="301" width="802" height="507" key="NewModule_or_Project.wizard" timestamp="1606823788780">
-      <screen x="0" y="34" width="1920" height="1046" />
-    </state>
-    <state x="549" y="301" width="802" height="507" key="NewModule_or_Project.wizard/0.34.1920.1046@0.34.1920.1046" timestamp="1606823788780" />
-    <state x="443" y="134" width="1024" height="843" key="SettingsEditor" timestamp="1606843300614">
-      <screen x="0" y="34" width="1920" height="1046" />
-    </state>
-    <state x="443" y="134" width="1024" height="843" key="SettingsEditor/0.34.1920.1046@0.34.1920.1046" timestamp="1606843300614" />
-    <state x="555" y="293" width="800" height="526" key="Vcs.Push.Dialog.v2" timestamp="1606844630078">
-      <screen x="0" y="34" width="1920" height="1046" />
-    </state>
-    <state x="555" y="293" width="800" height="526" key="Vcs.Push.Dialog.v2/0.34.1920.1046@0.34.1920.1046" timestamp="1606844630078" />
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
   </component>
 </project>
