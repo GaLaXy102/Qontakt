@@ -74,7 +74,6 @@ public class RSACryptoService {
         PEMParser pemParser = new PEMParser(new InputStreamReader(pemFile));
         try {
             return (RSAPublicKey) new JcaPEMKeyConverter().getPublicKey((SubjectPublicKeyInfo) pemParser.readObject());
-            //return new JcaPEMKeyConverter().setProvider("BC").getPublicKey((SubjectPublicKeyInfo) pemParser.readObject());
         } catch (IOException | ClassCastException e) {
             throw new SecurityException("Error reading key data");
         }

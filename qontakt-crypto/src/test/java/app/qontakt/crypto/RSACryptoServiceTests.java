@@ -41,4 +41,11 @@ public class RSACryptoServiceTests {
         byte[] decrypted = testable.decrypt(aesKeyEncAndCipherText.getRight(), aesKeyEncAndCipherText.getLeft(), privateKey);
         Assertions.assertArrayEquals(data, decrypted);
     }
+
+    @Test
+    void testWrongPassword() {
+        Assertions.assertThrows(SecurityException.class,
+                () -> testable.readPrivateKey(new ByteArrayInputStream(RSACryptoServiceTestData.encryptedPrivateKeyString.getBytes()),
+                RSACryptoServiceTestData.passphrase + "la"));
+    }
 }
