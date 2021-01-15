@@ -200,6 +200,7 @@
       <module fileurl="file://$PROJECT_DIR$/qontakt-crypto/qontakt-crypto.iml" filepath="$PROJECT_DIR$/qontakt-crypto/qontakt-crypto.iml" />
       <module fileurl="file://$PROJECT_DIR$/qontakt-host/qontakt-host.iml" filepath="$PROJECT_DIR$/qontakt-host/qontakt-host.iml" />
       <module fileurl="file://$PROJECT_DIR$/qontakt-user/qontakt-user.iml" filepath="$PROJECT_DIR$/qontakt-user/qontakt-user.iml" />
+      <module fileurl="file://$PROJECT_DIR$/qontakt-webui/qontakt-webui.iml" filepath="$PROJECT_DIR$/qontakt-webui/qontakt-webui.iml" />
     </modules>
   </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_14" default="false" project-jdk-name="15" project-jdk-type="JavaSDK">
