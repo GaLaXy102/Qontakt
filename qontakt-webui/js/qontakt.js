@@ -20,6 +20,9 @@ const translations = new Map(Object.entries({
         "confirmVisitHeader": "Bitte bestätigen Sie den Besuch in folgendem Lokal:",
         "confirmCheckout": "Besuch beenden",
         "confirmCheckoutText": "Möchten Sie Ihren Besuch wirklich beenden?",
+        "valid": "Gültig",
+        "yes": "ja",
+        "no": "nein",
     }
 }));
 
@@ -42,6 +45,7 @@ const translatableFields = new Map(Object.entries({
     "btn-q-closevisit": "save",
     "lb-q-closevisit": "confirmCheckout",
     "lb-q-closevisit-text": "confirmCheckoutText",
+    "lb-q-valid": "valid",
 }))
 
 function getTranslation(name) {
@@ -103,7 +107,7 @@ function formatLokalForCheckin(lokalData) {
 
 // QR INPUT
 
-const qrEnabled = new Array('checkin');
+const qrEnabled = ['checkin', 'verify'];
 
 const qontaktQRScanner = (function () {
     let scanner;
@@ -134,10 +138,17 @@ const qontaktQRScanner = (function () {
     }
 })();
 
+const QRLensAltlisteners = new Map(Object.entries({
+    "checkin": listenInputGetLokal,
+    "verify": listenInputVerify,
+}));
+
 function initializeQR(pageName) {
     qontaktQRScanner.resetInstance();
     if (qrEnabled.includes(pageName)) {
-        document.getElementById('q-qr-lens-alt').addEventListener('input', listenInputGetLokal);
+        if (QRLensAltlisteners.has(pageName)) {
+            document.getElementById('q-qr-lens-alt').addEventListener('input', QRLensAltlisteners.get(pageName));
+        }
         QrScanner.hasCamera().then(function (camAvail) {
             if (camAvail) {
                 onCamera();
@@ -160,6 +171,7 @@ function onCamera() {
 
 function onNoCamera() {
     document.getElementById('q-qr-lens-alt').removeAttribute('disabled');
+    document.getElementById('q-qr-lens-alt-wrapper').classList.remove('d-none');
     document.getElementById('q-qr-lens-wrapper').remove();
 }
 
@@ -169,13 +181,11 @@ function toggleFlash() {
     })
 }
 
-const UUID_LENGTH = 36;
-
 function listenInputGetLokal(ev) {
     const btn = document.getElementById('btn-q-checkinto');
     const elem = ev.target;
     const text = elem.value.toString();
-    if (text.length < UUID_LENGTH) {
+    if (!text.match(uidPattern)) {
         elem.classList.add('bg-warning');
         elem.classList.remove('bg-success', 'bg-failure');
         btn.setAttribute('disabled', 'true');
@@ -193,6 +203,49 @@ function listenInputGetLokal(ev) {
             elem.classList.add('bg-failure');
             document.getElementById('q-qr-lens-friendly').value = "";
             btn.setAttribute('disabled', 'true');
+        }
+    }
+}
+
+const uidPattern = "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[34][0-9a-fA-F]{3}-[89ab][0-9a-fA-F]{3}-[0-9a-fA-F]{12}";
+const longPattern = "[0-9]{1,19}";
+const verifyRegex = "///" + uidPattern + "/" + uidPattern + "//" + longPattern + "///";
+
+function listenInputVerify(ev) {
+    const elem = ev.target;
+    const text = elem.value.toString();
+    const friendly = document.getElementById('q-qr-lens-friendly');
+    if (!text.match(verifyRegex)) {
+        // Warning in Input field for not matching regex
+        elem.classList.add('bg-warning');
+        // Timeout to allow batch processing
+        window.setTimeout(() => friendly.classList.remove('bg-warning'), 1000);
+        // Warning in Output field for bad value read
+        friendly.classList.add('bg-warning');
+        friendly.classList.remove('bg-success', 'bg-failure');
+        friendly.value = getTranslation('no');
+    } else {
+        // Remove any warnings (conservatively to avoid blinking)
+        elem.classList.remove('bg-warning');
+        friendly.classList.remove('bg-warning');
+        // Query verfication result
+        const result = queryVerification(text);
+        if (result) {
+            // Set output color
+            friendly.classList.remove('bg-failure');
+            friendly.classList.add('bg-success');
+            // Timeout to allow batch processing
+            window.setTimeout(() => friendly.classList.remove('bg-success'), 1000);
+            friendly.value = getTranslation('yes');
+        } else {
+            // Set output color
+            elem.classList.remove('bg-success');
+            elem.classList.add('bg-failure');
+            friendly.classList.remove('bg-success');
+            friendly.classList.add('bg-failure');
+            // Timeout to allow batch processing
+            window.setTimeout(() => friendly.classList.remove('bg-failure'), 1000);
+            friendly.value = getTranslation('no');
         }
     }
 }
@@ -277,20 +330,26 @@ function queryLokalData(uuid) {
 
 function hasActiveVisit() {
     // TODO implement me
-    console.log("Method not implemented: hasActiveVisit")
+    console.log("Method not implemented: hasActiveVisit");
     return window.localStorage.getItem('stubVisitActive') === "true";
 }
 
 function performCheckin() {
     // TODO implement me
-    console.log("Method not implemented: performCheckin")
+    console.log("Method not implemented: performCheckin");
     window.localStorage.setItem('stubVisitActive', true);
     return [true, 200];
 }
 
 function performCheckout() {
     // TODO implement me
-    console.log("Method not implemented: performCheckout")
+    console.log("Method not implemented: performCheckout");
     window.localStorage.setItem('stubVisitActive', false);
     return [true, 200];
+}
+
+function queryVerification(veriString) {
+    // TODO implement me
+    console.log("Method not implemented: queryVerification");
+    return true;
 }
