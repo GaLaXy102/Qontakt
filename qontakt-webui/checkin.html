@@ -51,9 +51,31 @@
         <button type="button" class="btn btn-primary btn-lg" id="btn-q-back" onclick="showNext(this)">
             ??back??
         </button>
-        <button type="button" class="btn btn-primary btn-lg" id="btn-q-checkinto" onclick="showNext(this)" disabled>
+        <button type="button" class="btn btn-primary btn-lg" id="btn-q-checkinto" data-toggle="modal"
+                data-target="#acceptCheckin" disabled>
             ??checkinto??
         </button>
+    </div>
+</div>
+<!-- Modal to accept changes -->
+<div class="modal fade" id="acceptCheckin" data-backdrop="static" data-keyboard="false" tabindex="-1"
+     aria-labelledby="btn-q-checkinto" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="lb-q-savevisit">??savevisit??</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="lb-q-savevisit-text">??savevisit-text??</div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" id="btn-q-dismiss">??back
+                    ??</button>
+                <button type="button" class="btn btn-primary" id="btn-q-savevisit" onclick="showNext(this)">??save??
+                </button>
+            </div>
+        </div>
     </div>
 </div>
 </body>

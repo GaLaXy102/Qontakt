@@ -14,6 +14,10 @@ const translations = new Map(Object.entries({
         "disabledCamera": "Bitte geben Sie den Zugriff auf Ihre Kamera frei oder geben Sie die ID unterhalb des" +
             " QR-Codes ein.",
         "error": "Fehler",
+        "confirmVisit": "Besuch bestätigen",
+        "dismiss": "Abbrechen",
+        "save": "Speichern",
+        "confirmVisitHeader": "Bitte bestätigen Sie den Besuch in folgendem Lokal:",
     }
 }));
 
@@ -30,6 +34,9 @@ const translatableFields = new Map(Object.entries({
     "btn-q-verify": "verify",
     "btn-q-back": "back",
     "btn-q-checkinto": "checkInTo",
+    "lb-q-savevisit": "confirmVisit",
+    "btn-q-dismiss": "dismiss",
+    "btn-q-savevisit": "save",
 }))
 
 function getTranslation(name) {
@@ -83,6 +90,10 @@ function setButtonStates(hasVisit, pageName) {
             }
             break;
     }
+}
+
+function formatLokalForCheckin(lokalData) {
+    return getTranslation("confirmVisitHeader") + "\n" + lokalData.name + "\n" + lokalData.address + "\n" + lokalData.gdprContact;
 }
 
 // QR INPUT
@@ -165,16 +176,17 @@ function listenInputGetLokal(ev) {
         btn.setAttribute('disabled', 'true');
     } else {
         elem.classList.remove('bg-warning');
-        const result = queryLokalName(text);
+        const result = queryLokalData(text);
         if (result[0]) {
             elem.classList.remove('bg-failure');
             elem.classList.add('bg-success');
-            document.getElementById('q-qr-lens-friendly').value = result[1];
+            document.getElementById('q-qr-lens-friendly').value = result[1].name;
             btn.removeAttribute('disabled');
+            document.getElementById('lb-q-savevisit-text').innerText = formatLokalForCheckin(result[1]);
         } else {
             elem.classList.remove('bg-success');
             elem.classList.add('bg-failure');
-            document.getElementById('q-qr-lens-friendly').value = result[1];
+            document.getElementById('q-qr-lens-friendly').value = "";
             btn.setAttribute('disabled', 'true');
         }
     }
@@ -209,7 +221,7 @@ const nextAction = new Map(Object.entries({
     "btn-q-back": function () {
         history.go(-1);
     },
-    "btn-q-checkinto": function () {
+    "btn-q-savevisit": function () {
         const response = performCheckin();
         if (response[0]) {
             history.go(-1);
@@ -230,9 +242,24 @@ function showNext(item) {
 
 // COMMUNICATION
 
-function queryLokalName(uuid) {
+function queryLokalData(uuid) {
     // TODO implement me
-    return [true, "Zur fröhlichen Reblaus"];
+    const sampleData = {
+        "name": "Zur Fröhlichen Reblaus",
+        "address": "Weinstraße 3, 01069 Dresden",
+        "coordinates": {
+            "x": 0,
+            "y": 0
+        },
+        "owner": "UID-of-Owner",
+        "gdprContact": "gdpr@qontakt.me",
+        "checkoutTime": "12:34:56",
+        "federalState": {
+            "countryCode": "DEU",
+            "shortName": "SN"
+        }
+    };
+    return [true, sampleData];
 }
 
 function hasActiveVisit() {
