@@ -18,6 +18,8 @@ const translations = new Map(Object.entries({
         "dismiss": "Abbrechen",
         "save": "Speichern",
         "confirmVisitHeader": "Bitte bestätigen Sie den Besuch in folgendem Lokal:",
+        "confirmCheckout": "Besuch beenden",
+        "confirmCheckoutText": "Möchten Sie Ihren Besuch wirklich beenden?",
     }
 }));
 
@@ -37,6 +39,9 @@ const translatableFields = new Map(Object.entries({
     "lb-q-savevisit": "confirmVisit",
     "btn-q-dismiss": "dismiss",
     "btn-q-savevisit": "save",
+    "btn-q-closevisit": "save",
+    "lb-q-closevisit": "confirmCheckout",
+    "lb-q-closevisit-text": "confirmCheckoutText",
 }))
 
 function getTranslation(name) {
@@ -207,7 +212,14 @@ const nextAction = new Map(Object.entries({
     "btn-q-checkin": function () {
         window.location.href = "checkin.html";
     },
-    //"btn-q-checkout": function () { console.log("Implement me!") }, // TODO
+    "btn-q-closevisit": function () {
+        const response = performCheckout();
+        if (response[0]) {
+            window.location.reload(false);
+        } else {
+            window.alert(getTranslation('error') + ": " + response[1]);
+        }
+    },
     "btn-q-visitdetail": function () {
         window.location.href = "myvisit.html";
     },
@@ -244,6 +256,7 @@ function showNext(item) {
 
 function queryLokalData(uuid) {
     // TODO implement me
+    console.log("Method not implemented: queryLokalData")
     const sampleData = {
         "name": "Zur Fröhlichen Reblaus",
         "address": "Weinstraße 3, 01069 Dresden",
@@ -264,10 +277,20 @@ function queryLokalData(uuid) {
 
 function hasActiveVisit() {
     // TODO implement me
-    return false;
+    console.log("Method not implemented: hasActiveVisit")
+    return window.localStorage.getItem('stubVisitActive') === "true";
 }
 
 function performCheckin() {
     // TODO implement me
+    console.log("Method not implemented: performCheckin")
+    window.localStorage.setItem('stubVisitActive', true);
+    return [true, 200];
+}
+
+function performCheckout() {
+    // TODO implement me
+    console.log("Method not implemented: performCheckout")
+    window.localStorage.setItem('stubVisitActive', false);
     return [true, 200];
 }

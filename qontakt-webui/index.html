@@ -28,7 +28,8 @@
             <button type="button" class="btn btn-primary btn-lg btn-block" id="btn-q-checkin" onclick="showNext(this)">
                 ??checkin??
             </button>
-            <button type="button" class="btn btn-primary btn-lg btn-block" id="btn-q-checkout" onclick="showNext(this)">
+            <button type="button" class="btn btn-primary btn-lg btn-block" id="btn-q-checkout"
+                    data-toggle="modal" data-target="#acceptCheckout">
                 ??checkout??
             </button>
         </div>
@@ -54,6 +55,27 @@
         <button type="button" class="btn btn-primary btn-lg" id="btn-q-verify" onclick="showNext(this)">
             ??verify??
         </button>
+    </div>
+</div>
+<!-- Modal to accept changes -->
+<div class="modal fade" id="acceptCheckout" data-backdrop="static" data-keyboard="false" tabindex="-1"
+     aria-labelledby="btn-q-checkout" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="lb-q-closevisit">??closevisit??</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="lb-q-closevisit-text">??closevisit-text??</div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" id="btn-q-dismiss">??back
+                    ??</button>
+                <button type="button" class="btn btn-primary" id="btn-q-closevisit" onclick="showNext(this)">??save??
+                </button>
+            </div>
+        </div>
     </div>
 </div>
 </body>
