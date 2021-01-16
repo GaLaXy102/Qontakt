@@ -15,7 +15,7 @@ const translations = new Map(Object.entries({
             " QR-Codes ein.",
         "error": "Fehler",
         "confirmVisit": "Besuch bestätigen",
-        "dismiss": "Abbrechen",
+        "dismiss": "Schließen",
         "save": "Speichern",
         "confirmVisitHeader": "Bitte bestätigen Sie den Besuch in folgendem Lokal:",
         "confirmCheckout": "Besuch beenden",
@@ -23,6 +23,8 @@ const translations = new Map(Object.entries({
         "valid": "Gültig",
         "yes": "ja",
         "no": "nein",
+        "abort": "Abbrechen",
+        "visitData": "Verifikationscode",
     }
 }));
 
@@ -40,12 +42,14 @@ const translatableFields = new Map(Object.entries({
     "btn-q-back": "back",
     "btn-q-checkinto": "checkInTo",
     "lb-q-savevisit": "confirmVisit",
-    "btn-q-dismiss": "dismiss",
+    "btn-q-dismiss": "abort",
+    "btn-q-dismiss2": "dismiss",
     "btn-q-savevisit": "save",
     "btn-q-closevisit": "save",
     "lb-q-closevisit": "confirmCheckout",
     "lb-q-closevisit-text": "confirmCheckoutText",
     "lb-q-valid": "valid",
+    "lb-q-visit-data": 'visitData',
 }))
 
 function getTranslation(name) {
@@ -101,8 +105,26 @@ function setButtonStates(hasVisit, pageName) {
     }
 }
 
+// OUTPUTS
+
 function formatLokalForCheckin(lokalData) {
     return getTranslation("confirmVisitHeader") + "\n" + lokalData.name + "\n" + lokalData.address + "\n" + lokalData.gdprContact;
+}
+
+function setContent(pageName) {
+    switch (pageName) {
+        case "main":
+            if (hasActiveVisit()) {
+                let verification = getVerification();
+                new QRCode(document.getElementById('q-qr-output-img'), {
+                    text: verification,
+                    width: 600,
+                    height: 600,
+                    correctLevel: QRCode.CorrectLevel.L
+                });
+                document.getElementById('q-qr-output-text').innerText = verification;
+            }
+    }
 }
 
 // QR INPUT
@@ -257,6 +279,7 @@ window.onload = function () {
     redirectForbidden(getPageName());
     setButtonStates(hasActiveVisit(), getPageName());
     setTranslations();
+    setContent(getPageName());
     initializeQR(getPageName());
 }
 
@@ -356,6 +379,12 @@ function performCheckout() {
     console.log("Method not implemented: performCheckout");
     window.localStorage.setItem('stubVisitActive', false);
     return [true, 200];
+}
+
+function getVerification() {
+    // TODO implement me
+    console.log("Method not implemented: getVerification");
+    return "///5c29d2cd-5f07-4767-b511-464f94e3fddb/fed2ea29-a462-43f1-9517-621e74bba804//37780///";
 }
 
 function queryVerification(veriString) {

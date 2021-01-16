@@ -9,6 +9,7 @@
             crossorigin="anonymous"></script>
     <script src="js/bootstrap.min.js"
             integrity="sha384-w1Q4orYjBQndcko6MimVbzY0tgp4pWB4lZ7lr30WKz0vr/aWKhXdBNmNb5D92v7s"></script>
+    <script src="js/qrcode.min.js"></script>
     <script src="js/qontakt.js"></script>
     <link rel="stylesheet" href="css/bootstrap.min.css"
           integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2">
@@ -36,7 +37,8 @@
     </div>
     <div class="row mb-3">
         <div class="col">
-            <button type="button" class="btn btn-primary btn-lg btn-block" id="btn-q-visitdetail" onclick="showNext(this)">
+            <button type="button" class="btn btn-primary btn-lg btn-block" id="btn-q-visitdetail"
+                    data-toggle="modal" data-target="#showVerification">
                 ??myvisit??
             </button>
         </div>
@@ -64,9 +66,6 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="lb-q-closevisit">??closevisit??</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
             </div>
             <div class="modal-body" id="lb-q-closevisit-text">??closevisit-text??</div>
             <div class="modal-footer">
@@ -74,6 +73,28 @@
                     ??</button>
                 <button type="button" class="btn btn-primary" id="btn-q-closevisit" onclick="showNext(this)">??save??
                 </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for verification code -->
+<div class="modal fade" id="showVerification" data-backdrop="static" data-keyboard="false" tabindex="-1"
+     aria-labelledby="btn-q-visitdetail" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="lb-q-visit-data">??verificationdata??</h5>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex justify-content-center" id="q-qr-output-img">
+                </div>
+                <hr />
+                <p id="q-qr-output-text"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal" id="btn-q-dismiss2">??back
+                    ??</button>
             </div>
         </div>
     </div>
