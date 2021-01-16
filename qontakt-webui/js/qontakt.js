@@ -254,12 +254,22 @@ function listenInputVerify(ev) {
 
 window.onload = function () {
     preferredLang = getLanguagePreference();
+    redirectForbidden(getPageName());
     setButtonStates(hasActiveVisit(), getPageName());
     setTranslations();
     initializeQR(getPageName());
 }
 
 // ROUTING
+const forbiddenActive = ['checkin'];
+const forbiddenInactive = ['myvisit'];
+function redirectForbidden(pageName) {
+    if (hasActiveVisit()) {
+        if (forbiddenActive.includes(pageName)) document.location = 'index.html';
+    } else {
+        if (forbiddenInactive.includes(pageName)) document.location = 'index.html';
+    }
+}
 
 const nextAction = new Map(Object.entries({
     "btn-q-checkin": function () {
