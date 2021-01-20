@@ -189,7 +189,7 @@ public class UserRestController {
             @ApiResponse(responseCode = "400", description = "User has no current Visit", content = @Content),
             @ApiResponse(responseCode = "200", description = "Current Visit data")
     })
-    @GetMapping("/visit/verify")
+    @GetMapping("/verify")
     ResponseEntity<String> getCurrentVisitVerificationString(@RequestParam String user_uid, HttpServletRequest request) {
         if (!UserRestController.isAuthorizedUser(request)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
