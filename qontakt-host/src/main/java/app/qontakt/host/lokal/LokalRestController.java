@@ -74,8 +74,8 @@ public class LokalRestController {
         }
     }
 
-    @Operation(summary = "Get all Lokals. Level of detail depends on userUid.", security =
-    @SecurityRequirement(name = "user-header"))
+    @Operation(summary = "Get all Lokals or a specific one. Level of detail depends on userUid.",
+            security = @SecurityRequirement(name = "user-header"))
     @ApiResponses(value = {
             @ApiResponse(responseCode = "401", description = "Missing Authorization header", content = @Content),
             @ApiResponse(responseCode = "403", description = "userUid doesn't match Authorization header", content =
@@ -87,6 +87,7 @@ public class LokalRestController {
     })
     @GetMapping("/lokal")
     public ResponseEntity<List<? extends LokalData>> getLokals(@RequestParam Optional<String> userUid,
+                                                               @RequestParam Optional<String> lokalUid,
                                                                HttpServletRequest request) {
         if (!LokalRestController.isAuthorized(request)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
@@ -94,7 +95,7 @@ public class LokalRestController {
         if (userUid.isPresent() && !LokalRestController.isAuthorized(request, userUid.get())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         }
-        return ResponseEntity.ok(this.lokalService.findAll(userUid));
+        return ResponseEntity.ok(this.lokalService.findAll(userUid, lokalUid));
     }
 
     @Operation(summary = "Get a PDF of all sent visits", security = @SecurityRequirement(name = "user-header"))

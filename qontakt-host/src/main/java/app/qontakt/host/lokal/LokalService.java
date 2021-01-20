@@ -101,16 +101,22 @@ public class LokalService {
     }
 
     /**
-     * Find all Lokals with the possiblity to restrict to a given user, yielding more information
+     * Find all Lokals or a specific one with the possiblity to restrict to a given user, yielding more information
      *
      * @param userUid userUid of Owner
+     * @param lokalUid lokalUid of Lokal
      * @return List of all Lokals, with missing checkoutTime and owner information when requesting all Lokals
      */
-    public List<? extends LokalData> findAll(Optional<String> userUid) {
+    public List<? extends LokalData> findAll(Optional<String> userUid, Optional<String> lokalUid) {
         if (userUid.isEmpty()) {
-            return this.lokalDataRepository.findAll().map(LokalDataPublic::new).toList();
+            return this.lokalDataRepository.findAll()
+                    .filter(lokalData -> lokalUid.isEmpty() || lokalData.getLokalUid().equals(lokalUid.get()))
+                    .map(LokalDataPublic::new)
+                    .toList();
         } else {
-            return this.lokalDataRepository.findAllByOwner(userUid.get()).toList();
+            return this.lokalDataRepository.findAllByOwner(userUid.get())
+                    .filter(lokalData -> lokalUid.isEmpty() || lokalData.getLokalUid().equals(lokalUid.get()))
+                    .toList();
         }
     }
 
