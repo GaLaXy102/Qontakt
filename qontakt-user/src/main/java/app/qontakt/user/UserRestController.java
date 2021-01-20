@@ -69,6 +69,15 @@ public class UserRestController {
         return request.getHeader("X-Lokal") != null;
     }
 
+    @Operation(summary = "Get user UID belonging to a given request", security = @SecurityRequirement(name = "user-header"))
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "UserUid or nothing if not authenticated")
+    })
+    @GetMapping("/whoami")
+    public ResponseEntity<String> whoami(HttpServletRequest request){
+        return ResponseEntity.ok(request.getHeader("X-User"));
+    }
+
     @Operation(summary = "Create a new Visit for the given User and Lokal.", security = @SecurityRequirement(name = "user-header"))
     @ApiResponses(value = {
             @ApiResponse(responseCode = "401", description = "User has no Authorization", content = @Content),
