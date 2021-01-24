@@ -167,7 +167,6 @@ services:
       traefik.enable: "true"
       traefik.http.routers.q-crypto.rule: PathPrefix(`/api/v1/crypto`)
       traefik.http.routers.q-crypto.entrypoints: web
-      traefik.http.routers.q-crypto.tls: "true"
 
   host:
     build: qontakt-host
