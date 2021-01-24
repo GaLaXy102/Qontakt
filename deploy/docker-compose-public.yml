@@ -1,0 +1,194 @@
+---
+version: "3.8"
+
+networks:
+  preauth0:
+    name: preauth0
+  postauth0:
+    name: postauth0
+  dmz0:
+    name: dmz0
+
+volumes:
+  traefik_certs:
+    name: traefik_certs
+  mariadb_data:
+    name: mariadb_data
+
+services:
+  # TLS encryption and drop headers
+  traefik_tls:
+    image: library/traefik:v2.3
+    command:
+      - "--api.dashboard=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--providers.docker.network=preauth0"
+      - "--providers.docker.constraints=Label(`qontakt`, `external`)"
+      - "--providers.file=true"
+      - "--providers.file.directory=/conf"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--entrypoints.web-alt.address=:8080"
+      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+      - "--certificatesresolvers.le.acme.dnschallenge=true"
+      - "--certificatesresolvers.le.acme.dnschallenge.resolvers=8.8.8.8:53"
+      - "--certificatesresolvers.le.acme.dnschallenge.provider=hetzner"
+      - "--certificatesresolvers.le.acme.email=services@galaxion.de"
+      - "--certificatesresolvers.le.acme.storage=/certs/acme.json"
+    restart: always
+    networks:
+      preauth0:
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"
+    volumes:
+      - traefik_certs:/certs
+      - ./traefik:/conf:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      - "HETZNER_API_KEY"
+    labels:
+      qontakt: external
+      traefik.enable: "true"
+      traefik.http.routers.dashboard.rule: Host(`traefik_ext.${DOMAIN}`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))
+      traefik.http.routers.dashboard.entrypoints: web-alt
+      traefik.http.routers.dashboard.middlewares: secHeaders@file
+      traefik.http.routers.dashboard.service: api@internal
+      traefik.http.routers.dashboard.tls: "true"
+      traefik.http.routers.dashboard.tls.certresolver: le
+      traefik.http.routers.dashboard.tls.domains[0].main: ${DOMAIN}
+      traefik.http.routers.dashboard.tls.domains[0].sans: "*.${DOMAIN}"
+
+  # TODO Debug
+  whoami:
+    image: containous/whoami
+    restart: always
+    networks:
+      preauth0:
+    labels:
+      qontakt: external
+      traefik.enable: "true"
+      traefik.http.routers.whoami.rule: Host(`whoami_preauth.${DOMAIN}`)
+      traefik.http.routers.whoami.entrypoints: websecure
+      traefik.http.routers.whoami.tls: "true"
+      traefik.http.routers.whoami.middlewares: secHeaders@file
+
+  # Auth
+  oathkeeper:
+    image: oryd/oathkeeper:v0.38.5-alpine
+    command: serve proxy -c "/etc/config/oathkeeper/config.yml"
+    restart: always
+    networks:
+      preauth0:
+      postauth0:
+    depends_on:
+      - kratos
+    expose:
+      - 4455
+    volumes:
+      - ./oathkeeper:/etc/config/oathkeeper:ro
+    environment:
+      LOG_LEVEL: debug
+    labels:
+      qontakt: external
+      traefik.enable: "true"
+      traefik.http.routers.oathkeeper.rule: HostRegexp(`{host:.+}`)
+      traefik.http.routers.oathkeeper.entrypoints: websecure
+      traefik.http.routers.oathkeeper.tls: "true"
+      traefik.http.routers.oathkeeper.middlewares: secHeaders@file
+
+  kratos:
+    image: oryd/kratos:v0.5.5-sqlite
+    command: serve -c /etc/config/kratos/config.yml --dev  # TODO: Switch to production
+    restart: always
+    networks:
+      postauth0:
+    expose:
+      - 4433
+    volumes:
+      - ./kratos:/etc/config/kratos:ro
+    environment:
+      SESSION_COOKIE_DOMAIN: ${DOMAIN}
+      SECRETS_DEFAULT: ${KRATOS_SECRET}
+      COURIER_SMTP_CONNECTION_URI: ${KRATOS_SMTP}
+      SERVE_PUBLIC_BASE_URL: https://${DOMAIN}/.ory/kratos/public
+
+
+  # Application Gateway
+  traefik_int:
+    image: library/traefik:v2.3
+    command:
+      - "--api.dashboard=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--providers.docker.network=postauth0"
+      - "--providers.docker.constraints=Label(`qontakt`, `internal`)"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.web-alt.address=:8081"
+    restart: always
+    networks:
+      postauth0:
+    expose:
+      - 80
+    ports:
+      - "8081:8081"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.dashboard-int.rule: Host(`traefik_int.${DOMAIN}`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))
+      traefik.http.routers.dashboard-int.entrypoints: web-alt
+      traefik.http.routers.dashboard-int.service: api@internal
+      traefik.http.routers.dashboard-int.tls: "true"
+      qontakt: internal
+
+  whoami2:
+    image: containous/whoami
+    restart: always
+    networks:
+      postauth0:
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.whoami2.rule: Host(`whoami_postauth.${DOMAIN}`)
+      traefik.http.routers.whoami2.entrypoints: web
+      qontakt: internal
+
+  crypto:
+    build: qontakt-crypto
+    networks:
+      postauth0:
+      dmz0:
+        aliases:
+          - q-crypto-service
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.q-crypto.rule: PathPrefix(`/api/v1/crypto`)
+      traefik.http.routers.q-crypto.entrypoints: web
+      traefik.http.routers.q-crypto.tls: "true"
+
+  host:
+    build: qontakt-host
+    networks:
+      postauth0:
+      dmz0:
+        aliases:
+          - q-host-service
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.q-host.rule: PathPrefix(`/api/v1/host`)
+      traefik.http.routers.q-host.entrypoints: web
+
+  user:
+    build: qontakt-user
+    networks:
+      postauth0:
+      dmz0:
+        aliases:
+          - q-user-service
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.q-user.rule: PathPrefix(`/api/v1/user`)
+      traefik.http.routers.q-user.entrypoints: web

@@ -1,0 +1,22 @@
+http:
+  middlewares:
+    secHeaders:
+      headers:
+        accesscontrolallowcredentials: "true"
+        accesscontrolallowheaders: "*"
+        accesscontrolalloworiginlist: ${DOMAIN}
+        accesscontrolalloworigin: ${DOMAIN}
+        framedeny: "true"
+        sslredirect: "true"
+        browserxssfilter: "true"
+        contenttypenosniff: "true"
+        referrerpolicy: "strict-origin"
+        stspreload: "true"
+        stsincludesubdomains: "true"
+        customrequestheaders:
+          X-Lokal: ""
+          X-User: ""
+        customresponseheaders:
+          X-Powered-By: ""
+          X-DNS-Prefetch-Control: off
+          X-Permitted-Cross-Domain-Policies: none

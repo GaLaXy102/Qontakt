@@ -17,6 +17,8 @@ services:
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
       - "--providers.docker.network=frontend0"
+      #- "--providers.file=true"
+      #- "--providers.file.filename=/proxy_local.toml"
       - "--entrypoints.web.address=:80"
       - "--entrypoints.websecure.address=:443"
       - "--entrypoints.web-alt.address=:8080"
@@ -31,6 +33,7 @@ services:
       - "8080:8080"
     volumes:
       - traefik_certs:/certs
+      #- ./proxy_local.toml:/proxy_local.toml
       - /var/run/docker.sock:/var/run/docker.sock:ro
     labels:
       - "traefik.enable=true"
@@ -54,6 +57,18 @@ services:
       - "traefik.http.middlewares.secHeaders.headers.customresponseheaders.X-Powered-By="
       - "traefik.http.middlewares.secHeaders.headers.customresponseheaders.X-DNS-Prefetch-Control=off"
       - "traefik.http.middlewares.secHeaders.headers.customresponseheaders.X-Permitted-Cross-Domain-Policies=none"
+      - "traefik.http.middlewares.userHeader.headers.customrequestheaders.X-User=00000000-0000-0000-0000-000000000000"
+
+  webui:
+    build: qontakt-webui
+    networks:
+      frontend0:
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.q-webui.rule=Host(`${DOMAIN}`)"
+      - "traefik.http.routers.q-webui.entrypoints=websecure"
+      - "traefik.http.routers.q-webui.tls=true"
+      - "traefik.http.routers.q-webui.middlewares=secHeaders"
 
   crypto:
     build: qontakt-crypto
@@ -78,7 +93,7 @@ services:
       - "traefik.http.routers.q-host.rule=Host(`${DOMAIN}`) && PathPrefix(`/api/v1/host`)"
       - "traefik.http.routers.q-host.entrypoints=websecure"
       - "traefik.http.routers.q-host.tls=true"
-      - "traefik.http.routers.q-host.middlewares=secHeaders"
+      - "traefik.http.routers.q-host.middlewares=secHeaders,userHeader"
 
   user:
     build: qontakt-user
@@ -92,4 +107,4 @@ services:
       - "traefik.http.routers.q-user.rule=Host(`${DOMAIN}`) && PathPrefix(`/api/v1/user`)"
       - "traefik.http.routers.q-user.entrypoints=websecure"
       - "traefik.http.routers.q-user.tls=true"
-      - "traefik.http.routers.q-user.middlewares=secHeaders"
+      - "traefik.http.routers.q-user.middlewares=secHeaders,userHeader"
