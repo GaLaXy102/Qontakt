@@ -15,7 +15,7 @@ const translations = new Map(Object.entries({
         //"kratos-4000002": "Fehlendes Feld.",
         "kratos-4000003": "Die Mindestlänge für die Validierung wurde nicht eingehalten.",
         "kratos-4000004": "Die Formatvorgaben für die Validierung wurden nicht eingehalten.",
-        "kratos-4000005": "Das gewählte Passwort verletzt die Passwortvorgaben.",
+        "kratos-4000005": "Das gewählte Passwort verletzt die Passwortvorgaben oder wurde gehackt.",
         "kratos-4000006": "Die Anmeldedaten sind ungültig. Überprüfen Sie Ihre E-Mail-Adresse und Ihr Passwort.",
         "kratos-4000007": "Es existiert bereits ein Account mit diesen Benutzerdaten.",
         "kratos-4010001": "Der Anmeldevorgang ist abgelaufen. Bitte versuchen Sie es erneut.",
@@ -109,7 +109,7 @@ function setFlowDetails(flowId, pageName) {
                 form.setAttribute('method', formConfig.method);
                 form.setAttribute('action', formConfig.action);
                 form.childNodes.forEach(child => child.remove());
-                formConfig.fields.forEach(field => {
+                formConfig.fields.reverse().forEach(field => {
                     // <div>
                     const formElementWrapper = document.createElement("div");
                     formElementWrapper.classList.add("form-group");
