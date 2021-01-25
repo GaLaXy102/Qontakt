@@ -7,6 +7,8 @@ const translations = new Map(Object.entries({
         "identifier": "E-Mail-Adresse",
         "password": "Passwort",
         "login": "Anmelden",
+        "email": "E-Mail-Adresse",
+        "traits.email": "E-Mail-Adresse",
         "kratos-1060001": "Die Wiederherstellung des Accounts war erfolgreich. Bitte ändern Sie noch Ihr Passwort.",
         "kratos-1060002": "Eine E-Mail mit einem Link zur Wiederherstellung des Accounts wurde an die angegebene E-Mail-Adresse versandt.",
         "kratos-1070002": "Eine E-Mail mit einem Link zur Verifikation wurde an die angegebene E-Mail-Adresse versandt.",
@@ -37,6 +39,7 @@ let preferredLang;
 const translatableFields = new Map(Object.entries({
     "btn-q-recover": "recoverAccount",
     "btn-q-register": "register",
+    "btn-q-login": "login",
 }))
 
 function getTranslation(name) {
@@ -86,6 +89,7 @@ function hasFlowId() {
 
 const pageNameToFlow = new Map(Object.entries({
     "login": "login",
+    "register": "registration",
 }));
 
 
@@ -100,7 +104,7 @@ function setFlowDetails(flowId, pageName) {
         statusCode: {
             200: function (response) {
                 const formConfig = response.methods.password.config;
-                console.log(formConfig);
+                console.log(response);
                 const form = document.getElementById('q-kratos');
                 form.setAttribute('method', formConfig.method);
                 form.setAttribute('action', formConfig.action);
@@ -122,10 +126,19 @@ function setFlowDetails(flowId, pageName) {
                     formFieldInput.setAttribute("placeholder", getTranslation(field.name));
                     switch (field.name) {
                         case "identifier":
+                        case "traits.email":
                             formFieldInput.setAttribute("autocomplete", "username");
                             break;
                         case "password":
-                            formFieldInput.setAttribute("autocomplete", "current-password");
+                            formFieldInput.minLength = 6;
+                            switch (pageName) {
+                                case "login":
+                                    formFieldInput.setAttribute("autocomplete", "current-password");
+                                    break;
+                                case "register":
+                                    formFieldInput.setAttribute("autocomplete", "new-password");
+                                    break;
+                            }
                             break;
                         default:
                             break;
@@ -139,6 +152,17 @@ function setFlowDetails(flowId, pageName) {
                     }
                     formElementWrapper.appendChild(formFieldInput);
                     // </input>
+                    // <feedback>
+                    if (field.messages) {
+                        field.messages.forEach(msg => {
+                            formFieldInput.classList.add("is-invalid");
+                            const formFieldFeedback = document.createElement("div");
+                            formFieldFeedback.classList.add("invalid-feedback");
+                            formFieldFeedback.innerText = getTranslation("kratos-" + msg.id);
+                            formElementWrapper.appendChild(formFieldFeedback);
+                        });
+                    }
+                    // </feedback>
                     switch (field.type) {
                         case "hidden":
                             form.appendChild(formFieldInput);
@@ -198,6 +222,9 @@ window.onload = function () {
 const nextAction = new Map(Object.entries({
     "btn-q-register": function () {
         window.location.href = "register.html";
+    },
+    "btn-q-login": function () {
+        window.location.href = "login.html";
     },
     "btn-q-recover": function () {
         window.location.href = "recover.html";
