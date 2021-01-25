@@ -156,6 +156,16 @@ services:
       traefik.http.routers.whoami2.entrypoints: web
       qontakt: internal
 
+  webui:
+    build: qontakt-webui
+    restart: always
+    networks:
+      postauth0:
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.webui.rule: Host(`${DOMAIN}`)
+      traefik.http.routers.webui.entrypoints: web
+
   crypto:
     build: qontakt-crypto
     networks:

@@ -2,4 +2,4 @@
 
 rm -r out
 mkdir -p out
-cp -rf *.html js img css out/
+cp -rf *.html js img css auth out/

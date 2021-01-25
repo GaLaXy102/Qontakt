@@ -1,7 +1,7 @@
-FROM pierrezemb/gostatic@sha256:cedf9cef1cf6452c4f294d1c9c2334075282a7cd34412ca216699e38aa545b17
+FROM nginx:1.19-alpine
+
+COPY serve.conf /etc/nginx/conf.d/default.conf
 
 LABEL qontakt=internal
 
-EXPOSE 8043
-
-COPY content/ /srv/http/
+COPY content/ /usr/share/nginx/html
