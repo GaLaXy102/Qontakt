@@ -367,6 +367,8 @@ function redirectForbidden(activeVisit, pageName) {
     }
 }
 
+const kratosLogoutEndpoint = "/.ory/kratos/public/self-service/browser/flows/logout";
+
 const nextAction = new Map(Object.entries({
     "btn-q-checkin": function () {
         window.location.href = "checkin.html";
@@ -388,7 +390,9 @@ const nextAction = new Map(Object.entries({
     "btn-q-datadetail": function () {
         window.location.href = "mydata.html";
     },
-    //"btn-q-logout": function () { console.log("Implement me!") }, // TODO
+    "btn-q-logout": function () {
+        window.location.href = kratosLogoutEndpoint;
+    },
     "btn-q-verify": function () {
         window.location.href = "verify.html";
     },
