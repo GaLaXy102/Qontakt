@@ -158,7 +158,7 @@ services:
       postauth0:
     labels:
       traefik.enable: "true"
-      traefik.http.routers.webui.rule: Host(`${DOMAIN}`)
+      traefik.http.routers.webui.rule: PathPrefix(`/`)  # All other requests
       traefik.http.routers.webui.entrypoints: web
 
   crypto:
