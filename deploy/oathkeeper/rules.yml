@@ -25,7 +25,7 @@
     preserve_host: true
     url: http://traefik_int
   match:
-    url: http://<[^/]*>/<(?!(\.ory/.*))(auth/.*|.*\.css$|.*\.js$|api/v1/crypto/.*)>
+    url: http://<[^/]*>/<(?!(\.ory/.*))(auth/.*|.*\.css$|.*\.js$|.*\.map$|api/v1/crypto/.*)>
     methods:
       - GET
       - POST
@@ -42,7 +42,7 @@
     preserve_host: true
     url: http://traefik_int
   match:
-    url: http://<[^/]*>/<(?!(auth/|api/v1/crypto|.*\.css$|.*\.js$|\.ory)).*>
+    url: http://<[^/]*>/<(?!(auth/|api/v1/crypto|.*\.css$|.*\.js$|.*\.map$|\.ory)).*>
     methods:
       - GET
       - POST
