@@ -18,7 +18,7 @@ volumes:
 services:
   # TLS encryption and drop headers
   traefik_tls:
-    image: library/traefik:v2.3
+    build: traefik
     command:
       - "--api.dashboard=true"
       - "--providers.docker=true"
@@ -46,7 +46,6 @@ services:
       - "8080:8080"
     volumes:
       - traefik_certs:/certs
-      - ./traefik:/conf:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
     environment:
       - "HETZNER_API_KEY"
@@ -78,7 +77,7 @@ services:
 
   # Auth
   oathkeeper:
-    image: oryd/oathkeeper:v0.38.5-alpine
+    build: oathkeeper
     command: serve proxy -c "/etc/config/oathkeeper/config.yml"
     restart: always
     networks:
@@ -88,8 +87,6 @@ services:
       - kratos
     expose:
       - 4455
-    volumes:
-      - ./oathkeeper:/etc/config/oathkeeper:ro
     environment:
       LOG_LEVEL: debug
     labels:
@@ -101,15 +98,13 @@ services:
       traefik.http.routers.oathkeeper.middlewares: secHeaders@file
 
   kratos:
-    image: oryd/kratos:v0.5.5-sqlite
+    build: kratos
     command: serve -c /etc/config/kratos/config.yml --dev  # TODO: Switch to production
     restart: always
     networks:
       postauth0:
     expose:
       - 4433
-    volumes:
-      - ./kratos:/etc/config/kratos:ro
     environment:
       SESSION_COOKIE_DOMAIN: ${DOMAIN}
       SECRETS_DEFAULT: ${KRATOS_SECRET}
