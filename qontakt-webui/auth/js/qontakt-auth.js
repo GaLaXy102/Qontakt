@@ -9,6 +9,10 @@ const translations = new Map(Object.entries({
         "login": "Anmelden",
         "email": "E-Mail-Adresse",
         "traits.email": "E-Mail-Adresse",
+        "verify": "Verifikation anfordern",
+        "requestNewVerification": "Verifikationslink erneut versenden",
+        "home": "Zur Anwendung",
+        "verifySuccess": "Die Verifikation war erfolgreich.",
         "kratos-1060001": "Die Wiederherstellung des Accounts war erfolgreich. Bitte ändern Sie noch Ihr Passwort.",
         "kratos-1060002": "Eine E-Mail mit einem Link zur Wiederherstellung des Accounts wurde an die angegebene E-Mail-Adresse versandt.",
         "kratos-1070002": "Eine E-Mail mit einem Link zur Verifikation wurde an die angegebene E-Mail-Adresse versandt.",
@@ -29,6 +33,7 @@ const translations = new Map(Object.entries({
         "kratos-4070002": "Die Verifikation wurde bereits erfolgreich durchgeführt und kann nicht wiederholt werden.",
         "kratos-4070003": "Während der Bestätigung ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.",
         "kratos-4070005": "Der Bestätigungsvorgang ist abgelaufen. Bitte versuchen Sie es erneut.",
+        "kratos-cust-00001": "Bitte verifizieren Sie Ihre E-Mail-Addresse.",
     }
 }));
 
@@ -40,6 +45,10 @@ const translatableFields = new Map(Object.entries({
     "btn-q-recover": "recoverAccount",
     "btn-q-register": "register",
     "btn-q-login": "login",
+    "btn-q-new-verification": "requestNewVerification",
+    "lb-q-verify-waiting": "kratos-1070002",
+    "btn-q-home": "home",
+    "lb-q-verify-success": "verifySuccess",
 }))
 
 function getTranslation(name) {
@@ -90,6 +99,7 @@ function hasFlowId() {
 const pageNameToFlow = new Map(Object.entries({
     "login": "login",
     "register": "registration",
+    "verify": "verification",
 }));
 
 
@@ -98,18 +108,40 @@ const pageNameToFlow = new Map(Object.entries({
 const kratosApiUrl = "/.ory/kratos/public/self-service/";
 const kratosApiMode = "/browser";
 
+function setMsg(messages, form) {
+    messages.forEach(msg => {
+        const alertField = document.createElement("div");
+        alertField.classList.add("alert", "alert-danger");
+        alertField.innerText = getTranslation("kratos-" + msg.id);
+        document.getElementById('q-form-wrapper').insertBefore(alertField, form);
+    });
+}
+
 function setFlowDetails(flowId, pageName) {
     $.ajax(kratosApiUrl + pageNameToFlow.get(pageName) + "/flows?id=" + flowId, {
         type: "GET",
         statusCode: {
             200: function (response) {
-                const formConfig = response.methods.password.config;
                 console.log(response);
+                if (response.state === "sent_email") {
+                    window.location.href = "/auth/wait-verify";
+                } else if (response.state === "passed_challenge") {
+                    window.location.href = "/auth/verify-success";
+                }
+                let formConfig;
+                if (response.methods.link) {
+                    formConfig = response.methods.link.config;
+                } else if (response.methods.password) {
+                    formConfig = response.methods.password.config;
+                }
                 const form = document.getElementById('q-kratos');
                 form.setAttribute('method', formConfig.method);
                 form.setAttribute('action', formConfig.action);
                 form.childNodes.forEach(child => child.remove());
-                formConfig.fields.reverse().forEach(field => {
+                if (pageName === "register") {
+                    formConfig.fields.reverse();
+                }
+                formConfig.fields.forEach(field => {
                     // <div>
                     const formElementWrapper = document.createElement("div");
                     formElementWrapper.classList.add("form-group");
@@ -126,17 +158,30 @@ function setFlowDetails(flowId, pageName) {
                     formFieldInput.setAttribute("placeholder", getTranslation(field.name));
                     switch (field.name) {
                         case "identifier":
+                        case "email":
                         case "traits.email":
-                            formFieldInput.setAttribute("autocomplete", "username");
+                            formFieldInput.setAttribute("autocomplete", "username email");
+                            formFieldInput.setAttribute("id", "username");
+                            if (pageName === "verify") {
+                                console.log("Q-UI: Getting verification email address");
+                                $.get("/.ory/kratos/public/sessions/whoami")
+                                    .then(json => {
+                                            console.log(json);
+                                            formFieldInput.setAttribute("value", json.identity.traits.email);
+                                            formFieldInput.setAttribute("readonly", "true");
+                                        });
+                            }
                             break;
                         case "password":
                             formFieldInput.minLength = 6;
                             switch (pageName) {
                                 case "login":
                                     formFieldInput.setAttribute("autocomplete", "current-password");
+                                    formFieldInput.setAttribute("id", "current-password");
                                     break;
                                 case "register":
                                     formFieldInput.setAttribute("autocomplete", "new-password");
+                                    formFieldInput.setAttribute("id", "new-password");
                                     break;
                             }
                             break;
@@ -177,13 +222,15 @@ function setFlowDetails(flowId, pageName) {
                 submitButton.classList.add("btn", "btn-primary", "btn-lg", "btn-block");
                 submitButton.innerText = getTranslation(pageName);
                 form.appendChild(submitButton);
+                if (response.messages !== null) {
+                    setMsg(response.messages, form);
+                } else {
+                    if (pageName === "verify") {
+                        setMsg([{id: "cust-00001"}], form);
+                    }
+                }
                 if (formConfig.messages !== undefined) {
-                    formConfig.messages.forEach(msg => {
-                        const alertField = document.createElement("div");
-                        alertField.classList.add("alert", "alert-danger");
-                        alertField.innerText = getTranslation("kratos-" + msg.id);
-                        document.getElementById('q-form-wrapper').insertBefore(alertField, form);
-                    });
+                    setMsg(formConfig.messages, form);
                 }
             },
             410: function () {
@@ -199,13 +246,17 @@ function createFlow(pageName) {
 }
 
 function setContent(pageName) {
-    if (!hasFlowId()) {
-        createFlow(pageName);
-    }
-    setFlowDetails(getFlowId(), pageName);
     switch (pageName) {
-        case "login":
+        case "wait-verify":
+        case "verify-success":
             break;
+        case "verify":
+            redirectVerifySuccess();
+        default:
+            if (!hasFlowId()) {
+                createFlow(pageName);
+            }
+            setFlowDetails(getFlowId(), pageName);
     }
 }
 
@@ -229,6 +280,12 @@ const nextAction = new Map(Object.entries({
     "btn-q-recover": function () {
         window.location.href = "recover.html";
     },
+    "btn-q-new-verification": function () {
+        window.location.href = "verify.html";
+    },
+    "btn-q-home": function () {
+        window.location.href = "/";
+    },
 }))
 
 function showNext(item) {
@@ -240,5 +297,12 @@ function showNext(item) {
 
 }
 
-// COMMUNICATION
+const kratosSessionEndpoint = "/.ory/kratos/public/sessions/whoami";
 
+function redirectVerifySuccess() {
+    $.get(kratosSessionEndpoint).then(response => {
+        if (response.identity.verifiable_addresses[0].verified) {
+            window.location.href = "/auth/verify-success";
+        }
+    });
+}

@@ -10,9 +10,8 @@ selfservice:
       after:
         password:
           hooks:
-            #- hook: session
-            #- hook: verify
-        default_browser_return_url: /
+            - hook: session
+        default_browser_return_url: /auth/wait-verify
       ui_url: /auth/register
     login:
       lifespan: 10m
@@ -20,15 +19,13 @@ selfservice:
         password:
           hooks:
             - hook: revoke_active_sessions
-            #- hook: session
-            #- hook: verify
         default_browser_return_url: /
       ui_url: /auth/login
     verification:
       lifespan: 1h
       ui_url: /auth/verify
       after:
-        default_browser_return_url: /
+        default_browser_return_url: /auth/verify-success
       enabled: true
     recovery:
       lifespan: 1h

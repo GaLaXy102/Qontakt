@@ -339,6 +339,7 @@ function listenInputVerify(ev) {
 // AUTOSTART
 
 window.onload = function () {
+    redirectVerify();
     loadUserUid();  // async
     preferredLang = getLanguagePreference();
     setTranslations();
@@ -368,6 +369,15 @@ function redirectForbidden(activeVisit, pageName) {
 }
 
 const kratosLogoutEndpoint = "/.ory/kratos/public/self-service/browser/flows/logout";
+const kratosSessionEndpoint = "/.ory/kratos/public/sessions/whoami";
+
+function redirectVerify() {
+    $.get(kratosSessionEndpoint).then(response => {
+        if (!response.identity.verifiable_addresses[0].verified) {
+            window.location.href = "/auth/verify";
+        }
+    });
+}
 
 const nextAction = new Map(Object.entries({
     "btn-q-checkin": function () {
