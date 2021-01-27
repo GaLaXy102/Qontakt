@@ -274,6 +274,7 @@ window.onload = function () {
     if ('serviceWorker' in navigator) navigator.serviceWorker.register('/stub-sw.js');
     preferredLang = getLanguagePreference();
     setTranslations();
+    document.documentElement.lang = preferredLang;
     setContent(getPageName());
 }
 

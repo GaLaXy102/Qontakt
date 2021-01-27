@@ -348,6 +348,7 @@ window.onload = function () {
     loadUserUid();  // async
     preferredLang = getLanguagePreference();
     setTranslations();
+    document.documentElement.lang = preferredLang;
     // Wait asynchronously for userUid (See https://stackoverflow.com/a/56216283)
     (async () => {
         // query each 25 ms until userUid received
