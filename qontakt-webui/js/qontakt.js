@@ -541,7 +541,7 @@ function performCheckin(lokalUid, callback) {
     console.debug("Q-UI: Visiting " + lokalUid);
     let reqUrlParams = "?user_uid=" + userUid + "&lokal_uid=" + lokalUid;
     $.ajax("/api/v1/user/visit" + reqUrlParams, {
-        type: "PUT",
+        type: "POST",
         statusCode: {
             201: function (response) {
                 console.debug("Q-UI: Create Visit OK");
@@ -572,7 +572,7 @@ function performCheckout(visitUid, callback) {
     console.debug("Q-UI: Closing Visit" + visitUid);
     let reqUrlParams = "?user_uid=" + userUid + "&visit_uid=" + visitUid;
     $.ajax("/api/v1/user/visit" + reqUrlParams, {
-        type: "POST",
+        type: "PUT",
         statusCode: {
             200: function (response) {
                 if (response) {

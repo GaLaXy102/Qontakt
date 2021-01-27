@@ -86,7 +86,7 @@ public class UserRestController {
             @ApiResponse(responseCode = "409", description = "There is an unterminated Visit for the given User UUID.", content = @Content),
             @ApiResponse(responseCode = "201", description = "The Visit with the given data was created.")
     })
-    @PutMapping("/visit")
+    @PostMapping("/visit")
     ResponseEntity<Boolean> newVisit(@RequestParam String user_uid, @RequestParam String lokal_uid, HttpServletRequest request) {
         if (!UserRestController.isAuthorizedUser(request)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
@@ -212,7 +212,7 @@ public class UserRestController {
             @ApiResponse(responseCode = "400", description = "Visit is already terminated.", content = @Content),
             @ApiResponse(responseCode = "200", description = "true -> Visit terminated; false -> No such Visit")
     })
-    @PostMapping("/visit")
+    @PutMapping("/visit")
     ResponseEntity<Boolean> closeVisit(@RequestParam String user_uid, @RequestParam String visit_uid, HttpServletRequest request) {
         if (!UserRestController.isAuthorizedUser(request)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);

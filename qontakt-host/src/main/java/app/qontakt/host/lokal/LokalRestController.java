@@ -57,7 +57,7 @@ public class LokalRestController {
                     "happen).", content = @Content),
             @ApiResponse(responseCode = "201", description = "The Lokal was created with the returned password.")
     })
-    @PutMapping("/lokal")
+    @PostMapping("/lokal")
     public ResponseEntity<String> createLokal(@RequestBody LokalData data, HttpServletRequest request) {
         if (!LokalRestController.isAuthorized(request)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
