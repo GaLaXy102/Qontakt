@@ -34,7 +34,9 @@ const translations = new Map(Object.entries({
         "hasCheckoutError": "Sie haben sich bereits ausgecheckt.",
         "lokal": "Lokal",
         "scanLokalFirst": "Bitte scannen Sie zuerst den QR-Code des Lokals, für welches Sie die Verifikation" +
-            " vornehmen möchten."
+            " vornehmen möchten.",
+        "retry": "Erneut versuchen",
+        "offlineLong": "Sie sind offline. Bitte überprüfen Sie Ihre Internetverbindung, um Qontakt zu benutzen.",
     }
 }));
 
@@ -61,6 +63,8 @@ const translatableFields = new Map(Object.entries({
     "lb-q-valid": "valid",
     "lb-q-visit-data": 'visitData',
     "lb-q-lokal": "lokal",
+    "btn-q-retry-offline": "retry",
+    "lb-q-offline": "offlineLong",
 }))
 
 function getTranslation(name) {
@@ -162,7 +166,7 @@ const qontaktQRScanner = (function () {
 
     function createInstance() {
         const scanElem = document.getElementById('q-qr-lens');
-        QrScanner.WORKER_PATH = "js/qr-scanner-worker.min.js";
+        QrScanner.WORKER_PATH = "/js/qr-scanner-worker.min.js";
         return new QrScanner(scanElem, result => {
             const elem = document.getElementById('q-qr-lens-alt');
             elem.value = result;
@@ -339,6 +343,7 @@ function listenInputVerify(ev) {
 // AUTOSTART
 
 window.onload = function () {
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register('/stub-sw.js');
     redirectVerify();
     loadUserUid();  // async
     preferredLang = getLanguagePreference();
@@ -353,7 +358,6 @@ window.onload = function () {
             setContent(response, getPageName());
         });
     })();
-
     initializeQR(getPageName());
 }
 
@@ -374,14 +378,14 @@ const kratosSessionEndpoint = "/.ory/kratos/public/sessions/whoami";
 function redirectVerify() {
     $.get(kratosSessionEndpoint).then(response => {
         if (!response.identity.verifiable_addresses[0].verified) {
-            window.location.href = "/auth/verify";
+            window.location.replace("/auth/verify");
         }
     });
 }
 
 const nextAction = new Map(Object.entries({
     "btn-q-checkin": function () {
-        window.location.href = "checkin.html";
+        window.location.replace("checkin");
     },
     "btn-q-closevisit": function () {
         getActiveVisit(function (visit) {
@@ -395,25 +399,28 @@ const nextAction = new Map(Object.entries({
         });
     },
     "btn-q-visitdetail": function () {
-        window.location.href = "myvisit.html";
+        window.location.replace("myvisit");
     },
     "btn-q-datadetail": function () {
-        window.location.href = "mydata.html";
+        window.location.replace("mydata");
     },
     "btn-q-logout": function () {
-        window.location.href = kratosLogoutEndpoint;
+        window.location.replace(kratosLogoutEndpoint);
     },
     "btn-q-verify": function () {
-        window.location.href = "verify.html";
+        window.location.replace("verify");
     },
     "btn-q-back": function () {
-        history.go(-1);
+        window.location.replace("/");
     },
     "btn-q-savevisit": function () {
         performCheckin(document.getElementById('q-qr-lens-alt').value, function (response) {
             // If we got here, everything went okay.
-            history.go(-1);
+            window.location.replace("/");
         });
+    },
+    "btn-q-retry-offline": function () {
+        window.location.replace("/");
     },
 }))
 

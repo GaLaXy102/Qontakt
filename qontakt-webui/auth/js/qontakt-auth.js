@@ -123,9 +123,9 @@ function setFlowDetails(flowId, pageName) {
         statusCode: {
             200: function (response) {
                 console.log(response);
-                if (response.state === "sent_email") {
+                if (response.state === "sent_email" && pageName === "verify") {
                     window.location.href = "/auth/wait-verify";
-                } else if (response.state === "passed_challenge") {
+                } else if (response.state === "passed_challenge" && pageName === "verify") {
                     window.location.href = "/auth/verify-success";
                 }
                 let formConfig;
@@ -263,6 +263,7 @@ function setContent(pageName) {
 // AUTOSTART
 
 window.onload = function () {
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register('/stub-sw.js');
     preferredLang = getLanguagePreference();
     setTranslations();
     setContent(getPageName());
@@ -272,19 +273,19 @@ window.onload = function () {
 
 const nextAction = new Map(Object.entries({
     "btn-q-register": function () {
-        window.location.href = "register.html";
+        window.location.replace("register");
     },
     "btn-q-login": function () {
-        window.location.href = "login.html";
+        window.location.replace("login");
     },
     "btn-q-recover": function () {
-        window.location.href = "recover.html";
+        window.location.replace("recover");
     },
     "btn-q-new-verification": function () {
-        window.location.href = "verify.html";
+        window.location.replace("verify");
     },
     "btn-q-home": function () {
-        window.location.href = "/";
+        window.location.replace("/");
     },
 }))
 
