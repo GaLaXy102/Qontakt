@@ -11,6 +11,7 @@ const translations = new Map(Object.entries({
         "email": "E-Mail-Adresse",
         "traits.email": "E-Mail-Adresse",
         "verify": "Verifikation anfordern",
+        "settings": "Einstellungen aktualisieren",
         "requestNewVerification": "Verifikationslink erneut versenden",
         "requestNewRecovery": "Wiederherstellung erneut anfordern",
         "home": "Zur Anwendung",
@@ -105,6 +106,7 @@ const pageNameToFlow = new Map(Object.entries({
     "register": "registration",
     "verify": "verification",
     "recover": "recovery",
+    "settings": "settings",
 }));
 
 
