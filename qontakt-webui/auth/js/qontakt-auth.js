@@ -3,6 +3,7 @@
 const translations = new Map(Object.entries({
     "de": {
         "recoverAccount": "Passwort vergessen",
+        "recover": "Passwort zurücksetzen",
         "register": "Registrieren",
         "identifier": "E-Mail-Adresse",
         "password": "Passwort",
@@ -11,6 +12,7 @@ const translations = new Map(Object.entries({
         "traits.email": "E-Mail-Adresse",
         "verify": "Verifikation anfordern",
         "requestNewVerification": "Verifikationslink erneut versenden",
+        "requestNewRecovery": "Wiederherstellung erneut anfordern",
         "home": "Zur Anwendung",
         "verifySuccess": "Die Verifikation war erfolgreich.",
         "kratos-1060001": "Die Wiederherstellung des Accounts war erfolgreich. Bitte ändern Sie noch Ihr Passwort.",
@@ -47,6 +49,8 @@ const translatableFields = new Map(Object.entries({
     "btn-q-login": "login",
     "btn-q-new-verification": "requestNewVerification",
     "lb-q-verify-waiting": "kratos-1070002",
+    "btn-q-new-recovery": "requestNewRecovery",
+    "lb-q-recover-waiting": "kratos-1060002",
     "btn-q-home": "home",
     "lb-q-verify-success": "verifySuccess",
 }))
@@ -100,6 +104,7 @@ const pageNameToFlow = new Map(Object.entries({
     "login": "login",
     "register": "registration",
     "verify": "verification",
+    "recover": "recovery",
 }));
 
 
@@ -123,10 +128,10 @@ function setFlowDetails(flowId, pageName) {
         statusCode: {
             200: function (response) {
                 console.log(response);
-                if (response.state === "sent_email" && pageName === "verify") {
-                    window.location.href = "/auth/wait-verify";
-                } else if (response.state === "passed_challenge" && pageName === "verify") {
-                    window.location.href = "/auth/verify-success";
+                if (response.state === "sent_email") {
+                    window.location.replace("/auth/wait-" + pageName);
+                } else if (response.state === "passed_challenge") {
+                    window.location.replace("/auth/" + pageName + "-success");
                 }
                 let formConfig;
                 if (response.methods.link) {
@@ -242,11 +247,12 @@ function setFlowDetails(flowId, pageName) {
 }
 
 function createFlow(pageName) {
-    window.location.href = kratosApiUrl + pageNameToFlow.get(pageName) + kratosApiMode;
+    window.location.replace(kratosApiUrl + pageNameToFlow.get(pageName) + kratosApiMode);
 }
 
 function setContent(pageName) {
     switch (pageName) {
+        case "wait-recover":
         case "wait-verify":
         case "verify-success":
             break;
@@ -281,6 +287,9 @@ const nextAction = new Map(Object.entries({
     "btn-q-recover": function () {
         window.location.replace("recover");
     },
+    "btn-q-new-recovery": function () {
+        window.location.replace("recover");
+    },
     "btn-q-new-verification": function () {
         window.location.replace("verify");
     },
@@ -303,7 +312,7 @@ const kratosSessionEndpoint = "/.ory/kratos/public/sessions/whoami";
 function redirectVerifySuccess() {
     $.get(kratosSessionEndpoint).then(response => {
         if (response.identity.verifiable_addresses[0].verified) {
-            window.location.href = "/auth/verify-success";
+            window.location.replace("/auth/verify-success");
         }
     });
 }
