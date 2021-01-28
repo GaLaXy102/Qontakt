@@ -45,6 +45,7 @@ const translations = new Map(Object.entries({
         "homeZip": "PLZ",
         "homeCity": "Stadt",
         "telephoneNumber": "Telefonnummer",
+        "allVisits": "Alle Besuche",
     }
 }));
 
@@ -80,6 +81,7 @@ const translatableFields = new Map(Object.entries({
     "lb-q-homeCity": "homeCity",
     "lb-q-telephoneNumber": "telephoneNumber",
     "btn-q-save-profile": "save",
+    "btn-q-listvisits": "allVisits",
 }))
 
 function getTranslation(name) {
@@ -161,6 +163,54 @@ function setVerificationData() {
     });
 }
 
+function addToList(obj, lokals, wrapper) {
+    const listElement = document.createElement("div");
+    listElement.classList.add("list-group-item");
+    if (!obj.checkOut) {
+        listElement.classList.add("active");
+    }
+    const listElementHeader = document.createElement("div");
+    listElementHeader.classList.add("d-flex", "w-100", "justify-content-between align-items-center");
+    const listElementHeaderText = document.createElement("h5");
+    listElementHeaderText.classList.add("mb-1");
+    // Query lokal cache, on miss use data from query
+    let lokalData = lokals.get(obj.lokalUid);
+    if (!lokalData) {
+        queryLokalData(obj.lokalUid, lokalData => {
+            lokals.set(obj.lokalUid, lokalData);
+            listElementHeaderText.innerText = lokalData.name;
+        });
+    } else {
+        listElementHeaderText.innerText = lokalData.name;
+    }
+    listElementHeader.appendChild(listElementHeaderText);
+    const listElementHeaderTime = document.createElement("small");
+    listElementHeaderTime.innerText = timeago.format(obj.checkIn, preferredLang);
+    listElementHeader.appendChild(listElementHeaderTime);
+    // Allow for subtext later, thus the extra div
+    listElement.appendChild(listElementHeader);
+    wrapper.appendChild(listElement);
+}
+
+function setProfileData() {
+    if (hasCreate()) {
+        document.getElementById('btn-q-back').remove();
+        setMsg("profileCreate", document.getElementById('q-form'));
+    } else {
+        document.getElementById('btn-q-logout').remove();
+        $.get(qontaktIDMEndpoint + "?userUid=" + userUid).then(response => {
+            $.each(response, (key, value) => {
+                document.getElementById(key).value = value;
+            });
+        });
+    }
+    // Kratos is always right.
+    document.getElementById('userUid').value = userUid;
+    $.get(kratosSessionEndpoint).then(response => {
+        document.getElementById("email").value = response.identity.traits.email;
+    });
+}
+
 function setContent(activeVisit, pageName) {
     switch (pageName) {
         case "main":
@@ -175,22 +225,18 @@ function setContent(activeVisit, pageName) {
             }
             break;
         case "profile":
-            if (hasCreate()) {
-                document.getElementById('btn-q-back').remove();
-                setMsg("profileCreate", document.getElementById('q-form'));
-            } else {
-                document.getElementById('btn-q-logout').remove();
-                $.get(qontaktIDMEndpoint + "?userUid=" + userUid).then(response => {
-                    $.each(response, (key, value) => {
-                        document.getElementById(key).value = value;
-                    });
+            setProfileData();
+            break;
+        case "visits":
+            getVisits(visits => {
+                // Temporary storage
+                const lokals = new Map();
+                const wrapper = document.getElementById("visitlist");
+                // Iterate over visits
+                $.each(visits.reverse(), (idx, obj) => {
+                    addToList(obj, lokals, wrapper);
                 });
-            }
-            // Kratos is always right.
-            document.getElementById('userUid').value = userUid;
-            $.get(kratosSessionEndpoint).then(response => {
-                document.getElementById("email").value = response.identity.traits.email;
-            });
+            })
     }
 }
 
@@ -457,9 +503,9 @@ const nextAction = new Map(Object.entries({
             }
         });
     },
-    "btn-q-visitdetail": function () {
+    /*"btn-q-visitdetail": function () {
         window.location.replace("myvisit");
-    },
+    },*/
     "btn-q-datadetail": function () {
         window.location.replace("profile");
     },
@@ -486,6 +532,9 @@ const nextAction = new Map(Object.entries({
             // If we got here, everything went okay.
             window.location.replace("/");
         });
+    },
+    "btn-q-listvisits": function () {
+        window.location.replace("visits");
     }
 }))
 
