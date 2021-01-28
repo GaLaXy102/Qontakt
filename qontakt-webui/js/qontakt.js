@@ -46,6 +46,7 @@ const translations = new Map(Object.entries({
         "homeCity": "Stadt",
         "telephoneNumber": "Telefonnummer",
         "allVisits": "Alle Besuche",
+        "noVisit": "Es liegen keine Besuche vor.",
     }
 }));
 
@@ -82,6 +83,7 @@ const translatableFields = new Map(Object.entries({
     "lb-q-telephoneNumber": "telephoneNumber",
     "btn-q-save-profile": "save",
     "btn-q-listvisits": "allVisits",
+    "lb-q-novisit": "noVisit",
 }))
 
 function getTranslation(name) {
@@ -170,7 +172,7 @@ function addToList(obj, lokals, wrapper) {
         listElement.classList.add("active");
     }
     const listElementHeader = document.createElement("div");
-    listElementHeader.classList.add("d-flex", "w-100", "justify-content-between align-items-center");
+    listElementHeader.classList.add("d-flex", "w-100", "justify-content-between", "align-items-center");
     const listElementHeaderText = document.createElement("h5");
     listElementHeaderText.classList.add("mb-1");
     // Query lokal cache, on miss use data from query
@@ -232,6 +234,10 @@ function setContent(activeVisit, pageName) {
                 // Temporary storage
                 const lokals = new Map();
                 const wrapper = document.getElementById("visitlist");
+                if (visits.length) {
+                    // Clear view
+                    wrapper.innerHTML = "";
+                }
                 // Iterate over visits
                 $.each(visits.reverse(), (idx, obj) => {
                     addToList(obj, lokals, wrapper);
