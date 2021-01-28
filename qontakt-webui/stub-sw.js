@@ -28,6 +28,7 @@ self.addEventListener("install", function(event) {
                     '/css/qontakt.css',
                     '/js/bootstrap.min.js',
                     '/js/jquery-3.5.1.min.js',
+                    '/js/jquery.serialize-object.min.js',
                     '/js/popper.min.js',
                     '/js/qontakt.js',
                     '/js/qrcode.min.js',

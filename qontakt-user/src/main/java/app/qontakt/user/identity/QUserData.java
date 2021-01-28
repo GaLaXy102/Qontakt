@@ -4,27 +4,36 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.validation.constraints.NotNull;
 import java.util.UUID;
 
 @Entity
 public class QUserData {
 
     @Id
-    @Schema(hidden = true)
+    @Schema(example = "00000000-0000-0000-0000-000000000000")
+    @NotNull
     private String userUid;
     @Schema(example = "Sam")
+    @NotNull
     private String firstName;
     @Schema(example = "Muster")
+    @NotNull
     private String lastName;
     @Schema(example = "sam.muster@qontakt.me")
+    @NotNull
     private String email;
     @Schema(example = "Musterstraße 42")
+    @NotNull
     private String homeAddress;
     @Schema(example = "01337")
+    @NotNull
     private String homeZip;
     @Schema(example = "Musterstadt")
+    @NotNull
     private String homeCity;
     @Schema(example = "0123-456789")
+    @NotNull
     private String telephoneNumber;
 
     public QUserData(String userUid, String firstName, String lastName, String email, String homeAddress,
@@ -37,20 +46,6 @@ public class QUserData {
         this.homeZip = homeZip;
         this.homeCity = homeCity;
         this.telephoneNumber = telephoneNumber;
-    }
-
-    /**
-     * Generate a new Lokal with an optional overwritten UUID
-     */
-    public QUserData(QUserData old, boolean overwriteUUID) {
-        this.userUid = overwriteUUID ? UUID.randomUUID().toString() : old.userUid;
-        this.firstName = old.firstName;
-        this.lastName = old.lastName;
-        this.email = old.email;
-        this.homeAddress = old.homeAddress;
-        this.homeZip = old.homeZip;
-        this.homeCity = old.homeCity;
-        this.telephoneNumber = old.telephoneNumber;
     }
 
     protected QUserData() {

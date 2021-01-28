@@ -31,17 +31,13 @@ public class IdentityRestController {
 
     @Operation(summary = "Create a new Identity")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "400", description = "Request was sent with a specified UUID, but UUID is " +
-                    "generated in backend OR supplied Identity data is invalid.", content = @Content),
+            @ApiResponse(responseCode = "400", description = "Supplied Identity data is invalid.", content = @Content),
             @ApiResponse(responseCode = "409", description = "There is an Identity with this UUID (should really " +
                     "never happen).", content = @Content),
             @ApiResponse(responseCode = "201", description = "The Identity was created.")
     })
-    @PutMapping("")
+    @PostMapping("")
     public ResponseEntity<String> createUser(@RequestBody QUserData data) {
-        if (data.getUserUid() != null) {
-            return ResponseEntity.badRequest().body(null);
-        }
         try {
             String uid = this.identityService.create(data);
             return ResponseEntity.created(URI.create("?user_uid=%s".formatted(uid))).body(uid);
@@ -60,7 +56,7 @@ public class IdentityRestController {
                     content = @Content),
             @ApiResponse(responseCode = "200", description = "true -> data updated; false -> no such user")
     })
-    @PostMapping("")
+    @PutMapping("")
     public ResponseEntity<Boolean> updateUser(@RequestBody QUserData data, HttpServletRequest request) {
         if (!app.qontakt.user.UserRestController.isAuthorizedUser(request)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);

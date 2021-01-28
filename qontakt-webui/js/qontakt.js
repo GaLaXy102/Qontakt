@@ -32,11 +32,19 @@ const translations = new Map(Object.entries({
         "hasVisitError": "Sie haben bereits einen Check-In.",
         "hasNoVisitError": "Sie haben keinen Check-In.",
         "hasCheckoutError": "Sie haben sich bereits ausgecheckt.",
+        "invalidData": "Formulardaten ungültig",
         "lokal": "Lokal",
         "scanLokalFirst": "Bitte scannen Sie zuerst den QR-Code des Lokals, für welches Sie die Verifikation" +
             " vornehmen möchten.",
         "retry": "Erneut versuchen",
         "offlineLong": "Sie sind offline. Bitte überprüfen Sie Ihre Internetverbindung, um Qontakt zu benutzen.",
+        "profileCreate": "Sie sind zum ersten Mal hier. Bitte erstellen Sie Ihr Profil.",
+        "firstName": "Vorname",
+        "lastName": "Nachname",
+        "homeAddress": "Straße und Hausnummer",
+        "homeZip": "PLZ",
+        "homeCity": "Stadt",
+        "telephoneNumber": "Telefonnummer",
     }
 }));
 
@@ -65,6 +73,13 @@ const translatableFields = new Map(Object.entries({
     "lb-q-lokal": "lokal",
     "btn-q-retry-offline": "retry",
     "lb-q-offline": "offlineLong",
+    "lb-q-firstName": "firstName",
+    "lb-q-lastName": "lastName",
+    "lb-q-homeAddress": "homeAddress",
+    "lb-q-homeZip": "homeZip",
+    "lb-q-homeCity": "homeCity",
+    "lb-q-telephoneNumber": "telephoneNumber",
+    "btn-q-save-profile": "save",
 }))
 
 function getTranslation(name) {
@@ -120,6 +135,10 @@ function setButtonStates(hasVisit, pageName) {
     }
 }
 
+function hasCreate() {
+    return new URLSearchParams(location.search).get("create") !== null;
+}
+
 // OUTPUTS
 
 function formatLokalForCheckin(lokalData) {
@@ -154,7 +173,32 @@ function setContent(activeVisit, pageName) {
             if (lokalUid !== undefined) {
                 setLokalNameVerify(lokalUid);
             }
+            break;
+        case "profile":
+            if (hasCreate()) {
+                document.getElementById('btn-q-back').remove();
+                setMsg("profileCreate", document.getElementById('q-form'));
+            } else {
+                document.getElementById('btn-q-logout').remove();
+                $.get(qontaktIDMEndpoint + "?userUid=" + userUid).then(response => {
+                    $.each(response, (key, value) => {
+                        document.getElementById(key).value = value;
+                    });
+                });
+            }
+            // Kratos is always right.
+            document.getElementById('userUid').value = userUid;
+            $.get(kratosSessionEndpoint).then(response => {
+                document.getElementById("email").value = response.identity.traits.email;
+            });
     }
+}
+
+function setMsg(message, form) {
+    const alertField = document.createElement("div");
+    alertField.classList.add("alert", "alert-warning");
+    alertField.innerText = getTranslation(message);
+    document.getElementById('q-form-wrapper').insertBefore(alertField, form);
 }
 
 // QR INPUT
@@ -353,6 +397,7 @@ window.onload = function () {
     (async () => {
         // query each 25 ms until userUid received
         while (userUid === null) await new Promise(resolve => setTimeout(resolve, 25));
+        redirectProfile(getPageName());
         hasActiveVisit(function (response) {
             redirectForbidden(response, getPageName());
             setButtonStates(response, getPageName());
@@ -365,6 +410,7 @@ window.onload = function () {
 // ROUTING
 const forbiddenActive = ['checkin'];
 const forbiddenInactive = ['myvisit'];
+
 function redirectForbidden(activeVisit, pageName) {
     if (activeVisit) {
         if (forbiddenActive.includes(pageName)) document.location = 'index.html';
@@ -379,9 +425,21 @@ const kratosSessionEndpoint = "/.ory/kratos/public/sessions/whoami";
 function redirectVerify() {
     $.get(kratosSessionEndpoint).then(response => {
         if (!response.identity.verifiable_addresses[0].verified) {
-            window.location.replace("/auth/verify");
+            window.location.replace("/auth/verify?first=true");
         }
     });
+}
+
+const qontaktIDMEndpoint = "/api/v1/user/identity";
+
+function redirectProfile(pageName) {
+    if (pageName !== "profile") {
+        $.get(qontaktIDMEndpoint + "?userUid=" + userUid).then(json => {
+            if (!json) {
+                window.location.replace("/profile?create");
+            }
+        });
+    }
 }
 
 const nextAction = new Map(Object.entries({
@@ -403,7 +461,7 @@ const nextAction = new Map(Object.entries({
         window.location.replace("myvisit");
     },
     "btn-q-datadetail": function () {
-        window.location.replace("mydata");
+        window.location.replace("profile");
     },
     "btn-q-logout": function () {
         window.location.replace(kratosLogoutEndpoint);
@@ -423,12 +481,19 @@ const nextAction = new Map(Object.entries({
     "btn-q-retry-offline": function () {
         window.location.replace("/");
     },
+    "btn-q-save-profile": function () {
+        saveProfile(document.getElementById('q-form'), function (response) {
+            // If we got here, everything went okay.
+            window.location.replace("/");
+        });
+    }
 }))
 
 function showNext(item) {
     try {
         nextAction.get(item.id)();
     } catch (e) {
+        console.debug(e);
         console.log("Q-UI: No action defined for " + item.id)
     }
 
@@ -460,7 +525,7 @@ function queryLokalData(lokalUid, callback) {
     console.debug("Q-UI: Anonymously requesting Lokal " + lokalUid);
     let reqUrlParams = "?lokalUid=" + lokalUid;
     $.ajax("/api/v1/host/lokal" + reqUrlParams, {
-        type: "GET",
+        method: "GET",
         statusCode: {
             200: function (response) {
                 console.debug("Q-UI: Request Lokals OK, found: " + String(response.length > 0));
@@ -541,7 +606,7 @@ function performCheckin(lokalUid, callback) {
     console.debug("Q-UI: Visiting " + lokalUid);
     let reqUrlParams = "?user_uid=" + userUid + "&lokal_uid=" + lokalUid;
     $.ajax("/api/v1/user/visit" + reqUrlParams, {
-        type: "POST",
+        method: "POST",
         statusCode: {
             201: function (response) {
                 console.debug("Q-UI: Create Visit OK");
@@ -572,7 +637,7 @@ function performCheckout(visitUid, callback) {
     console.debug("Q-UI: Closing Visit" + visitUid);
     let reqUrlParams = "?user_uid=" + userUid + "&visit_uid=" + visitUid;
     $.ajax("/api/v1/user/visit" + reqUrlParams, {
-        type: "PUT",
+        method: "PUT",
         statusCode: {
             200: function (response) {
                 if (response) {
@@ -609,7 +674,7 @@ function getVerificationString(callback) {
     console.debug("Q-UI: Getting verification");
     let reqUrlParams = "?user_uid=" + userUid;
     $.ajax("/api/v1/user/verify" + reqUrlParams, {
-        type: "GET",
+        method: "GET",
         statusCode: {
             200: function (response) {
                 console.debug("Q-UI: Get Verification OK");
@@ -641,7 +706,7 @@ function queryVerification(lokalUid, veriString, callback) {
     console.debug("Q-UI: Verifying");
     let reqUrlParams = "?lokalUid=" + lokalUid + "&qrData=" + veriString;
     $.ajax("/api/v1/host/lokal/verify" + reqUrlParams, {
-        type: "GET",
+        method: "GET",
         statusCode: {
             200: function (response) {
                 console.debug("Q-UI: Verification was possible");
@@ -650,6 +715,37 @@ function queryVerification(lokalUid, veriString, callback) {
             401: function (response) {
                 console.debug("Q-UI: Unauthorized");
                 window.alert(getTranslation("unauthorizedError"));
+            }
+        }
+    });
+}
+
+
+function saveProfile(form, callback) {
+    let method;
+    if (hasCreate()) {
+        method = "POST";
+    } else {
+        method = "PUT";
+    }
+    $.ajax(qontaktIDMEndpoint, {
+        method: method,
+        data: JSON.stringify($(form).serializeObject()),
+        contentType: "application/json",
+        statusCode: {
+            200: function (response) {
+                console.debug("Q-UI: Save profile success");
+                callback(response);
+            },
+            201: function (response) {
+                console.debug("Q-UI: Create profile success");
+                callback(response);
+            },
+            400: function (response) {
+                window.alert(getTranslation("invalidData"));
+            },
+            409: function (response) {
+                window.location.replace("/profile");
             }
         }
     });
