@@ -231,7 +231,7 @@ function addVisitToList(obj, lokals, wrapper) {
     }
     listElementHeader.appendChild(listElementHeaderText);
     const listElementHeaderTime = document.createElement("small");
-    listElementHeaderTime.innerText = timeago.format(obj.checkIn, preferredLang);
+    listElementHeaderTime.innerText = timeago.format(obj.checkIn + 'Z', preferredLang);
     listElementHeader.appendChild(listElementHeaderTime);
     // Allow for subtext later, thus the extra div
     listElement.appendChild(listElementHeader);
