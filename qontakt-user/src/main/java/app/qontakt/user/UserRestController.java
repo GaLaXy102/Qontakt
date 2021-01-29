@@ -69,7 +69,10 @@ public class UserRestController {
         return request.getHeader("X-Lokal") != null;
     }
 
-    @Operation(summary = "Get user UID belonging to a given request", security = @SecurityRequirement(name = "user-header"))
+    @Operation(
+            summary = "Get user UID belonging to a given request",
+            security = @SecurityRequirement(name = "user-header")
+    )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "UserUid or nothing if not authenticated")
     })
@@ -78,12 +81,16 @@ public class UserRestController {
         return ResponseEntity.ok(request.getHeader("X-User"));
     }
 
-    @Operation(summary = "Create a new Visit for the given User and Lokal.", security = @SecurityRequirement(name = "user-header"))
+    @Operation(
+            summary = "Create a new Visit for the given User and Lokal.",
+            security = @SecurityRequirement(name = "user-header")
+    )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "401", description = "User has no Authorization", content = @Content),
             @ApiResponse(responseCode = "403", description = "It is forbidden to create a Visit for another User.",
                     content = @Content),
-            @ApiResponse(responseCode = "409", description = "There is an unterminated Visit for the given User UUID.", content = @Content),
+            @ApiResponse(responseCode = "409", description = "There is an unterminated Visit for the given User UUID.",
+                    content = @Content),
             @ApiResponse(responseCode = "201", description = "The Visit with the given data was created.")
     })
     @PostMapping("/visit")
@@ -101,15 +108,20 @@ public class UserRestController {
         }
     }
 
-    @Operation(summary = "Get all Visits or a specific one for the given User.", security = @SecurityRequirement(name = "user-header"))
+    @Operation(
+            summary = "Get all Visits or a specific one for the given User.",
+            security = @SecurityRequirement(name = "user-header")
+    )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "401", description = "User has no Authorization", content = @Content),
-            @ApiResponse(responseCode = "403", description = "user_uid doesn't match Authorization header or Visit's associated user", content =
-            @Content),
-            @ApiResponse(responseCode = "400", description = "VisitUid was specified, but there is no such visit", content = @Content),
-            @ApiResponse(responseCode = "200", description = "List of all Visits for the given User", content = {
-                    @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = Visit.class))
+            @ApiResponse(responseCode = "403", description = "user_uid doesn't match Authorization header or Visit's associated user",
+                    content = @Content),
+            @ApiResponse(responseCode = "400", description = "VisitUid was specified, but there is no such visit",
+                    content = @Content),
+            @ApiResponse(responseCode = "200", description = "List of all Visits for the given User",
+                    content = {
+                            @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                    schema = @Schema(implementation = Visit.class))
             })
     })
     @GetMapping("/visit")
@@ -158,7 +170,10 @@ public class UserRestController {
         return ResponseEntity.ok(this.userService.getVisitsForLokal(lokal_uid, user_uid));
     }
 
-    @Operation(summary = "Delete a single Visit.", security = @SecurityRequirement(name = "user-header"))
+    @Operation(
+            summary = "Delete a single Visit.",
+            security = @SecurityRequirement(name = "user-header")
+    )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "401", description = "Missing Authorization Header", content = @Content),
             @ApiResponse(responseCode = "403", description = "user_uid doesn't match Authorization header or Visit " +
@@ -168,10 +183,10 @@ public class UserRestController {
     @DeleteMapping("/visit")
     ResponseEntity<Boolean> deleteSingleVisit(@RequestParam String user_uid, @RequestParam String visit_uid,
                                               HttpServletRequest request) {
-        if (!UserRestController.isAuthorizedUser(request)) {
+        if (!(UserRestController.isAuthorizedUser(request) && UserRestController.isAuthorizedLokal(request))) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
-        if (!UserRestController.isAuthorized(request, user_uid)) {
+        if (!UserRestController.isAuthorized(request, this.userService.getVisitsForUser(user_uid, Optional.of(visit_uid)).get(0).getLokalUid(), Optional.of(user_uid))) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         }
         try {
@@ -181,11 +196,14 @@ public class UserRestController {
         }
     }
 
-    @Operation(summary = "Get Verification string for current visit", security = @SecurityRequirement(name = "user-header"))
+    @Operation(
+            summary = "Get Verification string for current visit",
+            security = @SecurityRequirement(name = "user-header")
+    )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "401", description = "User has no Authorization", content = @Content),
-            @ApiResponse(responseCode = "403", description = "user_uid doesn't match Authorization header", content =
-            @Content),
+            @ApiResponse(responseCode = "403", description = "user_uid doesn't match Authorization header",
+                    content = @Content),
             @ApiResponse(responseCode = "400", description = "User has no current Visit", content = @Content),
             @ApiResponse(responseCode = "200", description = "Current Visit data")
     })
@@ -204,7 +222,10 @@ public class UserRestController {
         }
     }
 
-    @Operation(summary = "Close a single Visit", security = @SecurityRequirement(name = "user-header"))
+    @Operation(
+            summary = "Close a single Visit",
+            security = @SecurityRequirement(name = "user-header")
+    )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "401", description = "User has no Authorization", content = @Content),
             @ApiResponse(responseCode = "403", description = "user_uid doesn't match Authorization header or Visit " +
