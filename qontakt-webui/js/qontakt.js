@@ -47,6 +47,37 @@ const translations = new Map(Object.entries({
         "telephoneNumber": "Telefonnummer",
         "allVisits": "Alle Besuche",
         "noVisit": "Es liegen keine Besuche vor.",
+        "myLokals": "Meine Lokale",
+        "noLokal": "Sie administrieren keine Lokale.",
+        "add": "Hinzufügen",
+        "addLokal": "Ein neues Lokal registrieren",
+        "lokalName": "Name des Lokals",
+        "address": "Adresse (mit PLZ und Ort)",
+        "checkoutTime": "Zeit für Check-Out",
+        "checkoutTimeLong": "Um diese Uhrzeit werden automatisch alle Besuche geschlossen.",
+        "country": "Staat",
+        "state": "Bundesland",
+        "password": "Ihr Passwort",
+        "passwordLong": "Bitte notieren Sie sich das folgende Passwort:\n/pwd/\nSie benötigen es, um Daten über" +
+            " Besuche in Ihrem Lokal abrufen zu können. Es kann nicht wiederhergestellt werden! Verwahren Sie es" +
+            " deshalb sicher.",
+        "loc-DEU": "Deutschland",
+        "loc-DEU-BW": "Baden-Württemberg",
+        "loc-DEU-BY": "Bayern",
+        "loc-DEU-BE": "Berlin",
+        "loc-DEU-BB": "Brandenburg",
+        "loc-DEU-HB": "Bremen",
+        "loc-DEU-HH": "Hamburg",
+        "loc-DEU-HE": "Hessen",
+        "loc-DEU-MV": "Mecklenburg-Vorpommern",
+        "loc-DEU-NI": "Niedersachsen",
+        "loc-DEU-NW": "Nordrhein-Westfalen",
+        "loc-DEU-RP": "Rheinland-Pfalz",
+        "loc-DEU-SL": "Saarland",
+        "loc-DEU-SN": "Sachsen",
+        "loc-DEU-ST": "Sachsen-Anhalt",
+        "loc-DEU-SH": "Schleswig-Holstein",
+        "loc-DEU-TH": "Thüringen",
     }
 }));
 
@@ -84,6 +115,19 @@ const translatableFields = new Map(Object.entries({
     "btn-q-save-profile": "save",
     "btn-q-listvisits": "allVisits",
     "lb-q-novisit": "noVisit",
+    "btn-q-listlokals": "myLokals",
+    "lb-q-nolokal": "noLokal",
+    "btn-q-addlokal": "add",
+    "lb-q-addlokal": "addLokal",
+    "btn-q-sendcreatelokal": "save",
+    "lb-q-lokalname": "lokalName",
+    "lb-q-lokaladdress": "address",
+    "lb-q-lokalcheckout": "checkoutTime",
+    "lb-q-lokalcheckout-help": "checkoutTimeLong",
+    "lb-q-lokalcountry": "country",
+    "lb-q-lokalstate": "state",
+    "lb-q-password": "password",
+    "btn-q-close": "dismiss",
 }))
 
 function getTranslation(name) {
@@ -165,7 +209,7 @@ function setVerificationData() {
     });
 }
 
-function addToList(obj, lokals, wrapper) {
+function addVisitToList(obj, lokals, wrapper) {
     const listElement = document.createElement("div");
     listElement.classList.add("list-group-item");
     if (!obj.checkOut) {
@@ -194,15 +238,45 @@ function addToList(obj, lokals, wrapper) {
     wrapper.appendChild(listElement);
 }
 
+function addLokalToList(obj, wrapper) {
+    const listElement = document.createElement("div");
+    listElement.classList.add("list-group-item");
+    const listElementHeader = document.createElement("div");
+    listElementHeader.classList.add("d-flex", "w-100", "justify-content-between", "align-items-center");
+    const listElementHeaderText = document.createElement("h5");
+    listElementHeaderText.classList.add("mb-1");
+    listElementHeaderText.innerText = obj.name;
+    listElementHeader.appendChild(listElementHeaderText);
+    const listElementHeaderBadge = document.createElement("span");
+    listElementHeaderBadge.classList.add("badge", "bagde-primary", "badge-pill");
+    listElementHeaderBadge.setAttribute("onclick", "downloadMarketing(this)");
+    listElementHeaderBadge.setAttribute("data-q-lokaluid", obj.lokalUid);
+    const listElementHeaderBadgeIcon = document.createElement("i");
+    listElementHeaderBadgeIcon.classList.add("bi", "bi-download");
+    listElementHeaderBadge.appendChild(listElementHeaderBadgeIcon);
+    listElementHeader.appendChild(listElementHeaderBadge);
+    listElement.appendChild(listElementHeader);
+    const listElementContent = document.createElement("small");
+    listElementContent.innerText = obj.address;
+    listElement.appendChild(listElementContent);
+    wrapper.appendChild(listElement);
+}
+
 function setProfileData() {
     if (hasCreate()) {
         document.getElementById('btn-q-back').remove();
         setMsg("profileCreate", document.getElementById('q-form'));
     } else {
-        document.getElementById('btn-q-logout').remove();
+        const logoutBtn = document.getElementById('btn-q-logout');
+        if (logoutBtn) {
+            logoutBtn.remove();
+        }
         $.get(qontaktIDMEndpoint + "?userUid=" + userUid).then(response => {
             $.each(response, (key, value) => {
-                document.getElementById(key).value = value;
+                const insertElement = document.getElementById(key);
+                if (insertElement) {
+                    insertElement.value = value;
+                }
             });
         });
     }
@@ -210,6 +284,29 @@ function setProfileData() {
     document.getElementById('userUid').value = userUid;
     $.get(kratosSessionEndpoint).then(response => {
         document.getElementById("email").value = response.identity.traits.email;
+    });
+}
+
+let rulesAvailable;
+
+function addRulesToList() {
+    const countryWrapper = document.getElementById("lokalcountry");
+    $.each(rulesAvailable, key => {
+        const optionElement = document.createElement("option");
+        optionElement.value = key;
+        optionElement.innerText = getTranslation("loc-" + key);
+        countryWrapper.appendChild(optionElement);
+    });
+}
+
+function showAllLokals(lokals) {
+    const wrapper = document.getElementById("lokallist");
+    if (lokals.length) {
+        // Clear view
+        wrapper.innerHTML = "";
+    }
+    $.each(lokals, (idx, obj) => {
+        addLokalToList(obj, wrapper);
     });
 }
 
@@ -240,9 +337,18 @@ function setContent(activeVisit, pageName) {
                 }
                 // Iterate over visits
                 $.each(visits.reverse(), (idx, obj) => {
-                    addToList(obj, lokals, wrapper);
+                    addVisitToList(obj, lokals, wrapper);
                 });
-            })
+            });
+            break;
+        case "lokals":
+            getOwnedLokals(showAllLokals);
+            queryRulesStatesAvailable(json => {
+                rulesAvailable = json;
+                addRulesToList();
+            });
+            document.getElementById("lokalcountry").addEventListener("change", listenInputSelectCountry);
+            setProfileData();
     }
 }
 
@@ -436,6 +542,28 @@ function listenInputVerify(ev) {
     }
 }
 
+function listenInputSelectCountry(ev) {
+    const countryCode = ev.target.value;
+    const stateField = document.getElementById("lokalstate");
+    if (countryCode) {
+        // User selected a country -> replace all children
+        stateField.innerHTML = "";
+        stateField.appendChild(document.createElement("option"));
+        $.each(rulesAvailable[countryCode], (idx, value) => {
+            const optionElement = document.createElement("option");
+            optionElement.value = value;
+            optionElement.innerText = getTranslation("loc-" + countryCode + "-" + value);
+            stateField.appendChild(optionElement);
+        });
+        stateField.removeAttribute("disabled");
+    } else {
+        // User selected no country -> remove all children
+        stateField.innerHTML = "";
+        stateField.appendChild(document.createElement("option"));
+        stateField.setAttribute("disabled", "disabled");
+    }
+}
+
 // AUTOSTART
 
 window.onload = function () {
@@ -541,6 +669,20 @@ const nextAction = new Map(Object.entries({
     },
     "btn-q-listvisits": function () {
         window.location.replace("visits");
+    },
+    "btn-q-listlokals": function () {
+        window.location.replace("lokals");
+    },
+    "btn-q-sendcreatelokal": function () {
+        saveLokal(document.getElementById('q-form'), function (response) {
+            // If we got here, everything went okay.
+            $('#createLokal').modal('hide');
+            document.getElementById("lb-q-password-text").innerText = getTranslation("passwordLong").replace("/pwd/", response);
+            $('#showPassword').modal('show');
+        })
+    },
+    "btn-q-close": function () {
+        window.location.reload(false);
     }
 }))
 
@@ -548,7 +690,6 @@ function showNext(item) {
     try {
         nextAction.get(item.id)();
     } catch (e) {
-        console.debug(e);
         console.log("Q-UI: No action defined for " + item.id)
     }
 
@@ -571,6 +712,8 @@ function loadUserUid() {
     });
 }
 
+const qontaktLokalEndpoint = "/api/v1/host/lokal";
+
 /**
  * Get the data of a single lokal
  * @param lokalUid UID of Lokal
@@ -579,7 +722,7 @@ function loadUserUid() {
 function queryLokalData(lokalUid, callback) {
     console.debug("Q-UI: Anonymously requesting Lokal " + lokalUid);
     let reqUrlParams = "?lokalUid=" + lokalUid;
-    $.ajax("/api/v1/host/lokal" + reqUrlParams, {
+    $.ajax(qontaktLokalEndpoint + reqUrlParams, {
         method: "GET",
         statusCode: {
             200: function (response) {
@@ -804,4 +947,67 @@ function saveProfile(form, callback) {
             }
         }
     });
+}
+
+/**
+ * Query for Map of Country -> State where Qontakt is supported
+ * @param callback fn(map)
+ */
+function queryRulesStatesAvailable(callback) {
+    console.debug("Q-UI: Query known states");
+    $.ajax("/api/v1/host/rules/known", {
+        method: "GET",
+        statusCode: {
+            200: function (response) {
+                console.debug("Q-UI: Loaded known states");
+                callback(response);
+            }
+        }
+    })
+}
+
+// From https://stackoverflow.com/a/24012884
+function serializeForm(form) {
+    return $(form).serializeArray().reduce(function(obj, item) {
+        obj[item.name] = item.value;
+        return obj;
+    }, {});
+}
+
+/**
+ * Save a Lokal from form
+ * @param form form containing Lokal Data
+ * @param callback fn(uuid)
+ */
+function saveLokal(form, callback) {
+    $.ajax(qontaktLokalEndpoint, {
+        method: "POST",
+        data: JSON.stringify(serializeForm(form)),
+        contentType: "application/json",
+        statusCode: {
+            201: function (response) {
+                console.debug("Q-UI: Create lokal success");
+                callback(response);
+            },
+            401: function (response) {
+                console.debug("Q-UI: Unauthorized");
+                window.alert(getTranslation("unauthorizedError"));
+            },
+            403: function (response) {
+                console.debug("Q-UI: Forbidden");
+                window.alert(getTranslation("forbiddenError"));
+            },
+            409: function (response) {
+                window.location.replace("/profile");
+            }
+        }
+    });
+}
+
+/**
+ * Get all lokals of active user
+ * @param callback fn(JSON)
+ */
+function getOwnedLokals(callback) {
+    $.get(qontaktLokalEndpoint + "?userUid=" + userUid).then(response => callback(response));
 }

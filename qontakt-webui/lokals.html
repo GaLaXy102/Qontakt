@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="/js/jquery-3.5.1.min.js"></script>
+    <script src="/js/timeago.min.js"></script>
+    <script src="/js/popper.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/qontakt.js"></script>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/bootstrap-reboot.min.css">
+    <link rel="stylesheet" href="/css/bootstrap-icons.css">
+    <link rel="icon" href="/img/icon-small.png" type="image/png">
+    <link rel="stylesheet" href="/css/w3.css">
+    <link rel="stylesheet" href="/css/qontakt.css">
+    <link rel="manifest" href="/manifest.webmanifest">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+    <title>Qontakt</title>
+</head>
+<body>
+<div class="container vh-100 d-flex flex-column w3-animate-opacity" id="q-content" data-q-nav="lokals">
+    <div class="jumbotron jumbotron-fluid">
+        <img src="/img/logo-small.png" class="img-fluid mx-auto d-block" alt="Qontakt Logo">
+    </div>
+    <div class="list-group" id="lokallist">
+        <div class="alert alert-success" id="lb-q-nolokal">??nolokal??</div>
+    </div>
+    <div style="height: 10em"></div>
+    <div class="btn-toolbar justify-content-between flex-grow-1 align-items-end mb-5" role="toolbar">
+        <button type="button" class="btn btn-primary btn-lg" id="btn-q-back" onclick="showNext(this)">
+            ??back??
+        </button>
+        <button type="button" class="btn btn-primary btn-lg" id="btn-q-addlokal" data-toggle="modal"
+                data-target="#createLokal">
+            ??addlokal??
+        </button>
+    </div>
+</div>
+<!-- Modal to add lokal -->
+<div class="modal fade" id="createLokal" data-backdrop="static" data-keyboard="false" tabindex="-1"
+     aria-labelledby="btn-q-addlokal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="lb-q-addlokal">??addlokal??</h5>
+            </div>
+            <div class="modal-body" id="q-form-wrapper">
+                <form id="q-form">
+                    <input type="email" name="gdprContact" id="email" hidden required readonly>
+                    <input type="text" name="owner" id="userUid" hidden required readonly>
+                    <input type="number" name="coordinates.x" value="0" hidden required readonly>
+                    <input type="number" name="coordinates.y" value="0" hidden required readonly>
+                    <div class="form-group">
+                        <label id="lb-q-lokalname" for="name">??lokalname??</label>
+                        <input id="name" type="text" name="name" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label id="lb-q-lokaladdress" for="address">??lokaladdress??</label>
+                        <textarea id="address" type="text" name="address" rows="2" class="form-control" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label id="lb-q-lokalcheckout" for="checkouttime">??lokalcheckout??</label>
+                        <input id="checkouttime" type="time" name="checkoutTime" class="form-control" value="04:00"
+                               aria-describedby="lb-q-lokalcheckout-help" required>
+                        <small id="lb-q-lokalcheckout-help" class="form-text text-muted">
+                            ??lokalcheckout-help??
+                        </small>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col">
+                            <label id="lb-q-lokalcountry" for="lokalcountry">??lokalcountry??</label>
+                            <select id="lokalcountry" name="federalState.countryCode" class="form-control custom-select"
+                                    required>
+                                <option selected></option>
+                            </select>
+                        </div>
+                        <div class="form-group col">
+                            <label id="lb-q-lokalstate" for="lokalstate">??lokalstate??</label>
+                            <select id="lokalstate" name="federalState.shortName" class="form-control custom-select"
+                                    required disabled>
+                                <option selected></option>
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" id="btn-q-dismiss">??back
+                    ??</button>
+                <button type="button" class="btn btn-primary" id="btn-q-sendcreatelokal"
+                        onclick="showNext(this)">??save??
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal to show password -->
+<div class="modal fade" id="showPassword" data-backdrop="static" data-keyboard="false" tabindex="-1"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="lb-q-password">??password??</h5>
+            </div>
+            <div class="modal-body" id="lb-q-password-text">??password-text??</div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="btn-q-close" onclick="showNext(this)">
+                    ??close??</button>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

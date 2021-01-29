@@ -15,6 +15,10 @@ body {
     border-color: #083b66 !important;
 }
 
+.badge-pill {
+    font-size: 20px;
+}
+
 #q-qr-output-img img {
     width: 80%;
 }
