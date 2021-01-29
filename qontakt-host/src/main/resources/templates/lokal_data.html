@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <link href="bootstrap.css" th:href="@{bootstrap.css}" rel="stylesheet" />
+    <link href="qontakt.css" th:href="@{qontakt.css}" rel="stylesheet" />
+    <title>Qontakt</title>
+</head>
+<body>
+<div class="container vh-100 d-flex flex-column">
+    <div class="jumbotron jumbotron-fluid bg-white">
+        <img src="logo-small.png" th:src="@{logo-small.png}" class="img-fluid mx-auto d-block"
+             alt="Qontakt Logo" />
+    </div>
+    <h1 class="text-center" th:text="#{leaflet.header}"></h1>
+    <table class="table">
+        <tbody>
+        <tr>
+            <td class="text-center cols-2">
+                <span th:text="#{leaflet.checkin}"></span><br />
+                <strong th:text="${lokal.getName()}"></strong><br />
+                <span th:utext="${lokal.getAddress().replace('\r\n', '<br />')}"></span><br />
+                <span th:text="${lokal.getGdprContact()}"></span>
+            </td>
+            <td class="text-center cols-2" th:text="#{leaflet.firstuse}">
+            </td>
+        </tr>
+        <tr>
+            <td class="text-center cols-2">
+                <img class="qr" th:src="'data:image/png;base64,' + ${lokalqr}" />
+            </td>
+            <td class="text-center cols-2">
+                <img class="qr" th:src="'data:image/png;base64,' + ${qontaktqr}" />
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

@@ -1011,3 +1011,8 @@ function saveLokal(form, callback) {
 function getOwnedLokals(callback) {
     $.get(qontaktLokalEndpoint + "?userUid=" + userUid).then(response => callback(response));
 }
+
+function downloadMarketing(elem) {
+    window.location = qontaktLokalEndpoint + "/leaflet" + "?lokalUid=" + $(elem).data("q-lokaluid");
+    return false; //this is critical to stop the click event which will trigger a normal file download!
+}

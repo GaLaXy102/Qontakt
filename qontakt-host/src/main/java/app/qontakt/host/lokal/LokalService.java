@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.HashMap;
@@ -85,11 +86,14 @@ public class LokalService {
      * @param password  Lokal Password
      * @return true if and only if the user is authorized to administer the Lokal
      */
-    public boolean isAuthorized(String userUid, String lokalUid, String password) {
+    public boolean isAuthorized(String userUid, String lokalUid, Optional<String> password) {
         Optional<LokalData> foundLokal = this.lokalDataRepository.findById(lokalUid);
         if (foundLokal.isEmpty()) {
             // This Lokal does not exist.
             return false;
+        }
+        if (password.isEmpty()) {
+            return foundLokal.get().getOwner().equals(userUid);
         }
         Optional<LokalPassword> foundPassword = this.lokalPasswordRepository.findByLokal(foundLokal.get());
         if (foundPassword.isEmpty()) {
@@ -97,7 +101,7 @@ public class LokalService {
             throw new IllegalStateException("This Lokal has no password!");
         }
         return foundLokal.get().getOwner().equals(userUid)
-                && this.passwordEncoder.matches(password, foundPassword.get().getHashedPassword());
+                && this.passwordEncoder.matches(password.get(), foundPassword.get().getHashedPassword());
     }
 
     /**
@@ -155,6 +159,22 @@ public class LokalService {
                 .retrieve()
                 .bodyToFlux(Visit.class)
                 .blockFirst();
+    }
+
+    /**
+     * Print a Leaflet to promote the usage of Qontakt
+     * @param locale Locale of Document to generate
+     * @param lokalUid Uid of Lokal for which the leaflet is
+     * @param baseurl Base URL of this Qontakt instance, e.g. https://qontakt.me/
+     * @return PDF document
+     */
+    public byte[] printLeaflet(Locale locale, String lokalUid, String baseurl) {
+        LokalData lokalData = this.lokalDataRepository.findById(lokalUid).orElseThrow(() -> new IllegalArgumentException("No such Lokal"));
+        try {
+            return ThymeleafPdfPrinter.renderLeaflet(locale, lokalData, baseurl);
+        } catch (IOException e) {
+            return new ByteArrayOutputStream().toByteArray();
+        }
     }
 
     /**

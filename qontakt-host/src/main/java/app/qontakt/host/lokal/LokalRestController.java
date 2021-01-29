@@ -48,6 +48,13 @@ public class LokalRestController {
         return request.getHeader("X-User") != null;
     }
 
+    public static String calculateBaseUrl(HttpServletRequest request) {
+        String scheme = request.getHeader("X-Forwarded-Proto") != null
+                ? request.getHeader("X-Forwarded-Proto") : request.getScheme();
+        String hostname = request.getHeader("Host");
+        return scheme + "://" + hostname + request.getRequestURI().replaceFirst("api/v1/host.*$", "");
+    }
+
     @Operation(summary = "Create a new Lokal", security = @SecurityRequirement(name = "user-header"))
     @ApiResponses(value = {
             @ApiResponse(responseCode = "401", description = "Missing Authorization header", content = @Content),
@@ -85,7 +92,7 @@ public class LokalRestController {
                             schema = @Schema(implementation = LokalData.class))
             })
     })
-    @GetMapping("/lokal")
+    @GetMapping(value = "/lokal", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<? extends LokalData>> getLokals(@RequestParam Optional<String> userUid,
                                                                @RequestParam Optional<String> lokalUid,
                                                                HttpServletRequest request) {
@@ -98,6 +105,35 @@ public class LokalRestController {
         return ResponseEntity.ok(this.lokalService.findAll(userUid, lokalUid));
     }
 
+    @Operation(summary = "Get a PDF for with Qontakt Details for promotional purposes",
+            security = @SecurityRequirement(name = "user-header"))
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "401", description = "Missing Authorization header", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Lokal's owner doesn't match Authorization header",
+                    content = @Content),
+            @ApiResponse(responseCode = "200", description = "PDF of Lokal's Data",
+                    content = @Content(mediaType = MediaType.APPLICATION_PDF_VALUE))
+    })
+    @GetMapping(value = "/lokal/leaflet", produces = MediaType.APPLICATION_PDF_VALUE)
+    public ResponseEntity<byte[]> getLokalLeaflet(@RequestParam String lokalUid, HttpServletRequest request) {
+        if (!LokalRestController.isAuthorized(request)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+        if (!this.lokalService.isAuthorized(request.getHeader("X-User"), lokalUid, Optional.empty())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+        String fileName = "leaflet-"
+                + lokalUid
+                + ".pdf";
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentDispositionFormData(fileName, fileName);
+        headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
+        return ResponseEntity.ok().headers(headers).body(
+                this.lokalService.printLeaflet(request.getLocale(), lokalUid, calculateBaseUrl(request))
+        );
+    }
+
     @Operation(summary = "Get a PDF of all sent visits", security = @SecurityRequirement(name = "user-header"))
     @ApiResponses(value = {
             @ApiResponse(responseCode = "401", description = "Missing Authorization header", content = @Content),
@@ -108,12 +144,12 @@ public class LokalRestController {
     })
     @PostMapping("/lokal/print")
     public ResponseEntity<byte[]> printVisitData(@RequestBody List<Visit> visits,
-                                                 @RequestParam String lokalUid, @RequestParam String password,
+                                                 @RequestParam String lokalUid, @RequestParam Optional<String> password,
                                                  HttpServletRequest request) {
         if (!LokalRestController.isAuthorized(request)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
-        if (!this.lokalService.isAuthorized(request.getHeader("X-User"), lokalUid, password)) {
+        if (password.isEmpty() || !this.lokalService.isAuthorized(request.getHeader("X-User"), lokalUid, password)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         }
         String fileName = "report-"
@@ -139,12 +175,12 @@ public class LokalRestController {
     })
     @PostMapping("/lokal/export")
     public ResponseEntity<byte[]> exportVisitData(@RequestBody List<Visit> visits,
-                                                  @RequestParam String lokalUid, @RequestParam String password,
+                                                  @RequestParam String lokalUid, @RequestParam Optional<String> password,
                                                   HttpServletRequest request) {
         if (!LokalRestController.isAuthorized(request)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
-        if (!this.lokalService.isAuthorized(request.getHeader("X-User"), lokalUid, password)) {
+        if (password.isEmpty() || !this.lokalService.isAuthorized(request.getHeader("X-User"), lokalUid, password)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         }
         String fileName = "report-"
