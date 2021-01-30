@@ -966,10 +966,18 @@ function queryRulesStatesAvailable(callback) {
     })
 }
 
-// From https://stackoverflow.com/a/24012884
+// Adapted from https://stackoverflow.com/a/24012884
 function serializeForm(form) {
     return $(form).serializeArray().reduce(function(obj, item) {
-        obj[item.name] = item.value;
+        if (item.name.includes(".")) {
+            const nameArr = item.name.split(".");
+            if (!obj[nameArr[0]]) {
+                obj[nameArr[0]] = {};
+            }
+            obj[nameArr[0]][nameArr[1]] = item.value;
+        } else {
+            obj[item.name] = item.value;
+        }
         return obj;
     }, {});
 }
