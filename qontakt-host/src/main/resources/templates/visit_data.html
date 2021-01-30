@@ -62,7 +62,7 @@
 
         </img>
             <!--<h1 th:text="'Qontakt'">Qontakt</h1>-->
-            <span th:utext="${lokal.name} + ', ' + ${lokal.getAddress().replace('\r\n', '<br />')} + ', ' +
+            <span th:utext="${lokal.name} + ', ' + ${lokal.getAddress().replace('\r\n', ', ')} + ', ' +
     #{gdpr_contact} + ': ' + ${lokal.gdprContact} + '; ' + #{fed_state_rs} + ': ' + ${lokal.federalState}">Zur
                 fr&ouml;hlichen Reblaus, Weinstra&szlig;e 3, 01069
                 Dresden,
