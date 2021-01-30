@@ -19,8 +19,8 @@ public class QontaktCryptoApplication {
     @Bean
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
-                .addServersItem(new Server().url("https://localhost"))
                 .addServersItem(new Server().url("https://staging.qontakt.me"))
+                .addServersItem(new Server().url("https://staging.localhost"))
                 .info(new Info()
                         .title("Qontakt Crypto Service")
                         .contact(new Contact()

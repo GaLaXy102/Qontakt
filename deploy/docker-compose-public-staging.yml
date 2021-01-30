@@ -1,0 +1,79 @@
+---
+version: "3.8"
+
+networks:
+  dmz1:
+    name: dmz1
+
+services:
+  # Application Gateway
+  traefik_int_staging:
+    image: library/traefik:v2.3
+    command:
+      - "--api.dashboard=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--providers.docker.network=dmz1"
+      - "--providers.docker.constraints=Label(`qontakt`, `staging`)"
+      - "--entrypoints.web.address=:80"
+    restart: always
+    networks:
+      preauth0:
+      dmz1:
+    expose:
+      - 80
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.catchall-staging.rule: Host(`staging.${DOMAIN}`)
+      traefik.http.routers.catchall-staging.entrypoints: websecure
+      traefik.http.routers.catchall-staging.tls: "true"
+      qontakt: external
+
+  webui_staging:
+    build: qontakt-webui
+    restart: always
+    networks:
+      dmz1:
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.webui.rule: PathPrefix(`/`)  # All other requests
+      traefik.http.routers.webui.entrypoints: web
+      qontakt: staging
+
+  crypto_staging:
+    build: qontakt-crypto
+    networks:
+      dmz1:
+        aliases:
+          - q-crypto-service
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.q-crypto.rule: PathPrefix(`/api/v1/crypto`)
+      traefik.http.routers.q-crypto.entrypoints: web
+      qontakt: staging
+
+  host_staging:
+    build: qontakt-host
+    networks:
+      dmz1:
+        aliases:
+          - q-host-service
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.q-host.rule: PathPrefix(`/api/v1/host`)
+      traefik.http.routers.q-host.entrypoints: web
+      qontakt: staging
+
+  user_staging:
+    build: qontakt-user
+    networks:
+      dmz1:
+        aliases:
+          - q-user-service
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.q-user.rule: PathPrefix(`/api/v1/user`)
+      traefik.http.routers.q-user.entrypoints: web
+      qontakt: staging
