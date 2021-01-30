@@ -7,11 +7,19 @@ import app.qontakt.user.VerificationQrCodeData;
 import app.qontakt.user.Visit;
 import app.qontakt.user.identity.QUserData;
 import com.lowagie.text.DocumentException;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.data.util.Pair;
 import org.springframework.http.MediaType;
+import org.springframework.http.client.MultipartBodyBuilder;
+import org.springframework.http.client.reactive.ClientHttpRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.reactive.function.BodyInserter;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -194,6 +202,48 @@ public class LokalService {
         } catch (DocumentException e) {
             return new ByteArrayOutputStream().toByteArray();
         }
+    }
+
+    /**
+     * Get Visits at Lokal and print Data to PDF
+     *
+     * @param locale   Locale of Document to generate
+     * @param lokalUid Uid of Lokal for which the report is
+     * @return PDF document
+     */
+    public byte[] print(Locale locale, String lokalUid) {
+        WebClient client = WebClient.create("http://q-user-service:8080");
+        String remote = "/api/v1/user/visit/" + lokalUid;
+        List<Visit> visits = client.get()
+                .uri(uriBuilder -> uriBuilder.path(remote).build())
+                .accept(MediaType.APPLICATION_JSON)
+                .header("X-Lokal", lokalUid)
+                .retrieve()
+                .bodyToFlux(Visit.class)
+                .collectList()
+                .block();
+        return this.print(locale, lokalUid, visits);
+    }
+
+    /**
+     * Perform encryption with q-crypto-service
+     * @param data data to encrypt
+     * @param filename filename of data to encrypt
+     * @param publicKeyUid Uid of key to use
+     * @return encrypted data and corresponding filename
+     */
+    public Pair<byte[], String> encryptWithKnownKey(byte[] data, String filename, String publicKeyUid) {
+        WebClient client = WebClient.create("http://q-crypto-service:8080");
+        String remote = "/api/v1/crypto/encrypt/" + publicKeyUid;
+        MultipartBodyBuilder builder = new MultipartBodyBuilder();
+        builder.part("data", data).filename(filename);
+        Mono<ByteArrayResource> buffer = client.post()
+                .uri(uriBuilder -> uriBuilder.path(remote).build())
+                .syncBody(builder.build())
+                .accept(MediaType.APPLICATION_OCTET_STREAM)
+                .retrieve()
+                .bodyToMono(ByteArrayResource.class);
+        return Pair.of(buffer.block().getByteArray(), filename + ".qenc");
     }
 
     /**

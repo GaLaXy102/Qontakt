@@ -8,13 +8,13 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import org.springframework.data.util.Pair;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -163,6 +163,42 @@ public class LokalRestController {
         headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
         return ResponseEntity.ok().headers(headers).body(this.lokalService.print(request.getLocale(), lokalUid,
                 visits));
+    }
+
+    @Operation(
+            summary = "Get an encrypted PDF of all visits at the given Lokal",
+            security = @SecurityRequirement(name = "user-header"))
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "401", description = "Missing Authorization header", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Lokal's owner doesn't match Authorization header",
+                    content = @Content),
+            @ApiResponse(responseCode = "200", description = "Encrypted PDF of all sent visits",
+                    content = @Content(mediaType = MediaType.APPLICATION_PDF_VALUE))
+    })
+    @GetMapping("/lokal/print")
+    public ResponseEntity<byte[]> printVisitDataEncrypted(@RequestParam String lokalUid,
+                                                          @RequestParam String password,
+                                                          @RequestParam String publicKeyUid,
+                                                          HttpServletRequest request) {
+        if (!LokalRestController.isAuthorized(request)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+        if (password.isEmpty() || !this.lokalService.isAuthorized(request.getHeader("X-User"), lokalUid,
+                Optional.of(password))) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+        String fileName = "report-"
+                + DateTimeFormatter.ISO_DATE_TIME.format(LocalDateTime.now())
+                + "-"
+                + lokalUid
+                + ".pdf";
+        byte[] print = this.lokalService.print(request.getLocale(), lokalUid);
+        Pair<byte[], String> result = this.lokalService.encryptWithKnownKey(print, fileName, publicKeyUid);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        headers.setContentDispositionFormData(fileName, result.getSecond());
+        headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
+        return ResponseEntity.ok().headers(headers).body(result.getFirst());
     }
 
     @Operation(summary = "Get a CSV of all sent visits", security = @SecurityRequirement(name = "user-header"))
