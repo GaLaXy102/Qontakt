@@ -23,7 +23,7 @@
                 <span th:utext="${lokal.getAddress().replace('\r\n', '<br />')}"></span><br />
                 <span th:text="${lokal.getGdprContact()}"></span>
             </td>
-            <td class="text-center cols-2" th:text="#{leaflet.firstuse}">
+            <td class="text-center cols-2" th:text="#{leaflet.firstuse(${basehost})}">
             </td>
         </tr>
         <tr>

@@ -67,6 +67,7 @@ public class ThymeleafPdfPrinter {
         Context context = new Context();
         context.setLocale(locale);
         context.setVariable("lokal", lokalData);
+        context.setVariable("basehost", baseurl.replaceAll("http[s]?://(.+)/", "$1"));
         context.setVariable("lokalqr", generateQrCodePngBase64(lokalData.getLokalUid()));
         context.setVariable("qontaktqr", generateQrCodePngBase64(baseurl));
         String html = templateEngine.process("lokal_data", context);
