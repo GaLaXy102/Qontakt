@@ -1,104 +1,101 @@
-# Qontakt
+[toc]
 
-Qontakt ist eine Anwendung zur Nachverfolgung von Infektionsketten im Sinne des Infektionsschutzgesetzes. Öffentliche Orte wie Läden und Restaurants können Lokal-Profile erstellen. In diesen Lokalen können Endnutzer nach einmaliger Registrierung einchecken. Während des Aufenthaltes können sich Lokal-Inhaber mit einem QR-Code, welcher auf dem Endgerät des Kunden angezeigt wird, über die erfolgte Anmeldung informieren, sodass zusätzlich die analoge Kontaktverfolgung ermöglicht wird. Beim Verlassen eines Lokals muss der Kunde sich selbstständig auschecken. Wenn er dies nicht tut, erfolgt ein automatischer Check-Out jeweils zu einer vom Lokal-Inhaber bestimmten Uhrzeit (bspw. 03:30 Uhr). Zu dieser Uhrzeit werden außerdem alle Einträge, welcher älter sind als es die rechtliche Aufbewahrungsfrist vorsieht, gelöscht.
+## Verwendung
 
-## User Stories
+###  Aufgabe des Dienstes
 
-### U-N-00
+Ziel unserer Anwendung ist, die Gesundheitsämter bei der Nachverfolgung von Infektionsketten zu unterstützen. Hierfür sollen sich Nutzer im Rahmen der digitalen Kontaktdatennachverfolgung unter Einhaltung datenschutzrechtlicher Grundsätze bei jedem Aufenthalt in einem Lokal ein- und auschecken können.
 
-Ein Nutzer möchte sich gegenüber der Anwendung registrieren. Dafür gibt er folgende Daten an:
+### Schnittstellenbeschreibung
 
-* Name und Vorname
-* E-Mail-Adresse
-* Anwendungspasswort
-* Heimatbundesland und die erforderlichen Daten nach [Tab. 1]
+Für die Dokumentation der von unserem Dienst genutzten Schnittstellen haben wir Swagger verwendet. Eine Möglichkeit zum Ausprobieren der Funktionalitäten der einzelnen Services findet sich auf der [Staging-Instanz](https://staging.qontakt.me).
 
-Die Registrierung muss nicht vom Kunden per E-Mail bestätigt werden. [Zusatz: doch]
+Wichtig ist die Unterscheidung, ob man intern oder extern gegen die API entwickelt. Für den internen Zugriff erfolgt die Authentifikation und Authorisierung auf Basis der Header `X-User` und `X-Lokal`. Von außen erfolgt die Authentifikation und Authorisierung auf Basis des Session-Cookies `ory_kratos_session`, welches unter Verwendung der Flows aus der [ORY/Kratos-Dokumentation](https://www.ory.sh/kratos/docs/self-service) unter dem Präfix `<BASE_URL>/.ory/kratos/public/` erzeugt werden kann. Von extern kann jeder Nutzer nur Aktionen ausführen, welche ausschließlich den Header `X-User` verwenden. Dieser Header wird automatisch intern hinzugefügt. Von extern eingehende Header `X-User` und `X-Lokal` werden gefiltert.
 
-Nur ein am System registrierter Nutzer kann sich am System anmelden.
 
-### U-N-01
 
-Ein Nutzer möchte seinen Besuch in einem Qontakt-Lokal erfassen. Hierfür scannt er einen vom Lokal generierten QR-Code [U-L-05] am Eingang des Lokals und wird auf eine Willkommensseite weitergeleitet. Dort kann er sich registrieren [U-N-00] oder sich mit E-Mail-Adresse und Passwort anmelden. [Zusatz: Anonyme Check-Ins werden ebenfalls unterstützt.]
+TODO: YAML verlinken.
 
-Der Check-In wird vom Nutzer bestätigt, woraufhin er zur Hauptseite [U-N-02] weitergeleitet wird.
+## Organisation
 
-### U-N-02
+### Aufbau des Teams
 
-Der Nutzer möchte sich Details zu in der Anwendung gespeicherten Daten anzeigen lassen. Auf der Hauptseite kann er seine Nutzerdaten einsehen und ändern, sowie eine Historie der gespeicherten Check-Ins für den Nutzer erhalten.
+Unser Team besteht aus Konstantin Köhring und Ylvi Sarah Bachmann. Wir belegen beide den Studiengang Bachelor Informatik an der TU Dresden.
 
-### U-N-03
+In vorangegangenen Projekten konnten wir unterschiedlich viel Erfahrung bezüglich Spring Boot, Java und der Verwendung von Docker sammeln.
 
-Der in einem Lokal eingecheckte Nutzer wird vom Personal aufgefordert, seinen Check-In nachzuweisen. Hierfür öffnet er auf der Hauptseite [U-N-02] seinen aktiven Check-In und bekommt einen QR-Code mit folgenden Informationen angezeigt:
+### Aufgabenverteilung
 
-* UUID des Nutzers [1]
-* UUID des Check-Ins [2]
-* Timestamp der Anforderung seit Epoch in Sekunden als 64-bit Integer [3]
+| Funktionalität                      | Entwickler        |
+| ----------------------------------- | ----------------- |
+| Nutzerdatenverwaltung               | Ylvi              |
+| Identitätsmanagement                | Konstantin        |
+| Lokalverwaltung und Datenauswertung | Konstantin        |
+| GUI und Authentifikation            | Konstantin / Ylvi |
+| Sicherheit                          | Konstantin / Ylvi |
+| Analyse und Dokumentation           | Ylvi              |
 
-Das Datenformat des kodierten Strings ist `///[1]/[2]//[3]///`.
+## Vorgehen
 
-### U-N-04
+### Verwendete Programmiersprache und Plattform
 
-Der eingecheckte Nutzer möchte aus dem Lokal auschecken. Dafür scannt er erneut den QR-Code aus [U-N-01] und wird aufgrund des bestehenden Check-Ins auf die Übersichtsseite [U-N-02] weitergeleitet. Dort gibt es einen Button zum Durchführen des Check-Out. Nach dem Check-Out wird er auf die Übersichtsseite zurückgeleitet.
+Wir verwenden für die Implementierung der Services zur Nutzerdaten-, Lokalverwaltung und Verschlüsselung Java und Spring Boot. Die Umsetzung des Frontends erfolgt mit JavaScript.
 
-### U-N-05
+| Framework / Tool | Verwendung                                                   |
+| ---------------- | ------------------------------------------------------------ |
+| Swagger, OpenAPI | Schnittstellendokumentation                                  |
+| Docker           | Komponiertes Deployment                                      |
+| ORY/Kratos       | Authentifizierung                                            |
+| ORY/Oathkeeper   | Authorisierung                                               |
+| Traefik          | Präprozessierung, Shielding und TLS-Terminierung, sowie API-Gateway |
+| BouncyCastle     | hybride Verschlüsselung von Dokumenten                       |
 
-Ein angemeldeter Nutzer kann sich am System abmelden.
+### Sicherheitsmechanismen
 
-### U-L-01
+Da unsere Anwendung, um ihren Verwendungszweck zu erfüllen, schützenswerte Daten des Nutzers erfassen und speichern muss, haben wir Maßnahmen zum Schutze dieser ergriffen.
 
-Jeder Nutzer möchte ein oder mehrere Lokal(e) anmelden können. Durch diese Aktion wird der anmeldende Nutzer zum **Lokal-Inhaber**. Hierfür müssen folgende Informationen eingegeben werden:
+| Funktionalität                                               | Umsetzung                                                    |
+| ------------------------------------------------------------ | ------------------------------------------------------------ |
+| Speichern und Abrufen von Kontaktdaten des Nutzers           | Datensparsamkeit, Pseudonymisierung, Verteilte Datenspeicherung, Berechtigungsmanagement<br />Später: Datenbankverschlüsselung |
+| Speichern von Metadaten zu Besuchen                          | Zuverlässigkeit, Integrität, Datensparsamkeit                |
+| Übermittlung von Besuchen und zugehörigen Nutzerdaten an Gesundheitsämter | Generierung einer verschlüsselten Datei mit hybridem Verschlüsselungsansatz |
+| Kommunikation                                                | TLS-Terminierung, keine externen Quellen                     |
 
-* Name des Lokals
-* Anschrift und/oder Koordinaten
-* Benennung Datenschutzbeauftragter/Inhaber
-* E-Mail-Adresse
-* Auto-Checkout-Zeit
-* Bundesland (für die zu übergebenden Daten und die Aufbewahrungsfrist [siehe Tab. 1])
+Die umgesetzten Schutzziele der Auth-Services sind in den jeweiligen Dokumentationen nachzulesen.
 
-Der Lokal-Inhaber bekommt eine UUID und ein Passwort für sein Lokal. Das Passwort wird nur gehasht gespeichert und kann dadurch nur einmal angezeigt werden und muss sicher notiert werden. Die UUID kann im Klartext gespeichert werden. Die Lokalverwaltungsseite wird dadurch freigeschaltet. Auf dieser kann ein Lokal-Inhaber im Namen des Lokals die untenstehenden User Stories [U-L-02], [U-L-03] und [U-L-04] durchführen.
+| Tool           | Dokumentation der Schutzziele                     |
+| -------------- | ------------------------------------------------- |
+| ORY/Kratos     | https://www.ory.sh/kratos/docs/concepts/security/ |
+| ORY/Oathkeeper | Entwicklerseitig noch nicht vorhanden             |
 
-### U-L-02
+### Umsetzung der Services
 
-Um den Datenschutzanforderungen nachzukommen, möchte der Lokal-Inhaber Nutzerdaten löschen können. Dafür muss der Nutzer seine UUID (ein Pseudonym) dem Lokalinhaber mitteilen, welcher dann manuell die UUID eingibt und alle Besuche in einem von ihm verwalteten Lokal löscht. Hierbei sollte gemäß IfSG darauf hingewiesen werden, dass dadurch der Vorgang in Papierform übertragen wird.
+Unsere Anwendung haben wir mit Microservices umgesetzt (wobei diese letztendlich noch kleiner realisierbar gewesen wären). Einen zur Umsetzung der Funktionalitäten, welche den Nutzer (Besucher) eines Lokals und die Verwaltung bzw. Erfassung seiner Daten betreffen, einen weiteren zur Umsetzung der Funktionalitäten, welche dem Inhaber eines Lokals zur Verfügung stehen sollen und den dritten für die Verschlüsselung der Nutzerdaten bei einem Export. Außerdem gibt es noch einen extern bezogenen OSS-Authentifikationsdienst.
 
-### U-L-03
+Sofern in den nachfolgenden Beschreibungen von Nutzerrollen gesprochen wird, sind immer die Rollen außerhalb der Anwendung gemeint, da diese keine Nutzerrollen implementiert.
 
-Der Laden-Inhaber möchte unter Einhaltung der Privatsphäre des Nutzers den Check-In eines Nutzers überprüfen. Dafür scannt er den QR-Code aus [U-N-03] und bekommt, falls der Check-In gültig ist, die Check-In-Zeit bestätigt. Ein Check-In ist gültig, wenn der Timestamp [3] nicht älter als 30 Sekunden ist UND der Check-In nicht älter ist als 24 Stunden UND es keinen mit dem Check-In asoziierten Check-Out gibt.
+#### Nutzerdatenverwaltung
 
-### U-L-04
+Sämtliche Funktionalitäten, welche zur Nutzerdatenverwaltung benötigt werden, sind im Service `qontakt-user` zusammengefasst. Diese umfassen das Anlegen und Beenden eines Besuchs in einem bestimmten Lokal, die Erstellung eines QR-Codes mit den benötigten Daten zur Validierung eines Besuchs, sowie das Anzeigen aller Besuche eines Nutzers. Außerdem speichert dieser Service die nutzerspezifischen Kontaktattribute.
 
-Der Laden-Inhaber hat vom Gesundheitsamt die Aufforderung bekommen, Nutzerdaten preiszugeben. Der zu erstellende Datensatz ist eine Liste von Besuchen mit den folgenden Feldern:
+Da die Ansprüche der Corona-Verordnungen der Länder mit den Datenaufbewahrungsfristen größer wiegen als die Ansprüche des Nutzers, seine Daten gemäß DSGVO zu löschen, wird das Löschen eines Profils nur unter der Bedingung unterstützt, dass keine Besuche gespeichert sind. Dies genügt, da Besuche automatisch nach Ablauf der Speicherfrist gelöscht werden.
 
-* Name und Vorname des Gastes
-* Persönliche Details je nach Bundesland
-* Datum sowie Check-In- und Check-Out-Zeit
+#### Lokalverwaltung
 
-Um die Datensicherheit zu gewähren, wird die Datei mit dem öffentlichen RSA-Schlüssel des Gesundheitsamtes, welcher dem Lokalinhaber bspw. per E-Mail mitgeteilt wird und von diesem bei der Anfrage in die Anwendung geladen wird, verschlüsselt. Im Gesundheitsamt kann dieser Datensatz dann mit dem privaten Schlüssel entschlüsselt werden. Als Kryptosystem muss RSA mit 4096 bit langen Schlüsseln erzwungen werden.
+Im Service `qontakt-lokal` werden alle Details zu besuchbaren Orten ("Lokale") gespeichert. Außerdem ist hier der Bezug der Nutzerdaten zur Report-Generierung sowie die Löschung von Nutzerdaten nach der vorgeschriebenen Zeit implementiert.
 
-Die Ausgabe erfolgt als verschlüsselte CSV-Datei. [Zusatz: Ebenfalls wird ein verschlüsseltes PDF-Dokument erzeugt.]
+#### Verschlüsselung
 
-### Tabelle 1: Nachzuverfolgende Nutzerdaten nach Bundesland
+Der Service `qontakt-crypto` implementiert die Identitätsfunktion. Unter Verwendung eines öffentlichen RSA-Schlüssels wird ein hybrider Verschlüsselungsansatz für Dateien ausgeführt. Hierbei wird die Datei zuerst mit einem jeweils neu generierten AES-Schlüssel verschlüsselt, danach wird der AES-Schlüssel mit dem öffentlichen RSA-Schlüssel verschlüsselt und dem Ciphertext der Datei vorangestellt. Zum Entschlüsseln werden private RSA-Schlüssel mit und ohne Passwort unterstützt.
 
-| Bundesland | Aufbewahrungsdauer | Name | Aufenthaltszeit | Wohnort | Anschrift | Telefonnummer | E-Mail    | Stand      |
-| ---------- | ------------------ | ---- | --------------- | ------- | --------- | ------------- | --------- | ---------- |
-| BW         | 28 Tage            | y    | y               | y       | y         | o             | n         | 18.11.2020 |
-| BY         | 31 Tage            | y    | y               | x       | x         | x             | x         | 20.10.2020 |
-| BE         | 28 Tage            | y    | y               | y       | x         | x             | x         | 17.11.2020 |
-| BB         | 28 Tage            | y    | y               | x       | x         | x             | x         | 30.10.2020 |
-| HB         | 21 Tage            | y    | y               | x       | x         | x             | x         | 31.10.2020 |
-| HH         | 28 Tage            | y    | y               | y       | y         | o             | n         | 23.11.2020 |
-| HE         | 31 Tage            | y    | y               | y       | y         | o             | n         | 15.05.2020 |
-| MV         | 28 Tage            | y    | y               | y       | y         | o             | n         | 11.05.2020 |
-| NI         | 21 Tage            | y    | y               | y       | y         | o             | n         | 02.11.2020 |
-| NW         | 28 Tage            | y    | y               | y       | y         | o             | n         | 06.11.2020 |
-| RP         | 31 Tage            | y    | y               | y       | y         | o             | n         | 09.06.2020 |
-| SL         | 31 Tage            | y    | y               | y       | x         | x             | x         | 14.11.2020 |
-| SN         | 31 Tage            | y    | y               | y       | x         | x             | x         | 10.11.2020 |
-| ST         | 28 Tage            | y    | y               | y       | y         | y             | n         | 30.10.2020 |
-| SH         | 28 Tage            | y    | y               | y       | y         | x             | x         | 01.11.2020 |
-| TH         | 28 Tage            | y    | y               | x       | x         | x             | n         | 09.06.2020 |
+### Umsetzung des Clients
 
-## Technische Spezifikation
+Für unsere Anwendung haben wir einen statischen Web-Client mit JavaScript entwickelt. Der Nutzer kann mit Hilfe eines Webbrowsers oder einer Progressive Web App auf unseren Dienst unter [Qontakt.me](https://www.qontakt.me) zugreifen.
 
-TODO
+### Deployment
+
+Aktuell führen wir das Deployment manuell durch Ausspielen einer `docker-compose` per Docker Remote Access über TLS durch. Perspektivisch könnte dies durch Kubernetes erfolgen. Die Skalierung kann problemlos erfolgen, da lediglich die Datenbankebene stateful ist.
+
+### Tests
+
+Wir haben uns zuerst auf die Implementierung unseres Dienstes und danach auf die Umsetzung einer GUI konzentriert, weshalb nicht viel Zeit für umfangreiches Testen blieb. Dies war teilweise so von uns vorgesehen und auch in der Priorisierung der Aufgaben mit einberechnet. Unser eigentliches Ziel wäre es dennoch gewesen, die zu Grunde liegenden Funktionalitäten unserer Anwendung mit Unit-Tests abzudecken. Dies war leider auf Grund der Verzögerung des Projektstarts und des Mangels an verfügbarer Arbeitszeit durch das Ausscheiden des dritten Teammitglieds nicht möglich. Wir haben deshalb entschieden, dass wir unsere Anwendung manuell testen. Lediglich der Microservice `qontakt-crypto` wird automatisiert getestet.
