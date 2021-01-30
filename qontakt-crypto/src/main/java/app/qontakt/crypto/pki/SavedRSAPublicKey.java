@@ -3,8 +3,10 @@ package app.qontakt.crypto.pki;
 import app.qontakt.crypto.RSACryptoService;
 import org.slf4j.LoggerFactory;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.validation.constraints.Digits;
 import java.math.BigInteger;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
@@ -21,7 +23,9 @@ public class SavedRSAPublicKey {
     private final String id;
     private boolean enabled;
     private final String name;
+    @Column(precision = 1270)
     private final BigInteger modulus;
+    @Column(precision = 1270)
     private final BigInteger publicExponent;
 
     /**

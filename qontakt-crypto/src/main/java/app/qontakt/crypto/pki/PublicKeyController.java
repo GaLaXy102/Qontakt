@@ -8,10 +8,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.Serializable;
 import java.util.List;
 
 @RestController
-@RequestMapping("/pki")
+@RequestMapping("/api/v1/crypto/pki")
 public class PublicKeyController {
     private final PublicKeyService publicKeyService;
 
@@ -19,7 +20,16 @@ public class PublicKeyController {
         this.publicKeyService = publicKeyService;
     }
 
-    static record PublicKeyDataPublic(String id, String name) {}
+    public static class PublicKeyDataPublic implements Serializable {
+
+        public final String id;
+        public final String name;
+
+        PublicKeyDataPublic(String id, String name) {
+            this.id = id;
+            this.name = name;
+        }
+    }
 
     @Operation(summary = "Encrypt a file using AES over RSA")
     @ApiResponses({
