@@ -24,6 +24,10 @@
     </div>
     <div class="list-group" id="lokallist">
         <div class="alert alert-success" id="lb-q-nolokal">??nolokal??</div>
+        <button type="button" class="btn btn-primary btn-lg btn-block mb-3 hidden" id="btn-q-export" data-toggle="modal"
+                data-target="#exportData">
+            ??exportdata??
+        </button>
     </div>
     <div style="height: 10em"></div>
     <div class="btn-toolbar justify-content-between flex-grow-1 align-items-end mb-5" role="toolbar">
@@ -106,6 +110,44 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary" id="btn-q-close" onclick="showNext(this)">
                     ??close??</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal to export data -->
+<div class="modal fade" id="exportData" data-backdrop="static" data-keyboard="false" tabindex="-1"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="lb-q-export">??export??</h5>
+            </div>
+            <div class="modal-body" id="q-export-wrapper">
+                <form id="q-export">
+                    <div class="form-group">
+                        <label id="lb-q-lokalexport" for="lokalexport">??lokal??</label>
+                        <select id="lokalexport" name="lokalUid" class="form-control custom-select"
+                                required>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label id="lb-q-passwordexport" for="passwordexport">??lokal??</label>
+                        <input id="passwordexport" name="passwordexport" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label id="lb-q-targetexport" for="targetexport">??lokal??</label>
+                        <select id="targetexport" name="publicKeyUid" class="form-control custom-select"
+                                required>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" id="btn-q-dismiss3">
+                    ??close??</button>
+                <button type="button" class="btn btn-primary" id="btn-q-performexport"
+                        onclick="showNext(this)">??save??
+                </button>
             </div>
         </div>
     </div>

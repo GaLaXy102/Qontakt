@@ -61,6 +61,11 @@ const translations = new Map(Object.entries({
         "passwordLong": "Bitte notieren Sie sich das folgende Passwort:\n/pwd/\nSie benötigen es, um Daten über" +
             " Besuche in Ihrem Lokal abrufen zu können. Es kann nicht wiederhergestellt werden! Verwahren Sie es" +
             " deshalb sicher.",
+        "exportData": "Daten exportieren",
+        "encryptAndExport": "Verschlüsseln und Herunterladen",
+        "lokalToExport": "Lokal für Datenexport",
+        "target": "Empfänger",
+        "wrongPassword": "Falsches Passwort!",
         "loc-DEU": "Deutschland",
         "loc-DEU-BW": "Baden-Württemberg",
         "loc-DEU-BY": "Bayern",
@@ -97,6 +102,7 @@ const translatableFields = new Map(Object.entries({
     "lb-q-savevisit": "confirmVisit",
     "btn-q-dismiss": "abort",
     "btn-q-dismiss2": "dismiss",
+    "btn-q-dismiss3": "dismiss",
     "btn-q-savevisit": "save",
     "btn-q-closevisit": "save",
     "lb-q-closevisit": "confirmCheckout",
@@ -128,6 +134,12 @@ const translatableFields = new Map(Object.entries({
     "lb-q-lokalstate": "state",
     "lb-q-password": "password",
     "btn-q-close": "dismiss",
+    "btn-q-export": "exportData",
+    "lb-q-export": "exportData",
+    "btn-q-performexport": "encryptAndExport",
+    "lb-q-lokalexport": "lokalToExport",
+    "lb-q-passwordexport": "password",
+    "lb-q-targetexport": "target",
 }))
 
 function getTranslation(name) {
@@ -299,15 +311,41 @@ function addRulesToList() {
     });
 }
 
-function showAllLokals(lokals) {
+function addLokalsToView(lokals) {
     const wrapper = document.getElementById("lokallist");
-    if (lokals.length) {
-        // Clear view
-        wrapper.innerHTML = "";
-    }
     $.each(lokals, (idx, obj) => {
         addLokalToList(obj, wrapper);
     });
+}
+
+function addLokalsToOptionList(lokals) {
+    const wrapper = document.getElementById('lokalexport');
+    $.each(lokals, (idx, item) => {
+        const optionElement = document.createElement("option");
+        optionElement.value = item.lokalUid;
+        optionElement.innerText = item.name;
+        wrapper.appendChild(optionElement);
+    });
+}
+
+function addEncryptionTargetsToOptionList(targets) {
+    const wrapper = document.getElementById('targetexport');
+    $.each(targets, (idx, item) => {
+        const optionElement = document.createElement("option");
+        optionElement.value = item.id;
+        optionElement.innerText = item.name;
+        wrapper.appendChild(optionElement);
+    })
+}
+
+function showAllLokals(lokals) {
+    if (lokals.length) {
+        // Clear view
+        document.getElementById('lb-q-nolokal').classList.add("hidden");
+        document.getElementById('btn-q-export').classList.remove("hidden");
+    }
+    addLokalsToView(lokals);
+    addLokalsToOptionList(lokals);
 }
 
 function setContent(activeVisit, pageName) {
@@ -347,6 +385,7 @@ function setContent(activeVisit, pageName) {
                 rulesAvailable = json;
                 addRulesToList();
             });
+            queryEncryptionTargets(addEncryptionTargetsToOptionList);
             document.getElementById("lokalcountry").addEventListener("change", listenInputSelectCountry);
             setProfileData();
     }
@@ -683,6 +722,9 @@ const nextAction = new Map(Object.entries({
     },
     "btn-q-close": function () {
         window.location.reload(false);
+    },
+    "btn-q-performexport": function () {
+        performExport(document.getElementById('q-export'));
     }
 }))
 
@@ -1023,4 +1065,34 @@ function getOwnedLokals(callback) {
 function downloadMarketing(elem) {
     window.location = qontaktLokalEndpoint + "/leaflet" + "?lokalUid=" + $(elem).data("q-lokaluid");
     return false; //this is critical to stop the click event which will trigger a normal file download!
+}
+
+/**
+ * Get all encryption targets
+ * @param callback fn(JSON)
+ */
+function queryEncryptionTargets(callback) {
+    $.get("/api/v1/crypto/pki/keys").then(response => callback(response));
+}
+
+function performExport(form) {
+    const jsonForm = serializeForm(form);
+    const resultUrl = "/api/v1/host/lokal/print?lokalUid=" + jsonForm.lokalUid
+        + "&password=" + jsonForm.passwordexport
+        + "&publicKeyUid=" + jsonForm.publicKeyUid;
+    $.ajax(resultUrl, {
+        method: "GET",
+        statusCode: {
+            200: function () {
+                window.location = resultUrl;
+            },
+            401: function () {
+                console.debug("Q-UI: Unauthorized");
+                window.alert(getTranslation("unauthorizedError"));
+            },
+            403: function () {
+                window.alert(getTranslation("wrongPassword"));
+            }
+        }
+    })
 }

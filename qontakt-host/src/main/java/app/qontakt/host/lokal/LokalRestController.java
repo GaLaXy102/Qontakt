@@ -170,7 +170,8 @@ public class LokalRestController {
             security = @SecurityRequirement(name = "user-header"))
     @ApiResponses(value = {
             @ApiResponse(responseCode = "401", description = "Missing Authorization header", content = @Content),
-            @ApiResponse(responseCode = "403", description = "Lokal's owner doesn't match Authorization header",
+            @ApiResponse(responseCode = "403", description = "Lokal's owner doesn't match Authorization header or " +
+                    "wrong password",
                     content = @Content),
             @ApiResponse(responseCode = "200", description = "Encrypted PDF of all sent visits",
                     content = @Content(mediaType = MediaType.APPLICATION_PDF_VALUE))
