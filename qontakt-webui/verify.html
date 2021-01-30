@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="/js/jquery-3.5.1.min.js"></script>
+    <script src="/js/popper.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/qr-scanner.umd.min.js"></script>
+    <script src="/js/qontakt.js"></script>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/bootstrap-reboot.min.css">
+    <link rel="icon" href="/img/icon-small.png" type="image/png">
+    <link rel="stylesheet" href="/css/w3.css">
+    <link rel="stylesheet" href="/css/qontakt.css">
+    <link rel="manifest" href="/manifest.webmanifest">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+    <title>Qontakt</title>
+</head>
+<body>
+<div class="container vh-100 d-flex flex-column w3-animate-opacity" id="q-content" data-q-nav="verify">
+    <div class="jumbotron jumbotron-fluid">
+        <img src="/img/logo-small.png" class="img-fluid mx-auto d-block" alt="Qontakt Logo">
+    </div>
+    <div class="row">
+        <div class="embed-responsive embed-responsive-4by3 mb-5 mx-5" id="q-qr-lens-wrapper">
+            <video class="embed-responsive-item" id="q-qr-lens"
+                   onclick="toggleFlash();"></video>
+        </div>
+    </div>
+    <div class="row">
+        <div class="input-group mb-5 mx-5" id="q-qr-lens-alt-wrapper">
+            <div class="input-group-prepend">
+                <span class="input-group-text" id="lb-code">Code</span>
+            </div>
+            <input type="text" class="form-control" aria-labelledby="lb-code" aria-describedby="lb-code"
+                   id="q-qr-lens-alt" maxlength="100">
+        </div>
+
+        <div class="input-group mb-5 mx-5">
+            <div class="input-group-prepend">
+                <span class="input-group-text" id="lb-q-lokal">??lokal??</span>
+            </div>
+            <input type="text" class="form-control" aria-labelledby="lb-q-lokal" aria-describedby="lb-q-lokal"
+                   id="q-qr-lens-friendly-lokal" disabled>
+        </div>
+
+        <div class="input-group mb-5 mx-5">
+            <div class="input-group-prepend">
+                <span class="input-group-text" id="lb-q-valid">??valid??</span>
+            </div>
+            <input type="text" class="form-control" aria-labelledby="lb-q-valid" aria-describedby="lb-q-valid"
+                   id="q-qr-lens-friendly-result" disabled>
+        </div>
+    </div>
+    <div class="btn-toolbar justify-content-left flex-grow-1 align-items-end mb-5" role="toolbar">
+        <button type="button" class="btn btn-primary btn-lg" id="btn-q-back" onclick="showNext(this)">
+            ??back??
+        </button>
+    </div>
+</div>
+</body>
+</html>

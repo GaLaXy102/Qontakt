@@ -1,0 +1,92 @@
+selfservice:
+  default_browser_return_url: /
+
+  flows:
+    logout:
+      after:
+        default_browser_return_url: /
+    registration:
+      lifespan: 10m
+      after:
+        password:
+          hooks:
+            - hook: session
+        default_browser_return_url: /auth/wait-verify
+      ui_url: /auth/register
+    login:
+      lifespan: 10m
+      after:
+        password:
+          hooks:
+            - hook: revoke_active_sessions
+        default_browser_return_url: /
+      ui_url: /auth/login
+    verification:
+      lifespan: 1h
+      ui_url: /auth/verify
+      after:
+        default_browser_return_url: /auth/verify-success
+      enabled: true
+    recovery:
+      lifespan: 1h
+      ui_url: /auth/recover
+      after:
+        default_browser_return_url: /
+      enabled: true
+    error:
+      ui_url: /auth/error
+    settings:
+      lifespan: 1h
+      privileged_session_max_age: 1h
+      after:
+        password:
+          hooks:
+            - hook: verify
+          default_browser_return_url: /
+        profile:
+          hooks:
+            - hook: verify
+          default_browser_return_url: /
+        default_browser_return_url: /
+      ui_url: /auth/settings
+
+  methods:
+    password:
+      enabled: true
+    link:
+      enabled: true
+    profile:
+      enabled: true
+
+  whitelisted_return_urls:
+    - /
+
+log:
+  level: debug
+
+password:
+  ignore_network_errors: true
+
+
+hashers:
+  argon2:
+    parallelism: 1
+    memory: 131072
+    iterations: 2
+    salt_length: 16
+    key_length: 16
+
+session:
+  cookie:
+    persistent: true
+    path: /
+  lifespan: 24h
+
+version: v0.5.5-alpha.1
+
+identity:
+  default_schema_url: file:///etc/config/kratos/identity.traits.schema.json
+
+courier:
+  smtp:
+    from_address: no-reply@galaxion.de

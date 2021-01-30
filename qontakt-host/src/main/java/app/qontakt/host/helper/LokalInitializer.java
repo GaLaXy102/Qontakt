@@ -36,8 +36,9 @@ public class LokalInitializer {
      */
     @Transactional
     void initialize() {
+        UUID uuid = UUID.randomUUID();
         LokalData lokal = new LokalData(
-                NULL_UUID.toString(),
+                uuid.toString(),
                 "Sample Lokal",
                 "Sample Address",
                 new Point(0, 0),
@@ -48,6 +49,6 @@ public class LokalInitializer {
         );
         // this.lokalDataRepository.save(lokal); This is done implicitly ↓
         this.lokalPasswordRepository.save(new LokalPassword(lokal, passwordEncoder.encode(NULL_UUID.toString())));
-        LoggerFactory.getLogger(LokalInitializer.class).info("Added sample Lokal");
+        LoggerFactory.getLogger(LokalInitializer.class).info("Added sample Lokal " + uuid.toString());
     }
 }

@@ -1,0 +1,60 @@
+---
+- id: ory:kratos:public
+  upstream:
+    preserve_host: true
+    url: http://kratos:4433
+    strip_path: /.ory/kratos/public
+  match:
+    url: http://<[^/]*>/.ory/kratos/public/<.*>
+    methods:
+      - GET
+      - POST
+      - PUT
+      - DELETE
+      - PATCH
+      - HEAD
+  authenticators:
+    - handler: noop
+  authorizer:
+    handler: allow
+  mutators:
+    - handler: noop
+
+- id: qontakt:public
+  upstream:
+    preserve_host: true
+    url: http://traefik_int
+  match:
+    url: http://<[^/]*>/<(?!(\.ory/.*))(auth/.*|.*\.css$|.*\.js$|.*\.map$|offline.html$|manifest.webmanifest$|.*\.png$|.\.woff[2]?$|api/v1/crypto/.*)>
+    methods:
+      - GET
+      - POST
+      - HEAD
+  authenticators:
+    - handler: anonymous
+  authorizer:
+    handler: allow
+  mutators:
+    - handler: noop
+
+- id: qontakt:protected
+  upstream:
+    preserve_host: true
+    url: http://traefik_int
+  match:
+    url: http://<[^/]*>/<(?!(auth/|api/v1/crypto|.*\.css$|.*\.js$|.*\.map$|.*\.png$|.\.woff[2]?$|offline.html$|manifest.webmanifest$|\.ory)).*>
+    methods:
+      - GET
+      - POST
+      - PUT
+      - DELETE
+      - OPTIONS
+      - HEAD
+  authenticators:
+    - handler: cookie_session
+  authorizer:
+    handler: allow
+  mutators:
+    - handler: header
+  errors:
+    - handler: redirect

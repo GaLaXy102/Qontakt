@@ -1,0 +1,22 @@
+{
+    "short_name": "Qontakt",
+    "name": "Qontakt: Simple contact tracing",
+    "description": "Contact Tracing Application",
+    "icons": [
+    {
+        "src": "/img/icon-big.png",
+        "type": "image/png",
+        "sizes": "512x512"
+    },
+    {
+        "src": "/img/icon-small.png",
+        "type": "image/png",
+        "sizes": "192x192"
+    }
+],
+    "start_url": "/?source=pwa",
+    "background_color": "#31A4FF",
+    "display": "standalone",
+    "scope": "/",
+    "theme_color": "#083B66"
+}

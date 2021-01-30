@@ -7,13 +7,22 @@ import app.qontakt.user.VerificationQrCodeData;
 import app.qontakt.user.Visit;
 import app.qontakt.user.identity.QUserData;
 import com.lowagie.text.DocumentException;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.data.util.Pair;
 import org.springframework.http.MediaType;
+import org.springframework.http.client.MultipartBodyBuilder;
+import org.springframework.http.client.reactive.ClientHttpRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.reactive.function.BodyInserter;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.HashMap;
@@ -85,11 +94,14 @@ public class LokalService {
      * @param password  Lokal Password
      * @return true if and only if the user is authorized to administer the Lokal
      */
-    public boolean isAuthorized(String userUid, String lokalUid, String password) {
+    public boolean isAuthorized(String userUid, String lokalUid, Optional<String> password) {
         Optional<LokalData> foundLokal = this.lokalDataRepository.findById(lokalUid);
         if (foundLokal.isEmpty()) {
             // This Lokal does not exist.
             return false;
+        }
+        if (password.isEmpty()) {
+            return foundLokal.get().getOwner().equals(userUid);
         }
         Optional<LokalPassword> foundPassword = this.lokalPasswordRepository.findByLokal(foundLokal.get());
         if (foundPassword.isEmpty()) {
@@ -97,20 +109,26 @@ public class LokalService {
             throw new IllegalStateException("This Lokal has no password!");
         }
         return foundLokal.get().getOwner().equals(userUid)
-                && this.passwordEncoder.matches(password, foundPassword.get().getHashedPassword());
+                && this.passwordEncoder.matches(password.get(), foundPassword.get().getHashedPassword());
     }
 
     /**
-     * Find all Lokals with the possiblity to restrict to a given user, yielding more information
+     * Find all Lokals or a specific one with the possiblity to restrict to a given user, yielding more information
      *
      * @param userUid userUid of Owner
+     * @param lokalUid lokalUid of Lokal
      * @return List of all Lokals, with missing checkoutTime and owner information when requesting all Lokals
      */
-    public List<? extends LokalData> findAll(Optional<String> userUid) {
+    public List<? extends LokalData> findAll(Optional<String> userUid, Optional<String> lokalUid) {
         if (userUid.isEmpty()) {
-            return this.lokalDataRepository.findAll().map(LokalDataPublic::new).toList();
+            return this.lokalDataRepository.findAll()
+                    .filter(lokalData -> lokalUid.isEmpty() || lokalData.getLokalUid().equals(lokalUid.get()))
+                    .map(LokalDataPublic::new)
+                    .toList();
         } else {
-            return this.lokalDataRepository.findAllByOwner(userUid.get()).toList();
+            return this.lokalDataRepository.findAllByOwner(userUid.get())
+                    .filter(lokalData -> lokalUid.isEmpty() || lokalData.getLokalUid().equals(lokalUid.get()))
+                    .toList();
         }
     }
 
@@ -152,6 +170,22 @@ public class LokalService {
     }
 
     /**
+     * Print a Leaflet to promote the usage of Qontakt
+     * @param locale Locale of Document to generate
+     * @param lokalUid Uid of Lokal for which the leaflet is
+     * @param baseurl Base URL of this Qontakt instance, e.g. https://qontakt.me/
+     * @return PDF document
+     */
+    public byte[] printLeaflet(Locale locale, String lokalUid, String baseurl) {
+        LokalData lokalData = this.lokalDataRepository.findById(lokalUid).orElseThrow(() -> new IllegalArgumentException("No such Lokal"));
+        try {
+            return ThymeleafPdfPrinter.renderLeaflet(locale, lokalData, baseurl);
+        } catch (IOException e) {
+            return new ByteArrayOutputStream().toByteArray();
+        }
+    }
+
+    /**
      * Print Data to PDF
      *
      * @param locale   Locale of Document to generate
@@ -168,6 +202,48 @@ public class LokalService {
         } catch (DocumentException e) {
             return new ByteArrayOutputStream().toByteArray();
         }
+    }
+
+    /**
+     * Get Visits at Lokal and print Data to PDF
+     *
+     * @param locale   Locale of Document to generate
+     * @param lokalUid Uid of Lokal for which the report is
+     * @return PDF document
+     */
+    public byte[] print(Locale locale, String lokalUid) {
+        WebClient client = WebClient.create("http://q-user-service:8080");
+        String remote = "/api/v1/user/visit/" + lokalUid;
+        List<Visit> visits = client.get()
+                .uri(uriBuilder -> uriBuilder.path(remote).build())
+                .accept(MediaType.APPLICATION_JSON)
+                .header("X-Lokal", lokalUid)
+                .retrieve()
+                .bodyToFlux(Visit.class)
+                .collectList()
+                .block();
+        return this.print(locale, lokalUid, visits);
+    }
+
+    /**
+     * Perform encryption with q-crypto-service
+     * @param data data to encrypt
+     * @param filename filename of data to encrypt
+     * @param publicKeyUid Uid of key to use
+     * @return encrypted data and corresponding filename
+     */
+    public Pair<byte[], String> encryptWithKnownKey(byte[] data, String filename, String publicKeyUid) {
+        WebClient client = WebClient.create("http://q-crypto-service:8080");
+        String remote = "/api/v1/crypto/encrypt/" + publicKeyUid;
+        MultipartBodyBuilder builder = new MultipartBodyBuilder();
+        builder.part("data", data).filename(filename);
+        Mono<ByteArrayResource> buffer = client.post()
+                .uri(uriBuilder -> uriBuilder.path(remote).build())
+                .syncBody(builder.build())
+                .accept(MediaType.APPLICATION_OCTET_STREAM)
+                .retrieve()
+                .bodyToMono(ByteArrayResource.class);
+        return Pair.of(buffer.block().getByteArray(), filename + ".qenc");
     }
 
     /**

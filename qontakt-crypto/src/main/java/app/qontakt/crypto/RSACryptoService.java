@@ -44,7 +44,7 @@ public class RSACryptoService {
      * @param password Passphrase for private key
      * @return read private key
      */
-    public RSAPrivateKey readPrivateKey(InputStream pemFile, String password) {
+    public static RSAPrivateKey readPrivateKey(InputStream pemFile, String password) {
         PEMParser pemParser = new PEMParser(new InputStreamReader(pemFile));
         PrivateKeyInfo keyInfo;
         try {
@@ -70,7 +70,7 @@ public class RSACryptoService {
      * @param pemFile Inputstream of .pem file
      * @return read public key
      */
-    public RSAPublicKey readPublicKey(InputStream pemFile) {
+    public static RSAPublicKey readPublicKey(InputStream pemFile) {
         PEMParser pemParser = new PEMParser(new InputStreamReader(pemFile));
         try {
             return (RSAPublicKey) new JcaPEMKeyConverter().getPublicKey((SubjectPublicKeyInfo) pemParser.readObject());

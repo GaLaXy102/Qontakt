@@ -15,7 +15,7 @@ public class IdentityService {
     private final VisitRepository visitRepository;
 
     public static boolean isValid(QUserData data) {
-        // Validation to follow later
+        // TODO Validation to follow later
         return true;
     }
 
@@ -48,9 +48,6 @@ public class IdentityService {
      */
     @Transactional
     public String create(QUserData data) {
-        if (data.getUserUid() == null) {
-            data = new QUserData(data, true);
-        }
         if (!IdentityService.isValid(data)) {
             throw new IllegalArgumentException("Invalid data.");
         }
