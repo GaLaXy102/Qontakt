@@ -6,14 +6,22 @@ networks:
     name: preauth0
   postauth0:
     name: postauth0
+  kratos0:
+    name: kratos0
   dmz0:
     name: dmz0
 
 volumes:
   traefik_certs:
     name: traefik_certs
-  mariadb_data:
-    name: mariadb_data
+  mariadb_crypto_data:
+    name: mariadb_crypto_data
+  mariadb_host_data:
+    name: mariadb_host_data
+  mariadb_user_data:
+    name: mariadb_user_data
+  postgres_data:
+    name: postgres_data
 
 services:
   # TLS encryption and drop headers
@@ -85,10 +93,11 @@ services:
 
   kratos:
     build: kratos
-    command: serve -c /etc/config/kratos/config.yml --dev  # TODO: Switch to production
+    command: serve -c /etc/config/kratos/config.yml
     restart: always
     networks:
       postauth0:
+      kratos0:
     expose:
       - 4433
     environment:
@@ -96,6 +105,18 @@ services:
       SECRETS_DEFAULT: ${KRATOS_SECRET}
       COURIER_SMTP_CONNECTION_URI: ${KRATOS_SMTP}
       SERVE_PUBLIC_BASE_URL: https://${DOMAIN}/.ory/kratos/public
+      DSN: postgres://kratos:${KRATOS_POSTGRES_PWD}@postgres:5432/kratos?sslmode=disable&max_conns=20&max_idle_conns=4
+
+  postgres:
+    image: library/postgres:13.1-alpine
+    restart: always
+    networks:
+      kratos0:
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: kratos
+      POSTGRES_PASSWORD: ${KRATOS_POSTGRES_PWD}
 
 
   # Application Gateway
@@ -143,10 +164,26 @@ services:
       dmz0:
         aliases:
           - q-crypto-service
+    environment:
+      MARIADB_PASSWORD: ${QONTAKT_MARIADB_PWD}
+      spring_profiles_active: prod
     labels:
       traefik.enable: "true"
       traefik.http.routers.q-crypto.rule: PathPrefix(`/api/v1/crypto`)
       traefik.http.routers.q-crypto.entrypoints: web
+
+  mariadb_crypto:
+    image: library/mariadb:10.5
+    restart: always
+    networks:
+      dmz0:
+    volumes:
+      - mariadb_crypto_data:/var/lib/mysql
+    environment:
+      MYSQL_DATABASE: qcrypto
+      MYSQL_USER: qontakt
+      MYSQL_PASSWORD: ${QONTAKT_MARIADB_PWD}
+      MYSQL_RANDOM_ROOT_PASSWORD: 1
 
   host:
     build: qontakt-host
@@ -155,10 +192,26 @@ services:
       dmz0:
         aliases:
           - q-host-service
+    environment:
+      MARIADB_PASSWORD: ${QONTAKT_MARIADB_PWD}
+      spring_profiles_active: prod
     labels:
       traefik.enable: "true"
       traefik.http.routers.q-host.rule: PathPrefix(`/api/v1/host`)
       traefik.http.routers.q-host.entrypoints: web
+
+  mariadb_host:
+    image: library/mariadb:10.5
+    restart: always
+    networks:
+      dmz0:
+    volumes:
+      - mariadb_host_data:/var/lib/mysql
+    environment:
+      MYSQL_DATABASE: qhost
+      MYSQL_USER: qontakt
+      MYSQL_PASSWORD: ${QONTAKT_MARIADB_PWD}
+      MYSQL_RANDOM_ROOT_PASSWORD: 1
 
   user:
     build: qontakt-user
@@ -167,7 +220,23 @@ services:
       dmz0:
         aliases:
           - q-user-service
+    environment:
+      MARIADB_PASSWORD: ${QONTAKT_MARIADB_PWD}
+      spring_profiles_active: prod
     labels:
       traefik.enable: "true"
       traefik.http.routers.q-user.rule: PathPrefix(`/api/v1/user`)
       traefik.http.routers.q-user.entrypoints: web
+
+  mariadb_user:
+    image: library/mariadb:10.5
+    restart: always
+    networks:
+      dmz0:
+    volumes:
+      - mariadb_user_data:/var/lib/mysql
+    environment:
+      MYSQL_DATABASE: quser
+      MYSQL_USER: qontakt
+      MYSQL_PASSWORD: ${QONTAKT_MARIADB_PWD}
+      MYSQL_RANDOM_ROOT_PASSWORD: 1

@@ -6,7 +6,6 @@ import org.slf4j.LoggerFactory;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.validation.constraints.Digits;
 import java.math.BigInteger;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
@@ -23,10 +22,10 @@ public class SavedRSAPublicKey {
     private final String id;
     private boolean enabled;
     private final String name;
-    @Column(precision = 1270)
-    private final BigInteger modulus;
-    @Column(precision = 1270)
-    private final BigInteger publicExponent;
+    @Column(length = 1270)
+    private final String modulus;           // Save as string to prevent precision issues
+    @Column(length = 1270)
+    private final String publicExponent;    // Save as string to prevent precision issues
 
     /**
      * Savable entity containing all information to reconstruct a RSA Public Key
@@ -37,8 +36,8 @@ public class SavedRSAPublicKey {
     public SavedRSAPublicKey(BigInteger modulus, BigInteger publicExponent, String name) {
         this.id = UUID.randomUUID().toString();
         this.enabled = true;
-        this.modulus = modulus;
-        this.publicExponent = publicExponent;
+        this.modulus = modulus.toString();
+        this.publicExponent = publicExponent.toString();
         this.name = name;
     }
 
@@ -50,8 +49,8 @@ public class SavedRSAPublicKey {
     public SavedRSAPublicKey(RSAPublicKey publicKey, String name) {
         this.id = UUID.randomUUID().toString();
         this.enabled = true;
-        this.modulus = publicKey.getModulus();
-        this.publicExponent = publicKey.getPublicExponent();
+        this.modulus = publicKey.getModulus().toString();
+        this.publicExponent = publicKey.getPublicExponent().toString();
         this.name = name;
     }
 
@@ -65,7 +64,9 @@ public class SavedRSAPublicKey {
     public PublicKey toPubKey() {
         try {
             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-            return keyFactory.generatePublic(new RSAPublicKeySpec(this.modulus, this.publicExponent));
+            BigInteger modulus = new BigInteger(this.modulus);
+            BigInteger publicExponent = new BigInteger(this.publicExponent);
+            return keyFactory.generatePublic(new RSAPublicKeySpec(modulus, publicExponent));
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
             LoggerFactory.getLogger(RSACryptoService.class).error("Something is wrong with your JRE. There is no RSA " +
                     "support.");
