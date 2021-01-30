@@ -23,8 +23,8 @@ public class RSACryptoServiceTests {
     void testPasswordlessIsIdentity() {
         byte[] data = new byte[1048576];
         new Random().nextBytes(data);
-        PrivateKey privateKey = testable.readPrivateKey(new ByteArrayInputStream(RSACryptoServiceTestData.privateKeyString.getBytes()), null);
-        PublicKey publicKey = testable.readPublicKey(new ByteArrayInputStream(RSACryptoServiceTestData.publicKeyString.getBytes()));
+        PrivateKey privateKey = RSACryptoService.readPrivateKey(new ByteArrayInputStream(RSACryptoServiceTestData.privateKeyString.getBytes()), null);
+        PublicKey publicKey = RSACryptoService.readPublicKey(new ByteArrayInputStream(RSACryptoServiceTestData.publicKeyString.getBytes()));
         Pair<byte[], byte[]> aesKeyEncAndCipherText = testable.encrypt(data, publicKey);
         byte[] decrypted = testable.decrypt(aesKeyEncAndCipherText.getRight(), aesKeyEncAndCipherText.getLeft(), privateKey);
         Assertions.assertArrayEquals(data, decrypted);
@@ -34,9 +34,9 @@ public class RSACryptoServiceTests {
     void testPasswordIsIdentity() {
         byte[] data = new byte[1048576];
         new Random().nextBytes(data);
-        PrivateKey privateKey = testable.readPrivateKey(new ByteArrayInputStream(RSACryptoServiceTestData.encryptedPrivateKeyString.getBytes()),
+        PrivateKey privateKey = RSACryptoService.readPrivateKey(new ByteArrayInputStream(RSACryptoServiceTestData.encryptedPrivateKeyString.getBytes()),
                 RSACryptoServiceTestData.passphrase);
-        PublicKey publicKey = testable.readPublicKey(new ByteArrayInputStream(RSACryptoServiceTestData.encryptedPublicKeyString.getBytes()));
+        PublicKey publicKey = RSACryptoService.readPublicKey(new ByteArrayInputStream(RSACryptoServiceTestData.encryptedPublicKeyString.getBytes()));
         Pair<byte[], byte[]> aesKeyEncAndCipherText = testable.encrypt(data, publicKey);
         byte[] decrypted = testable.decrypt(aesKeyEncAndCipherText.getRight(), aesKeyEncAndCipherText.getLeft(), privateKey);
         Assertions.assertArrayEquals(data, decrypted);
@@ -45,7 +45,7 @@ public class RSACryptoServiceTests {
     @Test
     void testWrongPassword() {
         Assertions.assertThrows(SecurityException.class,
-                () -> testable.readPrivateKey(new ByteArrayInputStream(RSACryptoServiceTestData.encryptedPrivateKeyString.getBytes()),
+                () -> RSACryptoService.readPrivateKey(new ByteArrayInputStream(RSACryptoServiceTestData.encryptedPrivateKeyString.getBytes()),
                 RSACryptoServiceTestData.passphrase + "la"));
     }
 }

@@ -45,7 +45,7 @@ public class CryptoController {
     @PostMapping(value = "/encrypt", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<byte[]> encrypt(@RequestPart("data") MultipartFile data, @RequestPart("key") MultipartFile publicKeyPem) {
         try {
-            RSAPublicKey publicKey = this.cryptoService.readPublicKey(publicKeyPem.getInputStream());
+            RSAPublicKey publicKey = RSACryptoService.readPublicKey(publicKeyPem.getInputStream());
             if (publicKey.getModulus().bitLength() < 4096) {
                 // Key too short
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
@@ -79,7 +79,7 @@ public class CryptoController {
             @RequestPart("data") MultipartFile data,
             @RequestPart("key") MultipartFile privateKeyPem, @RequestParam Optional<String> passwordForPrivateKey) {
         try {
-            RSAPrivateKey privateKey = this.cryptoService.readPrivateKey(
+            RSAPrivateKey privateKey = RSACryptoService.readPrivateKey(
                     privateKeyPem.getInputStream(),
                     passwordForPrivateKey.orElse(null)
             );
