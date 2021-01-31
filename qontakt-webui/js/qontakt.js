@@ -968,27 +968,29 @@ function saveProfile(form, callback) {
     } else {
         method = "PUT";
     }
-    $.ajax(qontaktIDMEndpoint, {
-        method: method,
-        data: JSON.stringify($(form).serializeObject()),
-        contentType: "application/json",
-        statusCode: {
-            200: function (response) {
-                console.debug("Q-UI: Save profile success");
-                callback(response);
-            },
-            201: function (response) {
-                console.debug("Q-UI: Create profile success");
-                callback(response);
-            },
-            400: function (response) {
-                window.alert(getTranslation("invalidData"));
-            },
-            409: function (response) {
-                window.location.replace("/profile");
+    if (form.reportValidity()) {
+        $.ajax(qontaktIDMEndpoint, {
+            method: method,
+            data: JSON.stringify($(form).serializeObject()),
+            contentType: "application/json",
+            statusCode: {
+                200: function (response) {
+                    console.debug("Q-UI: Save profile success");
+                    callback(response);
+                },
+                201: function (response) {
+                    console.debug("Q-UI: Create profile success");
+                    callback(response);
+                },
+                400: function (response) {
+                    window.alert(getTranslation("invalidData"));
+                },
+                409: function (response) {
+                    window.location.replace("/profile");
+                }
             }
-        }
-    });
+        });
+    }
 }
 
 /**
@@ -1030,28 +1032,30 @@ function serializeForm(form) {
  * @param callback fn(uuid)
  */
 function saveLokal(form, callback) {
-    $.ajax(qontaktLokalEndpoint, {
-        method: "POST",
-        data: JSON.stringify(serializeForm(form)),
-        contentType: "application/json",
-        statusCode: {
-            201: function (response) {
-                console.debug("Q-UI: Create lokal success");
-                callback(response);
-            },
-            401: function (response) {
-                console.debug("Q-UI: Unauthorized");
-                window.alert(getTranslation("unauthorizedError"));
-            },
-            403: function (response) {
-                console.debug("Q-UI: Forbidden");
-                window.alert(getTranslation("forbiddenError"));
-            },
-            409: function (response) {
-                window.location.replace("/profile");
+    if (form.reportValidity()) {
+        $.ajax(qontaktLokalEndpoint, {
+            method: "POST",
+            data: JSON.stringify(serializeForm(form)),
+            contentType: "application/json",
+            statusCode: {
+                201: function (response) {
+                    console.debug("Q-UI: Create lokal success");
+                    callback(response);
+                },
+                401: function (response) {
+                    console.debug("Q-UI: Unauthorized");
+                    window.alert(getTranslation("unauthorizedError"));
+                },
+                403: function (response) {
+                    console.debug("Q-UI: Forbidden");
+                    window.alert(getTranslation("forbiddenError"));
+                },
+                409: function (response) {
+                    window.location.replace("/profile");
+                }
             }
-        }
-    });
+        });
+    }
 }
 
 /**
