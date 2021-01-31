@@ -1,6 +1,5 @@
 package app.qontakt.host.rules;
 
-import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -21,6 +20,7 @@ public class FederalStateRuleSetService {
 
     /**
      * Calculate a mapping of countryCode to federal states where Qontakt knows the rules
+     *
      * @return Map from Country to FederalState
      */
     public Map<String, List<String>> getKnownRuleSetsMap() {
@@ -31,6 +31,18 @@ public class FederalStateRuleSetService {
                                 Collectors.mapping(FederalStateRuleSet::getShortName, Collectors.toList())
                         )
                 );
+    }
+
+    /**
+     * Get a FederalStateRuleSet by its code
+     *
+     * @param code Code of Federal State
+     * @return found ruleset
+     * @throws IllegalArgumentException when there is no such Ruleset
+     */
+    public FederalStateRuleSet getByCode(FederalStateRuleSet.Code code) {
+        return this.federalStateRuleSetRepository.findByCountryCodeAndShortName(code.getCountryCode(), code.getShortName())
+                .orElseThrow(() -> new IllegalArgumentException("No such RuleSet."));
     }
 }
 
