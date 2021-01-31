@@ -172,12 +172,17 @@ public class UserRestController {
 
     @Operation(
             summary = "Delete a single Visit.",
-            security = @SecurityRequirement(name = "user-header")
+            security = {
+                    @SecurityRequirement(name = "user-header"),
+                    @SecurityRequirement(name = "user-header")
+            }
     )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "401", description = "Missing Authorization Header", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Missing Authorization Header (Lokal and User",
+                    content = @Content),
             @ApiResponse(responseCode = "403", description = "user_uid doesn't match Authorization header or Visit " +
-                    "with UID visit_uid doesn't belong to specified user_uid.", content = @Content),
+                    "with UID visit_uid doesn't belong to specified user_uid or lokal_uid in Header.",
+                    content = @Content),
             @ApiResponse(responseCode = "200", description = "true -> Visit deleted; false -> No such Visit")
     })
     @DeleteMapping("/visit")
