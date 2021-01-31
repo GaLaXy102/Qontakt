@@ -28,7 +28,9 @@ public class LokalInitializer {
         this.lokalDataRepository = lokalDataRepository;
         this.lokalPasswordRepository = lokalPasswordRepository;
         this.passwordEncoder = passwordEncoder;
-        this.initialize();
+        if (this.lokalDataRepository.count() == 0) {
+            this.initialize();
+        }
     }
 
     /**
