@@ -96,6 +96,8 @@ Für unsere Anwendung haben wir einen statischen Web-Client mit JavaScript entwi
 
 Aktuell führen wir das Deployment manuell durch Ausspielen einer `docker-compose` per Docker Remote Access über TLS durch. Perspektivisch könnte dies durch Kubernetes erfolgen. Die Skalierung kann problemlos erfolgen, da lediglich die Datenbankebene stateful ist.
 
+![deployment_chart](/home/ylvion/IdeaProjects/ws2020-gruppe2/deployment_chart.png)
+
 ### Tests
 
 Wir haben uns zuerst auf die Implementierung unseres Dienstes und danach auf die Umsetzung einer GUI konzentriert, weshalb nicht viel Zeit für umfangreiches Testen blieb. Dies war teilweise so von uns vorgesehen und auch in der Priorisierung der Aufgaben mit einberechnet. Unser eigentliches Ziel wäre es dennoch gewesen, die zu Grunde liegenden Funktionalitäten unserer Anwendung mit Unit-Tests abzudecken. Dies war leider auf Grund der Verzögerung des Projektstarts und des Mangels an verfügbarer Arbeitszeit durch das Ausscheiden des dritten Teammitglieds nicht möglich. Wir haben deshalb entschieden, dass wir unsere Anwendung manuell testen. Lediglich der Microservice `qontakt-crypto` wird automatisiert getestet.
