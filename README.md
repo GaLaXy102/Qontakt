@@ -96,7 +96,7 @@ Für unsere Anwendung haben wir einen statischen Web-Client mit JavaScript entwi
 
 Aktuell führen wir das Deployment manuell durch Ausspielen einer `docker-compose` per Docker Remote Access über TLS durch. Perspektivisch könnte dies durch Kubernetes erfolgen. Die Skalierung kann problemlos erfolgen, da lediglich die Datenbankebene stateful ist.
 
-![deployment_chart](/home/ylvion/IdeaProjects/ws2020-gruppe2/deployment_chart.png)
+![deployment_chart](deployment_chart.png)
 
 ### Tests
 
