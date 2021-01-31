@@ -8,7 +8,7 @@ Ziel unserer Anwendung ist, die Gesundheitsämter bei der Nachverfolgung von Inf
 
 ### Schnittstellenbeschreibung
 
-Für die Dokumentation der von unserem Dienst genutzten Schnittstellen haben wir Swagger verwendet. Eine Möglichkeit zum Ausprobieren der Funktionalitäten der einzelnen Services findet sich auf der [Staging-Instanz](https://staging.qontakt.me).
+Für die Dokumentation der von unserem Dienst genutzten Schnittstellen haben wir Swagger verwendet. Eine Möglichkeit zum Ausprobieren der Funktionalitäten der einzelnen Services findet sich auf der ~~[Staging-Instanz](https://staging.qontakt.me)~~ (deaktiviert mangels Rechenleistung).
 
 Wichtig ist die Unterscheidung, ob man intern oder extern gegen die API entwickelt. Für den internen Zugriff erfolgt die Authentifikation und Authorisierung auf Basis der Header `X-User` und `X-Lokal`. Von außen erfolgt die Authentifikation und Authorisierung auf Basis des Session-Cookies `ory_kratos_session`, welches unter Verwendung der Flows aus der [ORY/Kratos-Dokumentation](https://www.ory.sh/kratos/docs/self-service) unter dem Präfix `<BASE_URL>/.ory/kratos/public/` erzeugt werden kann. Von extern kann jeder Nutzer nur Aktionen ausführen, welche ausschließlich den Header `X-User` verwenden. Dieser Header wird automatisch intern hinzugefügt. Von extern eingehende Header `X-User` und `X-Lokal` werden gefiltert.
 
