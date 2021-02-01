@@ -1,0 +1,768 @@
+openapi: 3.0.3
+info:
+  title: Qontakt Service
+  contact:
+    name: Galaxy & Ylvion
+    email: services@galaxion.de
+  license:
+    name: MIT Licence
+  version: v1
+servers:
+  - url: 'https://staging.qontakt.me'
+  - url: 'https://staging.localhost'
+paths:
+  /api/v1/user/visit:
+    get:
+      tags:
+        - user-rest-controller
+      summary: Get all Visits or a specific one for the given User.
+      operationId: showVisits
+      parameters:
+        - name: user_uid
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: visitUid
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of all Visits for the given User
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Visit'
+        '400':
+          description: 'VisitUid was specified, but there is no such visit'
+        '401':
+          description: User has no Authorization
+        '403':
+          description: >-
+            user_uid doesn't match Authorization header or Visit's associated
+            user
+      security:
+        - user_header: []
+    put:
+      tags:
+        - user-rest-controller
+      summary: Close a single Visit
+      operationId: closeVisit
+      parameters:
+        - name: user_uid
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: visit_uid
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: true -> Visit terminated; false -> No such Visit
+          content:
+            '*/*':
+              schema:
+                type: boolean
+        '400':
+          description: Visit is already terminated.
+        '401':
+          description: User has no Authorization
+        '403':
+          description: >-
+            user_uid doesn't match Authorization header or Visit with UID
+            visit_uid doesn't belong to specified user_uid.
+      security:
+        - user_header: []
+    post:
+      tags:
+        - user-rest-controller
+      summary: Create a new Visit for the given User and Lokal.
+      operationId: newVisit
+      parameters:
+        - name: user_uid
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: lokal_uid
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '201':
+          description: The Visit with the given data was created.
+          content:
+            '*/*':
+              schema:
+                type: boolean
+        '401':
+          description: User has no Authorization
+        '403':
+          description: It is forbidden to create a Visit for another User.
+        '409':
+          description: There is an unterminated Visit for the given User UUID.
+      security:
+        - user_header: []
+    delete:
+      tags:
+        - user-rest-controller
+      summary: Delete a single Visit.
+      operationId: deleteSingleVisit
+      parameters:
+        - name: user_uid
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: visit_uid
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: true -> Visit deleted; false -> No such Visit
+          content:
+            '*/*':
+              schema:
+                type: boolean
+        '401':
+          description: Missing Authorization Header (Lokal and User
+        '403':
+          description: >-
+            user_uid doesn't match Authorization header or Visit with UID
+            visit_uid doesn't belong to specified user_uid or lokal_uid in
+            Header.
+      security:
+        - user_header: []
+  /api/v1/user/identity:
+    get:
+      tags:
+        - identity-rest-controller
+      summary: Get Identity
+      operationId: getUser
+      parameters:
+        - name: userUid
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: null -> no such user; else user's Identity
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/QUserData'
+        '401':
+          description: Missing Authorization header
+        '403':
+          description: It is forbidden to get data of another user.
+      security:
+        - user_header: []
+    put:
+      tags:
+        - identity-rest-controller
+      summary: Update an existing Identity
+      operationId: updateUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QUserData'
+        required: true
+      responses:
+        '200':
+          description: true -> data updated; false -> no such user
+          content:
+            '*/*':
+              schema:
+                type: boolean
+        '400':
+          description: Supplied identity data is invalid.
+        '401':
+          description: Missing Authorization header
+        '403':
+          description: It is forbidden to update data of another user.
+      security:
+        - user_header: []
+    post:
+      tags:
+        - identity-rest-controller
+      summary: Create a new Identity
+      operationId: createUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QUserData'
+        required: true
+      responses:
+        '201':
+          description: The Identity was created.
+          content:
+            '*/*':
+              schema:
+                type: string
+        '400':
+          description: Supplied Identity data is invalid.
+        '409':
+          description: There is an Identity with this UUID (should really never happen).
+    delete:
+      tags:
+        - identity-rest-controller
+      summary: Delete Identity
+      operationId: deleteUser
+      parameters:
+        - name: userUid
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: true -> data deleted; false -> no such user
+          content:
+            '*/*':
+              schema:
+                type: boolean
+        '401':
+          description: Missing Authorization header
+        '403':
+          description: It is forbidden to update data of another user.
+        '419':
+          description: >-
+            There are visits associated with this userUid that must be deleted
+            first.
+      security:
+        - user_header: []
+  /api/v1/user/whoami:
+    get:
+      tags:
+        - user-rest-controller
+      summary: Get user UID belonging to a given request
+      operationId: whoami
+      responses:
+        '200':
+          description: UserUid or nothing if not authenticated
+          content:
+            '*/*':
+              schema:
+                type: string
+      security:
+        - user_header: []
+  '/api/v1/user/visit/{lokal_uid}':
+    get:
+      tags:
+        - user-rest-controller
+      summary: Get all Visits at a given Lokal for the given User.
+      operationId: getVisitsForLokal
+      parameters:
+        - name: user_uid
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: lokal_uid
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of all Visits for the given User at the given Lokal
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Visit'
+        '401':
+          description: User has no Authorization
+        '403':
+          description: user_uid doesn't match Authorization header
+      security:
+        - user_header: []
+        - lokal_header: []
+  /api/v1/user/verify:
+    get:
+      tags:
+        - user-rest-controller
+      summary: Get Verification string for current visit
+      operationId: getCurrentVisitVerificationString
+      parameters:
+        - name: user_uid
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Current Visit data
+          content:
+            '*/*':
+              schema:
+                type: string
+        '400':
+          description: User has no current Visit
+        '401':
+          description: User has no Authorization
+        '403':
+          description: user_uid doesn't match Authorization header
+      security:
+        - user_header: []
+  /api/v1/crypto/encrypt:
+    post:
+      tags:
+        - crypto-controller
+      summary: Encrypt a file using AES over RSA
+      operationId: encrypt
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                data:
+                  type: string
+                  format: binary
+                key:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: >-
+            Encryption successful. The first len(pkModulus) bytes are the
+            encrypted AES Key, the rest is the encrypted file content.
+          content:
+            application/octet-stream: {}
+        '400':
+          description: Malformed request
+        '401':
+          description: Invalid key data
+        '403':
+          description: Key too short
+  '/api/v1/crypto/encrypt/{keyUid}':
+    post:
+      tags:
+        - crypto-controller
+      summary: Encrypt a file using AES over RSA with saved RSA key
+      operationId: encrypt_1
+      parameters:
+        - name: keyUid
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                data:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: >-
+            Encryption successful. The first len(pkModulus) bytes are the
+            encrypted AES Key, the rest is the encrypted file content.
+          content:
+            application/octet-stream: {}
+        '400':
+          description: Malformed request
+        '401':
+          description: Invalid key data or unknown key
+  /api/v1/crypto/decrypt:
+    post:
+      tags:
+        - crypto-controller
+      summary: Decrypt a file using AES over RSA
+      operationId: decrypt
+      parameters:
+        - name: passwordForPrivateKey
+          in: query
+          required: false
+          schema:
+            type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                data:
+                  type: string
+                  format: binary
+                key:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Decryption successful.
+          content:
+            application/octet-stream: {}
+        '400':
+          description: Malformed request
+        '401':
+          description: Invalid or encrypted key data
+  /api/v1/crypto/pki/keys:
+    get:
+      tags:
+        - public-key-controller
+      summary: Encrypt a file using AES over RSA
+      operationId: getAllPublicKeys
+      responses:
+        '200':
+          description: Map of all Key UUID with their friendly Name
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PublicKeyDataPublic'
+  /api/v1/host/lokal:
+    get:
+      tags:
+        - lokal-rest-controller
+      summary: Get all Lokals or a specific one. Level of detail depends on userUid.
+      operationId: getLokals
+      parameters:
+        - name: userUid
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: lokalUid
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of all (owned) Lokals
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LokalData'
+        '401':
+          description: Missing Authorization header
+        '403':
+          description: userUid doesn't match Authorization header
+      security:
+        - user_header: []
+    post:
+      tags:
+        - lokal-rest-controller
+      summary: Create a new Lokal
+      operationId: createLokal
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LokalData'
+        required: true
+      responses:
+        '201':
+          description: The Lokal was created with the returned password.
+          content:
+            '*/*':
+              schema:
+                type: string
+        '401':
+          description: Missing Authorization header
+        '403':
+          description: It is forbidden to create a Lokal for another owner.
+        '409':
+          description: There is a Lokal with this UUID (should really never happen).
+      security:
+        - user_header: []
+  /api/v1/host/lokal/print:
+    get:
+      tags:
+        - lokal-rest-controller
+      summary: Get an encrypted PDF of all visits at the given Lokal
+      operationId: printVisitDataEncrypted
+      parameters:
+        - name: lokalUid
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: password
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: publicKeyUid
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Encrypted PDF of all sent visits
+          content:
+            application/pdf: {}
+        '401':
+          description: Missing Authorization header
+        '403':
+          description: Lokal's owner doesn't match Authorization header or wrong password
+      security:
+        - user_header: []
+    post:
+      tags:
+        - lokal-rest-controller
+      summary: Get a PDF of all sent visits
+      operationId: printVisitData
+      parameters:
+        - name: lokalUid
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: password
+          in: query
+          required: false
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Visit'
+        required: true
+      responses:
+        '200':
+          description: PDF of all sent visits
+          content:
+            application/pdf: {}
+        '401':
+          description: Missing Authorization header
+        '403':
+          description: Lokal's owner doesn't match Authorization header
+      security:
+        - user_header: []
+  /api/v1/host/lokal/export:
+    post:
+      tags:
+        - lokal-rest-controller
+      summary: Get a CSV of all sent visits
+      operationId: exportVisitData
+      parameters:
+        - name: lokalUid
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: password
+          in: query
+          required: false
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Visit'
+        required: true
+      responses:
+        '200':
+          description: CSV of all sent visits
+          content:
+            text/csv: {}
+        '401':
+          description: Missing Authorization header
+        '403':
+          description: Lokal's owner doesn't match Authorization header
+      security:
+        - user_header: []
+  /api/v1/host/rules/known:
+    get:
+      tags:
+        - federal-state-rule-set-controller
+      summary: >-
+        Get a Map countryCode -> federalStateCode for all states, where the
+        rules are known
+      operationId: getKnownStates
+      responses:
+        '200':
+          description: Map of known mappings
+          content:
+            '*/*':
+              schema:
+                type: object
+                additionalProperties:
+                  type: array
+                  items:
+                    type: string
+  /api/v1/host/lokal/verify:
+    get:
+      tags:
+        - lokal-rest-controller
+      summary: Verify Visit data (from /api/v1/user/visit/verify)
+      operationId: verifyQrData
+      parameters:
+        - name: lokalUid
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: qrData
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Verification was possible
+          content:
+            '*/*':
+              schema:
+                type: boolean
+        '401':
+          description: Missing Authorization header
+      security:
+        - user_header: []
+  /api/v1/host/lokal/leaflet:
+    get:
+      tags:
+        - lokal-rest-controller
+      summary: Get a PDF for with Qontakt Details for promotional purposes
+      operationId: getLokalLeaflet
+      parameters:
+        - name: lokalUid
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: PDF of Lokal's Data
+          content:
+            application/pdf: {}
+        '401':
+          description: Missing Authorization header
+        '403':
+          description: Lokal's owner doesn't match Authorization header
+      security:
+        - user_header: []
+components:
+  schemas:
+    QUserData:
+      required:
+        - email
+        - firstName
+        - homeAddress
+        - homeCity
+        - homeZip
+        - lastName
+        - telephoneNumber
+        - userUid
+      type: object
+      properties:
+        userUid:
+          type: string
+          example: 00000000-0000-0000-0000-000000000000
+        firstName:
+          type: string
+          example: Sam
+        lastName:
+          type: string
+          example: Muster
+        email:
+          type: string
+          example: sam.muster@qontakt.me
+        homeAddress:
+          type: string
+          example: Musterstraße 42
+        homeZip:
+          type: string
+          example: '01337'
+        homeCity:
+          type: string
+          example: Musterstadt
+        telephoneNumber:
+          type: string
+          example: 0123-456789
+    Visit:
+      type: object
+      properties:
+        visitUid:
+          type: string
+        userUid:
+          type: string
+        lokalUid:
+          type: string
+        checkIn:
+          type: string
+          format: date-time
+        checkOut:
+          type: string
+          format: date-time
+    PublicKeyDataPublic:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+    Code:
+      type: object
+      properties:
+        countryCode:
+          type: string
+          example: DEU
+        shortName:
+          type: string
+          example: SN
+    LokalData:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Zur Fröhlichen Reblaus
+        address:
+          type: string
+          example: 'Weinstraße 3, 01069 Dresden'
+        coordinates:
+          $ref: '#/components/schemas/Point'
+        owner:
+          type: string
+          example: UID-of-Owner
+        gdprContact:
+          type: string
+          example: gdpr@qontakt.me
+        checkoutTime:
+          type: string
+          example: '12:34:56'
+        federalState:
+          $ref: '#/components/schemas/Code'
+    Point:
+      type: object
+      properties:
+        x:
+          type: number
+          format: double
+        'y':
+          type: number
+          format: double
+  securitySchemes:
+    user_header:
+      type: apiKey
+      name: X-User
+      in: header
+    lokal_header:
+      type: apiKey
+      name: X-Lokal
+      in: header
+

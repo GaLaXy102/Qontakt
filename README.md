@@ -12,9 +12,9 @@ Für die Dokumentation der von unserem Dienst genutzten Schnittstellen haben wir
 
 Wichtig ist die Unterscheidung, ob man intern oder extern gegen die API entwickelt. Für den internen Zugriff erfolgt die Authentifikation und Authorisierung auf Basis der Header `X-User` und `X-Lokal`. Von außen erfolgt die Authentifikation und Authorisierung auf Basis des Session-Cookies `ory_kratos_session`, welches unter Verwendung der Flows aus der [ORY/Kratos-Dokumentation](https://www.ory.sh/kratos/docs/self-service) unter dem Präfix `<BASE_URL>/.ory/kratos/public/` erzeugt werden kann. Von extern kann jeder Nutzer nur Aktionen ausführen, welche ausschließlich den Header `X-User` verwenden. Dieser Header wird automatisch intern hinzugefügt. Von extern eingehende Header `X-User` und `X-Lokal` werden gefiltert.
 
+[OpenAPI-Dokument](openapi.yml)
 
-
-TODO: YAML verlinken.
+Für jeden Service gibt es unter /api/v1/{crypto,host,user}/swagger-ui eine interaktive Schnittstelle, wenn er nicht auf production läuft. 
 
 ## Organisation
 
