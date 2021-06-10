@@ -1,4 +1,20 @@
-[toc]
+- [Qontakt](#qontakt)
+  * [Verwendung](#verwendung)
+    + [Aufgabe des Dienstes](#aufgabe-des-dienstes)
+    + [Schnittstellenbeschreibung](#schnittstellenbeschreibung)
+  * [Organisation](#organisation)
+    + [Aufbau des Teams](#aufbau-des-teams)
+    + [Aufgabenverteilung](#aufgabenverteilung)
+  * [Vorgehen](#vorgehen)
+    + [Verwendete Programmiersprache und Plattform](#verwendete-programmiersprache-und-plattform)
+    + [Sicherheitsmechanismen](#sicherheitsmechanismen)
+    + [Umsetzung der Services](#umsetzung-der-services)
+      - [Nutzerdatenverwaltung](#nutzerdatenverwaltung)
+      - [Lokalverwaltung](#lokalverwaltung)
+      - [Verschlüsselung](#verschlüsselung)
+    + [Umsetzung des Clients](#umsetzung-des-clients)
+    + [Deployment](#deployment)
+    + [Tests](#tests)
 
 # Qontakt
 
