@@ -1,5 +1,38 @@
 [toc]
 
+# Qontakt
+
+> Im Rahmen der Lehrveranstaltung "Service and Cloud Computing" an der TU Dresden wurde
+> Qontakt entwickelt, ein Web-Service zur Kontakt-Verfolgung. Dieser
+> Proof-of-Concept wurde studentisch mit dem Ziel der
+> Datensparsamkeit und -sicherheit unter Einhaltung der gesetzlichen
+> Vorgaben als Antwort auf die öffentliche Tracing-Debatte konzipiert.
+> Qontakt kann sowohl zentral als auch dezentral bereitgestellt werden.
+> Auf diese Art und Weise kann jede akzeptierende Stelle selbst
+> entscheiden, wie und wo die Nutzerdaten verwaltet werden sollen.
+
+Achtung: Qontakt hat kein Datenschutz-Audit und befindet sich in einem Proof-of-Concept-Stadium.
+
+Derzeit werden folgende Funktionen von unserer Anwendung unterstützt:
+* Anlegen von Nutzerkonten
+* Anlegen von Lokalen (öffentliche Orte, in denen sich ein Benutzer anmelden kann)
+* Speichern von Besuchen von Nutzern in Lokalen durch pseudonymisierte Verknüpfung mit Start- und Endzeitpunkt des Besuches
+* Pseudonymisierte Gültigkeitsprüfungen von Besuchen (damit der Besitzer eines Lokals überprüfen kann, dass ein Gast sich ordnungsgemäß angemeldet hat)
+* Automatisches Löschen von Besuchen nach Ablauf der Aufbewahrungsfristen (derzeit max. 24 Stunden Verzögerung, Verzögerung kann verringert werden)
+* Datenexport (ausschließlich verschlüsselt möglich, in Menschen- und Maschinenlesbare Formate)
+* Entschlüsselung der exportierten Datensätze (Stub)
+
+Folgende Funktionalität fehlt noch:
+* Löschen von Nutzerkonten, wenn keine zu speichernden Daten nach §17, 3b DS-GVO mehr vorliegen (also nach Ablauf der jeweiligen Aufbewahrungsfrist)
+* Datenbankverschlüsselung für Konformität mit §32, 1a DS-GVO
+* Adressverifikation (damit sichergestellt werden kann, dass eingegebene Adressen gültig sind)
+* Überprüfung durch eine öffentliche Stelle für Datenschutz (können wir uns finanziell nicht leisten)
+* Speichern der kryptografischen Schlüssel der Gesundheitsämter (erfordert Kooperation, da diese nicht veröffentlicht wurden oder nicht existieren); Alternativ: Direkte Datenweitergabe an die Gesundheitsämter, per IRIS.
+
+Folgende Funktionen sind noch verbesserungswürdig:
+* Datensparsamkeit muss dahingehend verbessert werden, dass nur die für ein jeweiliges Bundesland erforderlichen Daten preisgegeben werden (derzeit wird das gesamte Nutzerprofil, bestehend aus Name, Anschrift, E-Mail-Adresse und Telefonnummer preisgegeben)
+* Nutzererlebnis (wir sind keine erfahrenen Entwickler für Nutzeroberflächen; das sollte gegebenenfalls an eine spezialisierte Agentur ausgelagert werden) 
+
 ## Verwendung
 
 ###  Aufgabe des Dienstes
