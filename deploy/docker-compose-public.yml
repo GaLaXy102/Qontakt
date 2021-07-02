@@ -159,6 +159,7 @@ services:
 
   crypto:
     build: qontakt-crypto
+    restart: always
     networks:
       postauth0:
       dmz0:
@@ -187,6 +188,7 @@ services:
 
   host:
     build: qontakt-host
+    restart: always
     networks:
       postauth0:
       dmz0:
@@ -215,6 +217,7 @@ services:
 
   user:
     build: qontakt-user
+    restart: always
     networks:
       postauth0:
       dmz0:

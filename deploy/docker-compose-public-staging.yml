@@ -44,6 +44,7 @@ services:
 
   crypto_staging:
     build: qontakt-crypto
+    restart: always
     networks:
       dmz1:
         aliases:
@@ -56,6 +57,7 @@ services:
 
   host_staging:
     build: qontakt-host
+    restart: always
     networks:
       dmz1:
         aliases:
@@ -68,6 +70,7 @@ services:
 
   user_staging:
     build: qontakt-user
+    restart: always
     networks:
       dmz1:
         aliases:
